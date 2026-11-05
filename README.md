@@ -9,10 +9,10 @@
 ```markdown
 Assets
 ├...
-├Resources
-┃├Buildings
-┃├Roads
-┃├Vehicles
-┃└...	
+├ Resources
+│├ Buildings
+│├ Roads
+│├Vehicles
+│└...	
 └...
 ```
