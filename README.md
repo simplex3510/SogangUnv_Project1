@@ -10,9 +10,9 @@
 Assets
 ├...
 ├ Resources
-│├ Buildings
-│├ Roads
-│├Vehicles
-│└...	
+│ ├ Buildings
+│ ├ Roads
+│ ├Vehicles
+│ └...	
 └...
 ```
