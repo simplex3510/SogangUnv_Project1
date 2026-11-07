@@ -27,7 +27,7 @@ namespace Game.Logistics
                 enabled = false;
             }
 
-            LoadType = LoadTypes.Load;
+            LoadType = LoadTypes.Unload;
         }
 
         private void OnEnable()

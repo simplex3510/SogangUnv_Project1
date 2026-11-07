@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,6 +17,8 @@ namespace Game.Player.Delivery
         [Tooltip("한 번에 적재할 수 있는 택배 수")]
         [SerializeField] private int _maxLoadedParcels = 6;
 
+        // 겹친 구역 목록. 마지막 원소가 현재 상호작용 대상
+        private readonly Queue<BuildingBase> _detectedBuildings = new();
         private BuildingBase _targetBuilding;
 
         private float _interactionTime;
@@ -26,15 +29,58 @@ namespace Game.Player.Delivery
         private void OnTriggerEnter(Collider other)
         {
             BuildingBase detected = other.GetComponentInParent<BuildingBase>();
-            if (detected != null && detected.CanInteract())
+            if (detected == null)
             {
-                _targetBuilding = detected;
+                return;
+            }
+
+            if (detected.CanInteract() == false)
+            {
+                return;
+            }
+
+            if (_detectedBuildings.Contains(detected) == false)
+            {
+                _detectedBuildings.Enqueue(detected);
+                SetInterationTarget(_detectedBuildings.Peek());
             }
         }
 
         private void OnTriggerExit(Collider other)
         {
-            _targetBuilding = null;
+            BuildingBase exited = other.GetComponentInParent<BuildingBase>();
+            if (exited == null)
+            {
+                return;
+            }
+
+            if (_detectedBuildings.Contains(exited) == false)
+            {
+                return;
+            }
+            else
+            {
+                _detectedBuildings.Dequeue();
+                if (_detectedBuildings.Count > 0)
+                {
+                    SetInterationTarget(_detectedBuildings.Peek());
+                }
+                else
+                {
+                    SetInterationTarget();
+                }
+            }
+        }
+
+        private void SetInterationTarget(BuildingBase building = null)
+        {
+            if (_targetBuilding == building)
+            {
+                return;
+            }
+
+            _targetBuilding = building;
+            ResetInteraction();
         }
 
         private void Update()
