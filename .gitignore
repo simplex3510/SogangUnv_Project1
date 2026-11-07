@@ -116,3 +116,7 @@ InitTestScene*.unity*
 # Resources folder
 /[Aa]ssets/Resources/*
 !/[Aa]ssets/Resources/.gitkeep
+
+# Claude Relatived
+/.claude
+/.omc
