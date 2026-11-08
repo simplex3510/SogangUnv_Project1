@@ -56,6 +56,7 @@ namespace Game.Logistics
         public void RequireParcels(int count)
         {
             _requiredParcels = count;
+            NotifyInteractableChanged();
         }
 
         public override bool CanInteract()
@@ -72,6 +73,7 @@ namespace Game.Logistics
                 Initialize();
             }
 
+            NotifyInteractableChanged();
             Debug.Log($"택배 하차 완료");
         }
     }

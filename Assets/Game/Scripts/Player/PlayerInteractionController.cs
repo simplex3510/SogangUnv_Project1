@@ -1,30 +1,58 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-using Game.Interaction;
 using Game.Building;
 
-namespace Game.Player.Delivery
+namespace Game.Player.Interaction
 {
-    public class PlayerDeliveryController : MonoBehaviour
+    public class PlayerInteractionController : MonoBehaviour
     {
         [Header("Interact Input")]
         [SerializeField] InputActionReference _interactionInput;
+
+        [Header("Interaction UI")]
+        [SerializeField] private PlayerUIController _uiController;
 
         [Header("Parcels Settings")]
         [SerializeField] private int _loadedParcels = 0;
         [Tooltip("한 번에 적재할 수 있는 택배 수")]
         [SerializeField] private int _maxLoadedParcels = 6;
 
-        // 겹친 구역 목록. 마지막 원소가 현재 상호작용 대상
-        private readonly Queue<BuildingBase> _detectedBuildings = new();
+        // 현재 겹쳐 있는 구역 목록. 진입 순서를 유지하며, 마지막 원소가 상호작용 대상
+        private readonly List<BuildingBase> _detectedBuildings = new();
         private BuildingBase _targetBuilding;
 
         private float _interactionTime;
 
-        private void OnEnable() => _interactionInput.action.Enable();
-        private void OnDisable() => _interactionInput.action.Disable();
+        private void Awake()
+        {
+            if (_uiController == null)
+            {
+                _uiController = GetComponentInChildren<PlayerUIController>(true);
+            }
+        }
+
+        private void OnEnable()
+        {
+            _interactionInput.action.Enable();
+
+            if (_targetBuilding != null)
+            {
+                _targetBuilding.InteractableChanged += RefreshInteractionUI;
+            }
+        }
+
+        private void OnDisable()
+        {
+            _interactionInput.action.Disable();
+
+            if (_targetBuilding != null)
+            {
+                _targetBuilding.InteractableChanged -= RefreshInteractionUI;
+            }
+        }
 
         private void OnTriggerEnter(Collider other)
         {
@@ -39,11 +67,13 @@ namespace Game.Player.Delivery
                 return;
             }
 
-            if (_detectedBuildings.Contains(detected) == false)
+            if (_detectedBuildings.Contains(detected))
             {
-                _detectedBuildings.Enqueue(detected);
-                SetInterationTarget(_detectedBuildings.Peek());
+                return;
             }
+
+            _detectedBuildings.Add(detected);
+            SetInterationTarget(_detectedBuildings[_detectedBuildings.Count - 1]);
         }
 
         private void OnTriggerExit(Collider other)
@@ -54,21 +84,18 @@ namespace Game.Player.Delivery
                 return;
             }
 
-            if (_detectedBuildings.Contains(exited) == false)
+            if (_detectedBuildings.Remove(exited) == false)
             {
                 return;
             }
+
+            if (_detectedBuildings.Count > 0)
+            {
+                SetInterationTarget(_detectedBuildings[_detectedBuildings.Count - 1]);
+            }
             else
             {
-                _detectedBuildings.Dequeue();
-                if (_detectedBuildings.Count > 0)
-                {
-                    SetInterationTarget(_detectedBuildings.Peek());
-                }
-                else
-                {
-                    SetInterationTarget();
-                }
+                SetInterationTarget();
             }
         }
 
@@ -79,8 +106,31 @@ namespace Game.Player.Delivery
                 return;
             }
 
+            if (_targetBuilding != null)
+            {
+                _targetBuilding.InteractableChanged -= RefreshInteractionUI;
+            }
+
             _targetBuilding = building;
+
+            if (_targetBuilding != null)
+            {
+                _targetBuilding.InteractableChanged += RefreshInteractionUI;
+            }
+
             ResetInteraction();
+            RefreshInteractionUI();
+        }
+
+        private void RefreshInteractionUI()
+        {
+            if (_uiController == null)
+            {
+                return;
+            }
+
+            bool canInteract = _targetBuilding != null && _targetBuilding.CanInteract();
+            _uiController.Show(canInteract ? _targetBuilding.LoadType : LoadTypes.None);
         }
 
         private void Update()

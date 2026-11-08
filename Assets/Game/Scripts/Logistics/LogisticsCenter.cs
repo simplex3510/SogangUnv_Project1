@@ -76,6 +76,7 @@ namespace Game.Logistics
         public override void Interact()
         {
             _parcels--;
+            NotifyInteractableChanged();
             Debug.Log($"택배 상차 완료");
         }
     }

@@ -1,3 +1,5 @@
+using System;
+
 using UnityEngine;
 
 using Game.Interaction;
@@ -18,6 +20,12 @@ namespace Game.Building
         public float InteractionDuration => _interactionDuration;
 
         public LoadTypes LoadType { get; protected set; } = LoadTypes.None;
+
+        /// <summary>CanInteract() 결과가 바뀔 수 있는 상태가 변경될 때 발생.</summary>
+        public event Action InteractableChanged;
+
+        // CanInteract()의 근거 상태를 바꾼 뒤 반드시 호출할 것
+        protected void NotifyInteractableChanged() => InteractableChanged?.Invoke();
 
         public abstract bool CanInteract();
         public abstract void Interact();

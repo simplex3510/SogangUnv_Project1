@@ -267,13 +267,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 717923574}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.46174863, y: 0, z: 0, w: 0.8870109}
-  m_LocalPosition: {x: -2.87, y: 5.7340636, z: -16.082035}
+  m_LocalRotation: {x: 0.3336744, y: 0.6234115, z: -0.33365077, w: 0.6234555}
+  m_LocalPosition: {x: -3.502901, y: 5.824352, z: -11.999998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0.03, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &717923578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -497,13 +497,9 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 717923576}
-    - target: {fileID: 3416430264410693408, guid: 97238172947347c42870058762ddf6b9, type: 3}
-      propertyPath: _loadedParcels
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6164739786679630296, guid: 97238172947347c42870058762ddf6b9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.87
+      value: 0.3800001
       objectReference: {fileID: 0}
     - target: {fileID: 6164739786679630296, guid: 97238172947347c42870058762ddf6b9, type: 3}
       propertyPath: m_LocalPosition.y
@@ -511,7 +507,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6164739786679630296, guid: 97238172947347c42870058762ddf6b9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -12.067
+      value: -12
       objectReference: {fileID: 0}
     - target: {fileID: 6164739786679630296, guid: 97238172947347c42870058762ddf6b9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -754,6 +750,7 @@ GameObject:
   - component: {fileID: 2057348934}
   - component: {fileID: 2057348933}
   - component: {fileID: 2057348935}
+  - component: {fileID: 2057348936}
   m_Layer: 0
   m_Name: CM_Camera
   m_TagString: Untagged
@@ -812,13 +809,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2057348932}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.46174863, y: 0, z: 0, w: 0.8870109}
-  m_LocalPosition: {x: -2.87, y: 5.7340636, z: -16.082035}
+  m_LocalRotation: {x: 0.33362055, y: 0.62350047, z: -0.3336873, w: 0.6233757}
+  m_LocalPosition: {x: -3.5029013, y: 5.824352, z: -11.999968}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 55, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2057348935
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -844,7 +841,36 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 0
   TargetOffset: {x: 0, y: 0, z: 0}
-  Damping: {x: 0.15, y: 0.15, z: 0.15}
+  Damping: {x: 0.5, y: 0.5, z: 0.5}
+  Lookahead:
+    Enabled: 0
+    Time: 0
+    Smoothing: 0
+    IgnoreY: 0
+--- !u!114 &2057348936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2057348932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f38bda98361e1de48a4ca2bd86ea3c17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineRotationComposer
+  Composition:
+    ScreenPosition: {x: 0, y: 0}
+    DeadZone:
+      Enabled: 0
+      Size: {x: 0.2, y: 0.2}
+    HardLimits:
+      Enabled: 0
+      Size: {x: 0.8, y: 0.8}
+      Offset: {x: 0, y: 0}
+  CenterOnActivate: 1
+  TargetOffset: {x: 0, y: -135, z: 90}
+  Damping: {x: 0.5, y: 0.5}
   Lookahead:
     Enabled: 0
     Time: 0
@@ -898,6 +924,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8557101591556997472, guid: 9d0722ccdcb0e6c44af48a3ab58913c3, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 717923576}
+    - target: {fileID: 9041853739410420954, guid: 9d0722ccdcb0e6c44af48a3ab58913c3, type: 3}
+      propertyPath: _camera
+      value: 
+      objectReference: {fileID: 717923576}
     - target: {fileID: 9124991714476953697, guid: 9d0722ccdcb0e6c44af48a3ab58913c3, type: 3}
       propertyPath: m_Name
       value: LogisticsCenter
