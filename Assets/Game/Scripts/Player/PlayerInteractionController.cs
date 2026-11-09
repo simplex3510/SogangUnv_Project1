@@ -3,200 +3,175 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-using Game.Building;
+using Game.Interaction;
+using System;
+using TMPro;
 
 namespace Game.Player.Interaction
 {
-    public class PlayerInteractionController : MonoBehaviour
+    public class PlayerInteractionController : MonoBehaviour, IInteractor
     {
         [Header("Interact Input")]
         [SerializeField] InputActionReference _interactionInput;
-
-        [Header("Interaction UI")]
-        [SerializeField] private PlayerUIController _uiController;
 
         [Header("Parcels Settings")]
         [SerializeField] private int _loadedParcels = 0;
         [Tooltip("한 번에 적재할 수 있는 택배 수")]
         [SerializeField] private int _maxLoadedParcels = 6;
 
+        public event Action<bool, InteractionTypes> InteractionContextChanged;
+
         // 현재 겹쳐 있는 구역 목록. 진입 순서를 유지하며, 마지막 원소가 상호작용 대상
-        private readonly List<BuildingBase> _detectedBuildings = new();
-        private BuildingBase _targetBuilding;
+        private readonly List<IInteractable> _detectedInteractables = new();
+        private IInteractable _currentInteractable;
+        private float _interactionTime = 0f;
 
-        private float _interactionTime;
+        // private void Awake()
+        // {
+        // }
 
-        private void Awake()
-        {
-            if (_uiController == null)
-            {
-                _uiController = GetComponentInChildren<PlayerUIController>(true);
-            }
-        }
+        // private void Start()
+        // {
+        // }
 
         private void OnEnable()
         {
             _interactionInput.action.Enable();
-
-            if (_targetBuilding != null)
-            {
-                _targetBuilding.InteractableChanged += RefreshInteractionUI;
-            }
         }
 
         private void OnDisable()
         {
             _interactionInput.action.Disable();
-
-            if (_targetBuilding != null)
-            {
-                _targetBuilding.InteractableChanged -= RefreshInteractionUI;
-            }
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            BuildingBase detected = other.GetComponentInParent<BuildingBase>();
-            if (detected == null)
+            IInteractable interactable = other.GetComponentInParent<IInteractable>();
+            if (interactable == null)
             {
                 return;
             }
 
-            if (detected.CanInteract() == false)
-            {
-                return;
-            }
-
-            if (_detectedBuildings.Contains(detected))
-            {
-                return;
-            }
-
-            _detectedBuildings.Add(detected);
-            SetInterationTarget(_detectedBuildings[_detectedBuildings.Count - 1]);
+            bool canInteract = CanInteract(interactable);
+            UpdateInteractables(interactable, canInteract);
         }
 
         private void OnTriggerExit(Collider other)
         {
-            BuildingBase exited = other.GetComponentInParent<BuildingBase>();
-            if (exited == null)
+            InteractableObject interactable = other.GetComponentInParent<InteractableObject>();
+            if (interactable == null)
             {
                 return;
             }
 
-            if (_detectedBuildings.Remove(exited) == false)
-            {
-                return;
-            }
-
-            if (_detectedBuildings.Count > 0)
-            {
-                SetInterationTarget(_detectedBuildings[_detectedBuildings.Count - 1]);
-            }
-            else
-            {
-                SetInterationTarget();
-            }
-        }
-
-        private void SetInterationTarget(BuildingBase building = null)
-        {
-            if (_targetBuilding == building)
-            {
-                return;
-            }
-
-            if (_targetBuilding != null)
-            {
-                _targetBuilding.InteractableChanged -= RefreshInteractionUI;
-            }
-
-            _targetBuilding = building;
-
-            if (_targetBuilding != null)
-            {
-                _targetBuilding.InteractableChanged += RefreshInteractionUI;
-            }
-
-            ResetInteraction();
-            RefreshInteractionUI();
-        }
-
-        private void RefreshInteractionUI()
-        {
-            if (_uiController == null)
-            {
-                return;
-            }
-
-            bool canInteract = _targetBuilding != null && _targetBuilding.CanInteract();
-            _uiController.Show(canInteract ? _targetBuilding.LoadType : LoadTypes.None);
+            UpdateInteractables(interactable, false);
+            CanInteract(_currentInteractable);
         }
 
         private void Update()
         {
-            bool IsInteracting = _interactionInput.action.IsPressed();
-            if (IsInteracting == false || _targetBuilding == null)
+            bool isPressed = _interactionInput.action.IsPressed();
+            if (isPressed == false || _currentInteractable == null)
             {
-                ResetInteraction();
+                ResetInteractionTime();
                 return;
             }
 
-            if (_targetBuilding.CanInteract() == true)
+            if (CanInteract(_currentInteractable) == false)
             {
-                // 상호작용 키 유지
-                _interactionTime += Time.deltaTime;
-                if (_interactionTime >= _targetBuilding.InteractionDuration)
-                {
-                    if (_targetBuilding.LoadType == LoadTypes.Load)
-                    {
-                        if (TryLoadParcel() == true)
-                        {
-                            _targetBuilding.Interact();
-                        }
-                    }
-                    else if (_targetBuilding.LoadType == LoadTypes.Unload)
-                    {
-                        if (TryUnloadParcel() == true)
-                        {
-                            _targetBuilding.Interact();
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"Building type is not assigned in {gameObject.name}");
-                    }
+                ResetInteractionTime();
+                return;
+            }
 
-                    ResetInteraction();
-                }
+            // 상호작용 키 유지
+            _interactionTime += Time.deltaTime;
+            if (_interactionTime >= _currentInteractable.InteractionDuration)
+            {
+                Interact(_currentInteractable);
             }
         }
 
-        private void ResetInteraction()
+        public bool CanInteract(IInteractable interactable)
+        {
+            bool canInteract = false;
+
+            if (interactable == null)
+            {
+                InteractionContextChanged?.Invoke(false, InteractionTypes.None);
+                return false;
+            }
+
+            if (interactable.CanInteract() == false)
+            {
+                InteractionContextChanged?.Invoke(false, InteractionTypes.None);
+                return false;
+            }
+
+            var type = interactable.InteractionType;
+            if (type == InteractionTypes.Load)
+            {
+                canInteract = _loadedParcels < _maxLoadedParcels;
+            }
+            else if (type == InteractionTypes.Unload)
+            {
+                canInteract = 0 < _loadedParcels;
+            }
+
+            InteractionContextChanged?.Invoke(canInteract, type);
+            return canInteract;
+        }
+
+        public void Interact(IInteractable interactable)
+        {
+            string debugLog = string.Empty;
+
+            interactable.Interact();
+
+            var type = interactable.InteractionType;
+            if (type == InteractionTypes.Load)
+            {
+                debugLog = $"택배 상차 완료: ";
+                _loadedParcels++;
+            }
+            else if (type == InteractionTypes.Unload)
+            {
+                debugLog = $"택배 하차 완료: ";
+                _loadedParcels--;
+            }
+
+            ResetInteractionTime();
+
+            debugLog += $"{_loadedParcels}";
+
+            Debug.Log(debugLog);
+        }
+
+        private void ResetInteractionTime()
         {
             _interactionTime = 0f;
         }
 
-        public bool TryLoadParcel()
+        private void UpdateInteractables(IInteractable interactable, bool canInteract)
         {
-            if (_loadedParcels >= _maxLoadedParcels)
+            if (canInteract == false)
             {
-                return false;
+                _detectedInteractables.Remove(interactable);
+                if (_detectedInteractables.Count <= 0)
+                {
+                    _currentInteractable = null;
+                    return;
+                }
             }
-
-            _loadedParcels++;
-            return true;
-        }
-
-        public bool TryUnloadParcel()
-        {
-            if (_loadedParcels <= 0)
+            else
             {
-                return false;
-            }
-
-            _loadedParcels--;
-            return true;
+                if (_detectedInteractables.Contains(interactable) == false)
+                {
+                    _detectedInteractables.Add(interactable);
+                }
+            }            
+            
+            int lastIndex = _detectedInteractables.Count - 1;
+            _currentInteractable =_detectedInteractables[lastIndex];
         }
     }
 }

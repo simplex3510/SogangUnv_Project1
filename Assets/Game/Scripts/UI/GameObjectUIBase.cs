@@ -16,11 +16,14 @@ namespace Game.UI
                 enabled = false;
             }
 
-            _rectTransform = GetComponent<RectTransform>();
             if (_rectTransform == null)
             {
-                Debug.LogError($"RectTransform is missing in {gameObject.name}");
-                enabled = false;
+                _rectTransform = GetComponent<RectTransform>();
+                Debug.LogWarning($"RectTransform is not assigned in {gameObject.name}");
+                if (_rectTransform == null)
+                {
+                    Debug.LogError($"RectTransform is missing in {gameObject.name}");
+                }
             }
         }
 

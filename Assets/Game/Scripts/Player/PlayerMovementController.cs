@@ -67,7 +67,14 @@ namespace Game.Player.Movement
         private void Awake()
         {
             if (_rigidbody == null)
+            {
                 _rigidbody = GetComponentInChildren<Rigidbody>();
+                Debug.LogWarning($"Rigidbody is not assigned in {gameObject.name}");
+                if (_rigidbody == null)
+                {
+                    Debug.LogError($"Rigidbody is missing in {gameObject.name}");
+                }                
+            }
 
             _rigidbody.linearDamping = 0f;
             _rigidbody.angularDamping = 0f;

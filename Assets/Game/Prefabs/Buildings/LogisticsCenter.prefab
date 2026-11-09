@@ -250,7 +250,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Logistics.LogisticsCenter
   _interactionDuration: 1
-  _parcels: 0
+  _interactionType: 1
+  _currentParcels: 0
   _maxParcels: 10
   _interactableZone: {fileID: 8376271112355349712}
 --- !u!1001 &3058991392573357633

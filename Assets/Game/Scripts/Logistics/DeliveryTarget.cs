@@ -1,62 +1,58 @@
 using UnityEngine;
-using Game.Building;
-using UnityEditor.EditorTools;
+
+using Game.Interaction;
 
 namespace Game.Logistics
 {
     /// <summary>지정된 배달지. 필요한 수량을 모두 받으면 더 이상 상호작용할 수 없다.</summary>
-    public class DeliveryTarget : BuildingBase
+    public class DeliveryTarget : InteractableObject
     {
         public bool IsInitialized { get; private set; }
 
         [Header("Parcels Settings")]
         [Tooltip("배송지가 배송받은 택배 수")]
-        [SerializeField, Min(0)] private int _deliveredParcels;
+        [SerializeField, Min(0)] private int _deliveredParcels = 0;
         [Tooltip("배송지가 배송받아야 할 택배 수")]
-        [SerializeField, Min(0)] private int _requiredParcels;
+        [SerializeField, Min(0)] private int _requiredParcels = 0;
+        [Tooltip("배송지가 배송받아야 할 택배 수")]
+        [SerializeField, Min(0)] private int _allocatableParcels = 5;
+
 
         [Header("Interact Zone")]
         [SerializeField] private Collider _interactableZone;
 
         private void Awake()
         {
-            _interactableZone = GetComponentInChildren<BoxCollider>();
             if (_interactableZone == null)
             {
-                Debug.LogError($"InteractableZone is missing in {gameObject.name}");
-                enabled = false;
+                _interactableZone = GetComponentInChildren<BoxCollider>();
+                Debug.LogWarning($"InteractableZone is not assigned in {gameObject.name}");
+                if (_interactableZone == null)
+                {
+                    Debug.LogError($"InteractableZone is missing in {gameObject.name}");
+                }
             }
-
-            LoadType = LoadTypes.Unload;
-        }
-
-        private void OnEnable()
-        {
-            Initialize();
         }
 
         private void Start()
         {
-            if (LogisticsCenter.Instance.DeliveryTargets == null)
+            if (LogisticsCenter.DeliveryTargets == null)
             {
                 Debug.LogError($"LogisticsCenter.deliveryTargets is null in {gameObject.name}");
                 return;
             }
 
-            LogisticsCenter.Instance.DeliveryTargets.Add(this);
+            LogisticsCenter.DeliveryTargets.Add(this);
         }
 
-        private void Initialize()
+        public bool CanAllocate()
         {
-            IsInitialized = true;
-            _requiredParcels = 0;
-            _deliveredParcels = 0;
+            return _requiredParcels < _allocatableParcels;
         }
 
-        public void RequireParcels(int count)
+        public void AllocateParcel(int amount = 1)
         {
-            _requiredParcels = count;
-            NotifyInteractableChanged();
+            _requiredParcels += amount;
         }
 
         public override bool CanInteract()
@@ -67,13 +63,6 @@ namespace Game.Logistics
         public override void Interact()
         {
             _deliveredParcels++;
-
-            if (_requiredParcels <= 0)
-            {
-                Initialize();
-            }
-
-            NotifyInteractableChanged();
             Debug.Log($"택배 하차 완료");
         }
     }

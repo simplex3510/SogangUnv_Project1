@@ -118,7 +118,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.UI.GameObjectUI
   _camera: {fileID: 0}
-  _rectTransform: {fileID: 0}
+  _rectTransform: {fileID: 7433886314280389716}
 --- !u!1 &1786929374905578016
 GameObject:
   m_ObjectHideFlags: 0
@@ -507,8 +507,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.Delivery.PlayerDeliveryController
   _interactionInput: {fileID: -5374473091262486240, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  _uiController: {fileID: 0}
-  _loadedParcels: 6
+  _loadedParcels: 0
   _maxLoadedParcels: 6
 --- !u!54 &6104127485426952191
 Rigidbody:
@@ -549,6 +548,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfaec095cee8689469e87d1b32d62422, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.Interaction.PlayerUIController
+  _interactionController: {fileID: 3416430264410693408}
   _interactionUIs:
   - {fileID: 4311786780744453121}
   - {fileID: 4690844629330939472}

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-using Game.Building;
+using Game.Interaction;
 
 namespace Game.UI
 {
@@ -9,10 +9,10 @@ namespace Game.UI
     public class PlayerObjectUI : GameObjectUI
     {
         [Tooltip("이 UI가 표시될 상호작용 종류")]
-        [SerializeField] private LoadTypes _loadType;
+        [SerializeField] private InteractionTypes _loadType;
         [SerializeField] private Image _interactionImage;
 
-        public LoadTypes LoadType => _loadType;
+        public InteractionTypes LoadType => _loadType;
 
         protected override void Awake()
         {
