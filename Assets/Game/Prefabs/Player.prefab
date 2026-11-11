@@ -399,9 +399,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6164739786679630296}
+  - component: {fileID: 6104127485426952191}
   - component: {fileID: 5841332346010887555}
   - component: {fileID: 3416430264410693408}
-  - component: {fileID: 6104127485426952191}
   - component: {fileID: 3321739127970385887}
   m_Layer: 6
   m_Name: Player
@@ -428,87 +428,6 @@ Transform:
   - {fileID: 7433886314280389716}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5841332346010887555
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8172847757324507159}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f35601f738ef70341a0a014a8b401163, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game.Player::Game.Player.Movement.PlayerMovementController
-  _rigidbody: {fileID: 6104127485426952191}
-  _playerMoveInput: {fileID: -1903826782516429882, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  _maxForwardSpeed: 3
-  _maxReverseSpeed: 2.5
-  _acceleration: 5
-  _brakeDeceleration: 20
-  _coastDeceleration: 4
-  _maxTurnRate: 100
-  _turnBySpeed:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.3
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 0.6
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _steerSmoothing: 5
-  _lateralGrip: 10
-  _groundMask:
-    serializedVersion: 2
-    m_Bits: 128
-  _ignoreMask:
-    serializedVersion: 2
-    m_Bits: 64
-  _groundCheckDistance: 0.7
-  _groundStickRange: 0.15
-  _uprightStrength: 12
-  _uprightDamping: 4
-  _airUprightFactor: 0.3
---- !u!114 &3416430264410693408
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8172847757324507159}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22ce9483e64c0d94ba3ed6b7ed7b848a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.Delivery.PlayerDeliveryController
-  _interactionInput: {fileID: -5374473091262486240, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  _loadedParcels: 0
-  _maxLoadedParcels: 6
 --- !u!54 &6104127485426952191
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -536,6 +455,48 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &5841332346010887555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8172847757324507159}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f35601f738ef70341a0a014a8b401163, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Player::Game.Player.Movement.PlayerMovementController
+  _rigidbody: {fileID: 6104127485426952191}
+  _playerMoveInput: {fileID: -1903826782516429882, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _modeChangeInput: {fileID: 5796770582059782820, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _driftInput: {fileID: 6558337803872432119, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _vehicleConfig: {fileID: 11400000, guid: f74b49c2abf41884b86f4d2023b772c0, type: 2}
+  _groundMask:
+    serializedVersion: 2
+    m_Bits: 128
+  _ignoreMask:
+    serializedVersion: 2
+    m_Bits: 64
+  _groundCheckDistance: 0.7
+  _groundStickRange: 0.15
+  _uprightStrength: 12
+  _uprightDamping: 4
+  _airUprightFactor: 0.3
+--- !u!114 &3416430264410693408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8172847757324507159}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22ce9483e64c0d94ba3ed6b7ed7b848a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.Delivery.PlayerDeliveryController
+  _interactionInput: {fileID: -5374473091262486240, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _maxLoadedParcels: 6
 --- !u!114 &3321739127970385887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -552,6 +513,8 @@ MonoBehaviour:
   _interactionUIs:
   - {fileID: 4311786780744453121}
   - {fileID: 4690844629330939472}
+  _messageText: {fileID: 0}
+  _messageDuration: 1.5
 --- !u!1 &8307094745303154995
 GameObject:
   m_ObjectHideFlags: 0

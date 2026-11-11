@@ -1,5 +1,9 @@
+using System;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
+
+using Game.Player.Interaction;
 
 namespace Game.Player.Movement
 {
@@ -10,28 +14,11 @@ namespace Game.Player.Movement
         [Header("Required Components")]
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private InputActionReference _playerMoveInput;
+        [SerializeField] private InputActionReference _modeChangeInput;
+        [SerializeField] private InputActionReference _driftInput;
 
-        [Header("Speed")]
-        [SerializeField] private float _maxForwardSpeed = 12f;
-        [SerializeField] private float _maxReverseSpeed = 5f;
-
-        [Header("Acceleration (m/s²)")]
-        [SerializeField] private float _acceleration = 8f;
-        [SerializeField] private float _brakeDeceleration = 20f;
-        [SerializeField] private float _coastDeceleration = 4f;
-
-        [Header("Steering")]
-        [SerializeField] private float _maxTurnRate = 100f;
-        [SerializeField]
-        private AnimationCurve _turnBySpeed = new AnimationCurve(
-            new Keyframe(0f, 0f),
-            new Keyframe(0.3f, 1f),
-            new Keyframe(1f, 0.6f));
-        [SerializeField] private float _steerSmoothing = 5f;
-
-        [Header("Grip")]
-        [Tooltip("옆방향 미끄러짐이 줄어드는 비율(/초). 클수록 접지력이 높아 코너에서 덜 미끄러진다")]
-        [SerializeField] private float _lateralGrip = 6f;
+        [Header("Config")]
+        [SerializeField] private VehicleConfig _vehicleConfig;
 
         [Header("Ground Check")]
         [SerializeField] private LayerMask _groundMask = ~0;
@@ -51,13 +38,31 @@ namespace Game.Player.Movement
 
         private const float GroundOriginOffset = 0.2f;
 
+        // 아래 값들은 VehicleConfig의 모드 값에 블렌딩을 적용한 현재 프레임의 실효값이다
+        private float _maxForwardSpeed;
+        private float _acceleration;
+        private float _maxTurnRate;
+        private float _lateralGrip;
+        private float _steerSmoothing;
+
+        private VehicleDrivingMode _drivingMode = VehicleDrivingMode.Normal;
+        private float _modeBlend;
+        private bool _isDriftHeld;
+        private bool _isDrifting;
+
         private Vector2 _input;
         private float _steer;
         private float _forwardSpeed;
         private bool _isGrounded;
+        private bool _isControlEnabled = true;
         private Vector3 _groundNormal = Vector3.up;
         private Vector3 _groundPoint;
         private float _pivotToBottom;
+        private PlayerInteractionController _interactionController;
+
+        public event Action<VehicleDrivingMode> DrivingModeChanged;
+
+        public VehicleDrivingMode DrivingMode => _drivingMode;
 
         private void Reset()
         {
@@ -66,6 +71,13 @@ namespace Game.Player.Movement
 
         private void Awake()
         {
+            if (_vehicleConfig == null)
+            {
+                Debug.LogError($"VehicleConfig is not assigned in {gameObject.name}");
+                enabled = false;
+                return;
+            }
+
             if (_rigidbody == null)
             {
                 _rigidbody = GetComponentInChildren<Rigidbody>();
@@ -73,7 +85,7 @@ namespace Game.Player.Movement
                 if (_rigidbody == null)
                 {
                     Debug.LogError($"Rigidbody is missing in {gameObject.name}");
-                }                
+                }
             }
 
             _rigidbody.linearDamping = 0f;
@@ -89,19 +101,66 @@ namespace Game.Player.Movement
 
             if (bottom < float.MaxValue)
                 _pivotToBottom = bottom - _rigidbody.position.y;
+
+            _interactionController = GetComponent<PlayerInteractionController>();
+
+            UpdateModeParameters();
         }
 
-        private void OnEnable() => _playerMoveInput.action.Enable();
-        private void OnDisable() => _playerMoveInput.action.Disable();
+        private void OnEnable()
+        {
+            _playerMoveInput.action.Enable();
+            _modeChangeInput.action.Enable();
+            _driftInput.action.Enable();
+        }
+
+        private void OnDisable()
+        {
+            _playerMoveInput.action.Disable();
+            _modeChangeInput.action.Disable();
+            _driftInput.action.Disable();
+        }
+
+        /// <summary>하루 종료 시 주행 입력을 끊고 차량을 즉시 세운다(기획서 3.5).</summary>
+        public void SetControlEnabled(bool isEnabled)
+        {
+            _isControlEnabled = isEnabled;
+            if (isEnabled)
+            {
+                return;
+            }
+
+            _input = Vector2.zero;
+            _isDriftHeld = false;
+
+            if (_rigidbody != null)
+            {
+                _rigidbody.linearVelocity = Vector3.zero;
+                _rigidbody.angularVelocity = Vector3.zero;
+            }
+        }
 
         private void Update()
         {
+            if (_isControlEnabled == false)
+            {
+                return;
+            }
+
             _input = _playerMoveInput.action.ReadValue<Vector2>();
+            _isDriftHeld = _driftInput.action.IsPressed();
+
+            if (_modeChangeInput.action.WasPressedThisFrame())
+            {
+                TryToggleDrivingMode();
+            }
         }
 
         private void FixedUpdate()
         {
+            UpdateModeParameters();
             CheckGround();
+            UpdateDriftState();
 
             if (_isGrounded)
             {
@@ -111,6 +170,57 @@ namespace Game.Player.Movement
             }
 
             KeepUpright();
+        }
+
+        private void TryToggleDrivingMode()
+        {
+            // 공중과 상호작용 중에는 전환 요청을 받지 않는다
+            if (_isGrounded == false)
+            {
+                return;
+            }
+
+            if (_interactionController != null && _interactionController.IsInteracting)
+            {
+                return;
+            }
+
+            _drivingMode = _drivingMode == VehicleDrivingMode.Normal
+                ? VehicleDrivingMode.Fast
+                : VehicleDrivingMode.Normal;
+
+            DrivingModeChanged?.Invoke(_drivingMode);
+        }
+
+        private void UpdateModeParameters()
+        {
+            float targetBlend = _drivingMode == VehicleDrivingMode.Fast ? 1f : 0f;
+
+            // 전환 시간에 걸쳐 서서히 이동시켜 회전력이 계단처럼 튀지 않게 한다
+            _modeBlend = _vehicleConfig.ModeTransitionSeconds > 0f
+                ? Mathf.MoveTowards(_modeBlend, targetBlend,
+                                    Time.fixedDeltaTime / _vehicleConfig.ModeTransitionSeconds)
+                : targetBlend;
+
+            VehicleConfig.DrivingModeSettings normal = _vehicleConfig.GetModeSettings(VehicleDrivingMode.Normal);
+            VehicleConfig.DrivingModeSettings fast = _vehicleConfig.GetModeSettings(VehicleDrivingMode.Fast);
+
+            _maxForwardSpeed = Mathf.Lerp(normal.MaxForwardSpeed, fast.MaxForwardSpeed, _modeBlend);
+            _acceleration = Mathf.Lerp(normal.Acceleration, fast.Acceleration, _modeBlend);
+            _maxTurnRate = Mathf.Lerp(normal.MaxTurnRate, fast.MaxTurnRate, _modeBlend);
+            _lateralGrip = Mathf.Lerp(normal.LateralGrip, fast.LateralGrip, _modeBlend);
+            _steerSmoothing = Mathf.Lerp(normal.SteerSmoothing, fast.SteerSmoothing, _modeBlend);
+        }
+
+        private void UpdateDriftState()
+        {
+            // 작업 중에는 드리프트를 막는다(기획서 16.2-1)
+            bool isBusy = _interactionController != null && _interactionController.IsInteracting;
+
+            _isDrifting = _isGrounded
+                && _isDriftHeld
+                && isBusy == false
+                && _forwardSpeed >= _vehicleConfig.DriftMinForwardSpeed;
         }
 
         private void CheckGround()
@@ -168,13 +278,13 @@ namespace Game.Player.Movement
 
             float targetSpeed = throttle >= 0f
                 ? throttle * _maxForwardSpeed
-                : throttle * _maxReverseSpeed;
+                : throttle * _vehicleConfig.MaxReverseSpeed;
 
             float rate;
             if (Mathf.Approximately(throttle, 0f))
-                rate = _coastDeceleration;
+                rate = _vehicleConfig.CoastDeceleration;
             else if (Mathf.Abs(forwardSpeed) > 0.1f && Mathf.Sign(throttle) != Mathf.Sign(forwardSpeed))
-                rate = _brakeDeceleration;
+                rate = _vehicleConfig.BrakeDeceleration;
             else
                 rate = _acceleration;
 
@@ -183,7 +293,8 @@ namespace Game.Player.Movement
 
         private float UpdateLateralSpeed(float lateralSpeed)
         {
-            float t = 1f - Mathf.Exp(-_lateralGrip * Time.fixedDeltaTime);
+            float grip = _isDrifting ? _lateralGrip * _vehicleConfig.DriftGripMultiplier : _lateralGrip;
+            float t = 1f - Mathf.Exp(-grip * Time.fixedDeltaTime);
             return Mathf.Lerp(lateralSpeed, 0f, t);
         }
 
@@ -191,10 +302,11 @@ namespace Game.Player.Movement
         {
             _steer = Mathf.MoveTowards(_steer, _input.x, _steerSmoothing * Time.fixedDeltaTime);
 
+            float turnRate = _isDrifting ? _maxTurnRate * _vehicleConfig.DriftTurnMultiplier : _maxTurnRate;
             float speedRatio = Mathf.Clamp01(Mathf.Abs(_forwardSpeed) / _maxForwardSpeed);
-            float turnMultiplier = _turnBySpeed.Evaluate(speedRatio);
+            float turnMultiplier = _vehicleConfig.TurnBySpeed.Evaluate(speedRatio);
 
-            float targetYaw = _steer * _maxTurnRate * turnMultiplier
+            float targetYaw = _steer * turnRate * turnMultiplier
                             * Mathf.Sign(_forwardSpeed) * Mathf.Deg2Rad;
 
             // 지면 법선 축의 회전만 교체하고, 피치/롤 회전은 물리에 맡김

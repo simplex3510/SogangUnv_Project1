@@ -35,6 +35,26 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
+                },
+                {
+                    "name": "ModeChange",
+                    "type": "Button",
+                    "id": "42977c5e-5132-4603-b53c-7f1d7d47de61",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "Drift",
+                    "type": "Button",
+                    "id": "6e06a3c5-639d-4cee-8e3f-9014800be39d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -52,7 +72,7 @@
                 {
                     "name": "up",
                     "id": "890c03f9-21d5-47b3-a2bd-170c95fca3db",
-                    "path": "<Keyboard>/w",
+                    "path": "<Keyboard>/upArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -63,7 +83,7 @@
                 {
                     "name": "down",
                     "id": "d1bd9f83-164a-4143-8141-09f3161cd6f7",
-                    "path": "<Keyboard>/s",
+                    "path": "<Keyboard>/downArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -74,7 +94,7 @@
                 {
                     "name": "left",
                     "id": "238e76b4-9bbe-47d7-925d-2bf1811dcd54",
-                    "path": "<Keyboard>/a",
+                    "path": "<Keyboard>/leftArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -85,7 +105,7 @@
                 {
                     "name": "right",
                     "id": "1996a950-9d05-4a2f-aada-643dc71445e0",
-                    "path": "<Keyboard>/d",
+                    "path": "<Keyboard>/rightArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -96,7 +116,7 @@
                 {
                     "name": "",
                     "id": "5f755640-29ea-4d5f-80df-a737c71d3270",
-                    "path": "<Keyboard>/f",
+                    "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -112,6 +132,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Escape",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3835d11f-c0b6-43f7-8e53-3503306399cc",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ModeChange",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "578b5ca1-d821-4306-aa12-4bcf7f0d3d64",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drift",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

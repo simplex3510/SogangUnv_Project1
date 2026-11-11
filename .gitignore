@@ -118,5 +118,10 @@ InitTestScene*.unity*
 !/[Aa]ssets/Resources/.gitkeep
 
 # Claude Relatived
+/CLAUDE.md
 /.claude
 /.omc
+/.docs
+
+/AgentScripts
+/ScreenShots
