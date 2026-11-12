@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Systems.DailyOperationConfig
   _businessStartHour: 9
   _businessEndHour: 18
-  _gameSpeed: 60
+  _gameSpeed: 600

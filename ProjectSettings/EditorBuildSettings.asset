@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Game/Scenes/_DevOnly/DevScene.unity
-    guid: 407d99a65e5407a4c9e4b7d26717d917
+    path: Assets/Game/Scenes/_DevOnly/SampleMapDesign.unity
+    guid: f88cfba098e4caa47a3b34a5cfc3d840
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
