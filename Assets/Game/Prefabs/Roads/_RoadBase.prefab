@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6768926878506184241}
   m_Layer: 7
-  m_Name: RoadBase
+  m_Name: _RoadBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -99,7 +99,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6538903991835684241, guid: 91a1f103276f59843bdd90bf0ec252c4, type: 3}
+  - {fileID: -6538903991835684241, guid: 352af46c2e1eab947b03bdf06ede11b7, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -130,7 +130,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6166447752606543349}
-  m_Material: {fileID: 13400000, guid: e7661eb2c1c40684db14a5ae2c7ceb93, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

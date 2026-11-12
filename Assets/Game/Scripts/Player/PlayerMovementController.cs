@@ -20,54 +20,6 @@ namespace Game.Player.Movement
         [Header("Config")]
         [SerializeField] private VehicleConfig _vehicleConfig;
 
-        [Header("Suspension")]
-        [Tooltip("바퀴 중심에서 쏘는 스피어캐스트 반지름(m). 바퀴 반지름보다 약간 작게 둔다")]
-        [SerializeField] private float _suspensionRadius = 0.07f;
-        [Tooltip("서스펜션이 늘어날 수 있는 최대 거리(m). 캐스트 길이 = 반지름 + 이 값")]
-        [SerializeField] private float _suspensionTravel = 0.15f;
-        [Tooltip("목표 휠 중심 높이(m). 차체가 지면에서 뜨는 정도를 결정한다")]
-        [SerializeField] private float _rideHeight = 0.078f; // TODO(tuning): 정지 시 바퀴가 노면에 닿는 높이
-        [Tooltip("스프링 강성(m/s² per m). 클수록 단단하다")]
-        [SerializeField] private float _springStrength = 150f; // TODO(tuning)
-        [Tooltip("스프링 감쇠(m/s² per m/s). 클수록 진동이 빨리 잦아든다")]
-        [SerializeField] private float _springDamper = 15f; // TODO(tuning)
-        [Tooltip("바퀴 중심의 루트 기준 오프셋(m). 앞-좌, 앞-우, 뒤-좌, 뒤-우 순서")]
-        [SerializeField] private Vector3[] _wheelOffsets =
-        {
-            new Vector3(-0.10f, 0.075f, 0.305f),
-            new Vector3(0.10f, 0.075f, 0.305f),
-            new Vector3(-0.10f, 0.075f, -0.105f),
-            new Vector3(0.10f, 0.075f, -0.105f),
-        };
-        [Tooltip("스피어캐스트가 지면으로 인정할 레이어")]
-        [SerializeField] private LayerMask _groundMask = 1 << 7;
-        [Tooltip("캐스트 법선의 위쪽 성분이 이 값 이상이어야 지면으로 인정한다 (0.5 ≈ 60도)")]
-        [SerializeField] private float _groundNormalMinDot = 0.5f;
-        [Tooltip("접지가 끊긴 뒤에도 접지로 취급하는 유예 시간(초)")]
-        [SerializeField] private float _groundContactGraceSeconds = 0.1f;
-        [Tooltip("캐스트 법선이 흔들릴 때 따라가는 속도(/초)")]
-        [SerializeField] private float _groundNormalSmoothing = 10f;
-
-        [Header("Self Righting")]
-        [Tooltip("차체를 지면(공중이면 수직)에 맞추는 힘")]
-        [SerializeField] private float _uprightStrength = 12f;
-        [Tooltip("기울기 흔들림을 잡는 감쇠")]
-        [SerializeField] private float _uprightDamping = 4f;
-        [Tooltip("공중에서의 복원력 비율")]
-        [SerializeField, Range(0f, 1f)] private float _airUprightFactor = 0.3f;
-
-        // 이보다 느리면 입력 반대 방향이어도 제동이 아니라 가속으로 취급한다
-        private const float BrakeSpeedThreshold = 0.1f;
-
-        // 프리팹에 오프셋이 직렬화되지 않은 경우 사용할 기본값 (모델의 바퀴 배치 기준)
-        private static readonly Vector3[] DefaultWheelOffsets =
-        {
-            new Vector3(-0.10f, 0.075f, 0.305f),
-            new Vector3(0.10f, 0.075f, 0.305f),
-            new Vector3(-0.10f, 0.075f, -0.105f),
-            new Vector3(0.10f, 0.075f, -0.105f),
-        };
-
         // 아래 값들은 VehicleConfig의 모드 값에 블렌딩을 적용한 현재 프레임의 실효값이다
         private float _maxForwardSpeed;
         private float _acceleration;
@@ -124,11 +76,6 @@ namespace Game.Player.Movement
             // 구동을 힘으로 인가하므로 감쇠가 남아 있으면 가속·조향 체감이 설정값과 어긋난다
             _rigidbody.linearDamping = 0f;
             _rigidbody.angularDamping = 0f;
-
-            if (_wheelOffsets == null || _wheelOffsets.Length == 0)
-            {
-                _wheelOffsets = DefaultWheelOffsets;
-            }
 
             DisableGroundCollision();
 
@@ -269,39 +216,42 @@ namespace Game.Player.Movement
         /// </summary>
         private void ApplySuspension()
         {
+            Vector3[] wheelOffsets = _vehicleConfig.WheelOffsets;
+
             // 캐스트를 바퀴 중심보다 위에서 시작해, 차체가 처져도 구가 지면에 파묻혀 히트를 놓치지 않게 한다
-            float castLift = _suspensionTravel;
-            float maxDistance = castLift + _suspensionRadius + _suspensionTravel;
+            float castLift = _vehicleConfig.SuspensionTravel;
+            float maxDistance = castLift + _vehicleConfig.SuspensionRadius + _vehicleConfig.SuspensionTravel;
 
             // 스프링이 무게를 받아 압축되는 만큼 목표 높이를 보정해, 정지 시 목표 높이에 서게 한다
-            float sag = Physics.gravity.magnitude / (_wheelOffsets.Length * _springStrength);
-            float targetHeight = _rideHeight + sag;
+            float sag = Physics.gravity.magnitude / (wheelOffsets.Length * _vehicleConfig.SpringStrength);
+            float targetHeight = _vehicleConfig.RideHeight + sag;
 
             Vector3 rootPosition = _rigidbody.position;
             Quaternion rootRotation = _rigidbody.rotation;
             Vector3 normalSum = Vector3.zero;
             bool hasGround = false;
 
-            for (int i = 0; i < _wheelOffsets.Length; i++)
+            for (int i = 0; i < wheelOffsets.Length; i++)
             {
-                Vector3 origin = rootPosition + rootRotation * _wheelOffsets[i] + Vector3.up * castLift;
+                Vector3 origin = rootPosition + rootRotation * wheelOffsets[i] + Vector3.up * castLift;
 
-                if (Physics.SphereCast(origin, _suspensionRadius, Vector3.down, out RaycastHit hit,
-                                       maxDistance, _groundMask, QueryTriggerInteraction.Ignore) == false)
+                if (Physics.SphereCast(origin, _vehicleConfig.SuspensionRadius, Vector3.down, out RaycastHit hit,
+                                       maxDistance, _vehicleConfig.GroundMask, QueryTriggerInteraction.Ignore) == false)
                 {
                     continue;
                 }
 
                 // 위쪽을 향하는 법선만 지면으로 인정해 벽·장애물을 걸러낸다
-                if (hit.normal.y < _groundNormalMinDot)
+                if (hit.normal.y < _vehicleConfig.GroundNormalMinDot)
                 {
                     continue;
                 }
 
-                float height = hit.distance - castLift + _suspensionRadius;
+                float height = hit.distance - castLift + _vehicleConfig.SuspensionRadius;
                 float compression = targetHeight - height;
                 float normalVelocity = Vector3.Dot(_rigidbody.GetPointVelocity(hit.point), hit.normal);
-                float force = _springStrength * compression - _springDamper * normalVelocity;
+                float force = _vehicleConfig.SpringStrength * compression
+                            - _vehicleConfig.SpringDamper * normalVelocity;
 
                 _rigidbody.AddForceAtPosition(hit.normal * force, hit.point, ForceMode.Acceleration);
 
@@ -315,10 +265,11 @@ namespace Game.Player.Movement
             }
 
             // 경계에서 접지가 한두 프레임 끊겨도 조작이 리셋되지 않도록 짧은 유예를 둔다
-            _isGrounded = hasGround || Time.fixedTime - _lastGroundedTime <= _groundContactGraceSeconds;
+            _isGrounded = hasGround
+                || Time.fixedTime - _lastGroundedTime <= _vehicleConfig.GroundContactGraceSeconds;
 
             Vector3 targetNormal = hasGround ? normalSum.normalized : Vector3.up;
-            float t = 1f - Mathf.Exp(-_groundNormalSmoothing * Time.fixedDeltaTime);
+            float t = 1f - Mathf.Exp(-_vehicleConfig.GroundNormalSmoothing * Time.fixedDeltaTime);
             Vector3 smoothed = Vector3.Slerp(_groundNormal, targetNormal, t);
 
             // 경계에서 법선이 튀어 0에 가까워지면 이후 계산이 무너지므로 방어한다
@@ -372,7 +323,7 @@ namespace Game.Player.Movement
                 return _vehicleConfig.CoastDeceleration;
             }
 
-            if (Mathf.Abs(forwardSpeed) > BrakeSpeedThreshold
+            if (Mathf.Abs(forwardSpeed) > _vehicleConfig.BrakeSpeedThreshold
                 && Mathf.Sign(throttle) != Mathf.Sign(forwardSpeed))
             {
                 return _vehicleConfig.BrakeDeceleration;
@@ -418,14 +369,14 @@ namespace Game.Player.Movement
             Vector3 targetUp = _isGrounded ? _groundNormal : Vector3.up;
 
             // 현재 위쪽 → 목표 위쪽으로 돌리는 축 (각도가 클수록 큼)
-            Vector3 correction = Vector3.Cross(up, targetUp) * _uprightStrength;
+            Vector3 correction = Vector3.Cross(up, targetUp) * _vehicleConfig.UprightStrength;
 
             // 기울기 방향 회전만 감쇠 (조향 회전은 건드리지 않음)
             Vector3 angularVelocity = _rigidbody.angularVelocity;
             Vector3 tiltVelocity = angularVelocity - up * Vector3.Dot(angularVelocity, up);
-            correction -= tiltVelocity * _uprightDamping;
+            correction -= tiltVelocity * _vehicleConfig.UprightDamping;
 
-            float factor = _isGrounded ? 1f : _airUprightFactor;
+            float factor = _isGrounded ? 1f : _vehicleConfig.AirUprightFactor;
             _rigidbody.AddTorque(correction * factor, ForceMode.Acceleration);
         }
     }

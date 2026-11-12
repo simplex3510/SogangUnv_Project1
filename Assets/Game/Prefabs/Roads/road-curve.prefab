@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &5471259883385513831
+--- !u!1001 &49993515320472422
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -10,11 +10,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2683050711790349005, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
       propertyPath: m_Name
-      value: road-roundabout
+      value: road-curve
       objectReference: {fileID: 0}
     - target: {fileID: 6768926878506184241, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 16.5
       objectReference: {fileID: 0}
     - target: {fileID: 6768926878506184241, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
       propertyPath: m_LocalPosition.y
@@ -22,11 +22,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6768926878506184241, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -16.5
       objectReference: {fileID: 0}
     - target: {fileID: 6768926878506184241, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 6768926878506184241, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
       propertyPath: m_LocalRotation.x
@@ -34,7 +34,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6768926878506184241, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 6768926878506184241, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
       propertyPath: m_LocalRotation.z
@@ -55,11 +55,19 @@ PrefabInstance:
     - target: {fileID: 7599706408042445034, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 2083375915920286552, guid: d540227665873884f9e063f6e9615a84, type: 3}
+      objectReference: {fileID: 103405191620377775, guid: 21638cba1c0ebc647a9937f3460377ad, type: 3}
     - target: {fileID: 8554063648339682988, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 2083375915920286552, guid: d540227665873884f9e063f6e9615a84, type: 3}
+      objectReference: {fileID: 103405191620377775, guid: 21638cba1c0ebc647a9937f3460377ad, type: 3}
+    - target: {fileID: 8554063648339682988, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8554063648339682988, guid: 5374f581a5271444e8f5c4d43ae7a7b1, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
