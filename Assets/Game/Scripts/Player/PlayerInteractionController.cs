@@ -34,6 +34,10 @@ namespace Game.Player.Interaction
         // 현재 겹쳐 있는 구역 목록. 진입 순서를 유지하며, 마지막 원소가 상호작용 대상
         private readonly List<IInteractable> _detectedInteractables = new();
 
+        // 차체 콜라이더가 여러 개라 같은 구역에 Enter/Exit가 콜라이더 수만큼 들어온다.
+        // 마지막 콜라이더가 빠질 때만 목록에서 제거하기 위해 겹침 개수를 센다.
+        private readonly Dictionary<IInteractable, int> _overlapCounts = new();
+
         private IInteractable _currentInteractable;
         private Parcel _activeParcel;
         private float _progressSeconds;
@@ -81,22 +85,38 @@ namespace Game.Player.Interaction
         private void OnTriggerEnter(Collider other)
         {
             IInteractable interactable = other.GetComponentInParent<IInteractable>();
-            if (interactable == null || _detectedInteractables.Contains(interactable))
+            if (interactable == null)
             {
                 return;
             }
 
+            // 다른 콜라이더가 이미 들어와 있으면 개수만 늘린다
+            if (_overlapCounts.TryGetValue(interactable, out int count))
+            {
+                _overlapCounts[interactable] = count + 1;
+                return;
+            }
+
+            _overlapCounts.Add(interactable, 1);
             _detectedInteractables.Add(interactable);
         }
 
         private void OnTriggerExit(Collider other)
         {
             IInteractable interactable = other.GetComponentInParent<IInteractable>();
-            if (interactable == null)
+            if (interactable == null || _overlapCounts.TryGetValue(interactable, out int count) == false)
             {
                 return;
             }
 
+            // 마지막 콜라이더가 빠질 때만 구역에서 벗어난 것으로 본다
+            if (count > 1)
+            {
+                _overlapCounts[interactable] = count - 1;
+                return;
+            }
+
+            _overlapCounts.Remove(interactable);
             _detectedInteractables.Remove(interactable);
         }
 

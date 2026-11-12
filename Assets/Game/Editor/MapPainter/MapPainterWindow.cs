@@ -18,6 +18,8 @@ namespace Game.EditorTools
         }
 
         private const float PaletteButtonSize = 92f;
+        private const float PaletteIconPadding = 4f;
+        private const float PaletteLabelHeight = 30f;
         private const int PaletteButtonsPerRow = 3;
 
         [SerializeField] private string _folderPath = "Assets/Game/Prefabs/Map";
@@ -189,6 +191,13 @@ namespace Game.EditorTools
                 return;
             }
 
+            // 프리팹이 다시 임포트되면 기존 참조가 파괴되어 그리기 중 예외가 나므로, 팔레트를 다시 읽는다
+            if (_entries.Exists(entry => entry.Prefab == null))
+            {
+                RefreshPalette();
+                return;
+            }
+
             _paletteScroll = EditorGUILayout.BeginScrollView(
                 _paletteScroll,
                 GUILayout.MinHeight(180f),
@@ -252,14 +261,14 @@ namespace Game.EditorTools
         private void DrawPaletteButton(int index, MapPaletteEntry entry)
         {
             Vector3 size = entry.Size;
-            GUIContent content = new($"{entry.DisplayName}", entry.Icon,
+            GUIContent content = new($"{entry.DisplayName}",
                 $"{entry.DisplayName}\n크기: {size.x:0.0}m × {size.z:0.0}m\n클릭해서 이 조각을 고릅니다.");
+            Rect buttonRect = GUILayoutUtility.GetRect(PaletteButtonSize, PaletteButtonSize);
 
             Color previous = GUI.backgroundColor;
             GUI.backgroundColor = index == _selectedIndex ? new Color(0.60f, 0.90f, 0.60f) : Color.white;
 
-            if (GUILayout.Button(content, _paletteButtonStyle,
-                    GUILayout.Width(PaletteButtonSize), GUILayout.Height(PaletteButtonSize)))
+            if (GUI.Button(buttonRect, content, _paletteButtonStyle))
             {
                 _selectedIndex = index;
                 _mode = PaintMode.Place;
@@ -267,6 +276,24 @@ namespace Game.EditorTools
             }
 
             GUI.backgroundColor = previous;
+
+            // 미리보기 텍스처(128px)를 그대로 그리면 버튼(92px) 밖으로 잘리므로 영역에 맞춰 축소해 그린다
+            Texture2D icon = entry.Icon;
+            if (icon != null)
+            {
+                Rect iconRect = new(
+                    buttonRect.x + PaletteIconPadding,
+                    buttonRect.y + PaletteIconPadding,
+                    buttonRect.width - PaletteIconPadding * 2f,
+                    buttonRect.height - PaletteIconPadding - PaletteLabelHeight);
+                GUI.DrawTexture(iconRect, icon, ScaleMode.ScaleToFit, true);
+            }
+
+            // 미리보기 생성이 끝날 때까지 다시 그려서, 완성되면 바로 실제 썸네일로 바뀌게 한다
+            if (AssetPreview.IsLoadingAssetPreview(entry.Prefab.GetEntityId()))
+            {
+                Repaint();
+            }
         }
 
         private void DrawStatusBar()
@@ -606,14 +633,12 @@ namespace Game.EditorTools
         {
             _titleStyle ??= new GUIStyle(EditorStyles.boldLabel) { fontSize = 18 };
 
+            // 썸네일은 버튼 위쪽에 직접 그리므로 텍스트는 아래에 배치한다
             _paletteButtonStyle ??= new GUIStyle(EditorStyles.miniButton)
             {
-                alignment = TextAnchor.MiddleCenter,
-                imagePosition = ImagePosition.ImageAbove,
+                alignment = TextAnchor.LowerCenter,
                 wordWrap = true,
                 fontSize = 10,
-                fixedWidth = PaletteButtonSize,
-                fixedHeight = PaletteButtonSize,
             };
         }
 

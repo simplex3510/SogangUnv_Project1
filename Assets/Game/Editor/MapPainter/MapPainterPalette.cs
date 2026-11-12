@@ -27,15 +27,20 @@ namespace Game.EditorTools
         {
             get
             {
-                if (_icon == null)
+                if (_icon != null)
                 {
-                    _icon = AssetPreview.GetAssetPreview(Prefab);
-                    if (_icon == null)
-                    {
-                        _icon = AssetPreview.GetMiniThumbnail(Prefab);
-                    }
+                    return _icon;
                 }
 
+                // AssetPreview는 비동기로 생성된다. 생성 중에는 기본 아이콘을 임시로만 쓰고, 완성된 미리보기만 캐시한다.
+                Texture2D preview = AssetPreview.GetAssetPreview(Prefab);
+                if (preview == null && AssetPreview.IsLoadingAssetPreview(Prefab.GetEntityId()))
+                {
+                    return AssetPreview.GetMiniThumbnail(Prefab);
+                }
+
+                // 미리보기가 없는 프리팹(메시 없음 등)은 기본 아이콘을 남긴다
+                _icon = preview ?? AssetPreview.GetMiniThumbnail(Prefab);
                 return _icon;
             }
         }

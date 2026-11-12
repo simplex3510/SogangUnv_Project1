@@ -20,13 +20,33 @@ namespace Game.Player.Movement
         [Header("Config")]
         [SerializeField] private VehicleConfig _vehicleConfig;
 
-        [Header("Ground Check")]
-        [SerializeField] private LayerMask _groundMask = ~0;
-        [SerializeField] private LayerMask _ignoreMask = ~0;
-        [Tooltip("피벗에서 바닥까지의 거리보다 약간 크게")]
-        [SerializeField] private float _groundCheckDistance = 0.7f;
-        [Tooltip("지면에 붙어 있다고 볼 여유 거리. 이보다 멀면 공중으로 취급")]
-        [SerializeField] private float _groundStickRange = 0.15f;
+        [Header("Suspension")]
+        [Tooltip("바퀴 중심에서 쏘는 스피어캐스트 반지름(m). 바퀴 반지름보다 약간 작게 둔다")]
+        [SerializeField] private float _suspensionRadius = 0.07f;
+        [Tooltip("서스펜션이 늘어날 수 있는 최대 거리(m). 캐스트 길이 = 반지름 + 이 값")]
+        [SerializeField] private float _suspensionTravel = 0.15f;
+        [Tooltip("목표 휠 중심 높이(m). 차체가 지면에서 뜨는 정도를 결정한다")]
+        [SerializeField] private float _rideHeight = 0.078f; // TODO(tuning): 정지 시 바퀴가 노면에 닿는 높이
+        [Tooltip("스프링 강성(m/s² per m). 클수록 단단하다")]
+        [SerializeField] private float _springStrength = 150f; // TODO(tuning)
+        [Tooltip("스프링 감쇠(m/s² per m/s). 클수록 진동이 빨리 잦아든다")]
+        [SerializeField] private float _springDamper = 15f; // TODO(tuning)
+        [Tooltip("바퀴 중심의 루트 기준 오프셋(m). 앞-좌, 앞-우, 뒤-좌, 뒤-우 순서")]
+        [SerializeField] private Vector3[] _wheelOffsets =
+        {
+            new Vector3(-0.10f, 0.075f, 0.305f),
+            new Vector3(0.10f, 0.075f, 0.305f),
+            new Vector3(-0.10f, 0.075f, -0.105f),
+            new Vector3(0.10f, 0.075f, -0.105f),
+        };
+        [Tooltip("스피어캐스트가 지면으로 인정할 레이어")]
+        [SerializeField] private LayerMask _groundMask = 1 << 7;
+        [Tooltip("캐스트 법선의 위쪽 성분이 이 값 이상이어야 지면으로 인정한다 (0.5 ≈ 60도)")]
+        [SerializeField] private float _groundNormalMinDot = 0.5f;
+        [Tooltip("접지가 끊긴 뒤에도 접지로 취급하는 유예 시간(초)")]
+        [SerializeField] private float _groundContactGraceSeconds = 0.1f;
+        [Tooltip("캐스트 법선이 흔들릴 때 따라가는 속도(/초)")]
+        [SerializeField] private float _groundNormalSmoothing = 10f;
 
         [Header("Self Righting")]
         [Tooltip("차체를 지면(공중이면 수직)에 맞추는 힘")]
@@ -36,7 +56,17 @@ namespace Game.Player.Movement
         [Tooltip("공중에서의 복원력 비율")]
         [SerializeField, Range(0f, 1f)] private float _airUprightFactor = 0.3f;
 
-        private const float GroundOriginOffset = 0.2f;
+        // 이보다 느리면 입력 반대 방향이어도 제동이 아니라 가속으로 취급한다
+        private const float BrakeSpeedThreshold = 0.1f;
+
+        // 프리팹에 오프셋이 직렬화되지 않은 경우 사용할 기본값 (모델의 바퀴 배치 기준)
+        private static readonly Vector3[] DefaultWheelOffsets =
+        {
+            new Vector3(-0.10f, 0.075f, 0.305f),
+            new Vector3(0.10f, 0.075f, 0.305f),
+            new Vector3(-0.10f, 0.075f, -0.105f),
+            new Vector3(0.10f, 0.075f, -0.105f),
+        };
 
         // 아래 값들은 VehicleConfig의 모드 값에 블렌딩을 적용한 현재 프레임의 실효값이다
         private float _maxForwardSpeed;
@@ -56,8 +86,8 @@ namespace Game.Player.Movement
         private bool _isGrounded;
         private bool _isControlEnabled = true;
         private Vector3 _groundNormal = Vector3.up;
-        private Vector3 _groundPoint;
-        private float _pivotToBottom;
+        private float _lastGroundedTime = float.NegativeInfinity;
+
         private PlayerInteractionController _interactionController;
 
         public event Action<VehicleDrivingMode> DrivingModeChanged;
@@ -82,25 +112,25 @@ namespace Game.Player.Movement
             {
                 _rigidbody = GetComponentInChildren<Rigidbody>();
                 Debug.LogWarning($"Rigidbody is not assigned in {gameObject.name}");
-                if (_rigidbody == null)
-                {
-                    Debug.LogError($"Rigidbody is missing in {gameObject.name}");
-                }
             }
 
+            if (_rigidbody == null)
+            {
+                Debug.LogError($"Rigidbody is missing in {gameObject.name}");
+                enabled = false;
+                return;
+            }
+
+            // 구동을 힘으로 인가하므로 감쇠가 남아 있으면 가속·조향 체감이 설정값과 어긋난다
             _rigidbody.linearDamping = 0f;
             _rigidbody.angularDamping = 0f;
 
-            // 무게중심을 낮춰 쉽게 뒤집히지 않게
-            // _rigidbody.centerOfMass = new Vector3(0f, -0.5f, 0f);
+            if (_wheelOffsets == null || _wheelOffsets.Length == 0)
+            {
+                _wheelOffsets = DefaultWheelOffsets;
+            }
 
-            // 지면에 붙일 때 쓸 피벗 → 콜라이더 최저점 거리
-            float bottom = float.MaxValue;
-            foreach (Collider c in GetComponentsInChildren<Collider>())
-                if (c.enabled) bottom = Mathf.Min(bottom, c.bounds.min.y);
-
-            if (bottom < float.MaxValue)
-                _pivotToBottom = bottom - _rigidbody.position.y;
+            DisableGroundCollision();
 
             _interactionController = GetComponent<PlayerInteractionController>();
 
@@ -159,17 +189,27 @@ namespace Game.Player.Movement
         private void FixedUpdate()
         {
             UpdateModeParameters();
-            CheckGround();
+            ApplySuspension();
             UpdateDriftState();
 
             if (_isGrounded)
             {
-                Drive();
-                Steer();
-                StickToGround();
+                ApplyDrive();
+                ApplySteering();
+                ApplyLateralGrip();
             }
 
             KeepUpright();
+        }
+
+        /// <summary>지면은 레이캐스트로만 판정한다. 콜라이더 접촉은 타일 경계마다 수직 충격을 만든다.</summary>
+        private void DisableGroundCollision()
+        {
+            int drivableLayer = LayerMask.NameToLayer("Drivable");
+            if (drivableLayer >= 0)
+            {
+                Physics.IgnoreLayerCollision(gameObject.layer, drivableLayer, true);
+            }
         }
 
         private void TryToggleDrivingMode()
@@ -223,82 +263,125 @@ namespace Game.Player.Movement
                 && _forwardSpeed >= _vehicleConfig.DriftMinForwardSpeed;
         }
 
-        private void CheckGround()
+        /// <summary>
+        /// 바퀴 4개에서 스피어캐스트로 지면을 읽고 서스펜션 힘을 인가한다.
+        /// 콜라이더 접촉 대신 캐스트를 쓰면 타일 경계에서 접촉 매니폴드가 재구성되지 않아 충격이 없다.
+        /// </summary>
+        private void ApplySuspension()
         {
-            Transform transform = _rigidbody.transform;
-            Vector3 origin = _rigidbody.position + (transform.up * GroundOriginOffset);
+            // 캐스트를 바퀴 중심보다 위에서 시작해, 차체가 처져도 구가 지면에 파묻혀 히트를 놓치지 않게 한다
+            float castLift = _suspensionTravel;
+            float maxDistance = castLift + _suspensionRadius + _suspensionTravel;
 
-            _isGrounded = Physics.Raycast(origin, -transform.up, out RaycastHit hit,
-                                          _groundCheckDistance + GroundOriginOffset,
-                                          _groundMask);
+            // 스프링이 무게를 받아 압축되는 만큼 목표 높이를 보정해, 정지 시 목표 높이에 서게 한다
+            float sag = Physics.gravity.magnitude / (_wheelOffsets.Length * _springStrength);
+            float targetHeight = _rideHeight + sag;
 
-            if (!_isGrounded)
+            Vector3 rootPosition = _rigidbody.position;
+            Quaternion rootRotation = _rigidbody.rotation;
+            Vector3 normalSum = Vector3.zero;
+            bool hasGround = false;
+
+            for (int i = 0; i < _wheelOffsets.Length; i++)
             {
-                _groundNormal = Vector3.up;
-                return;
+                Vector3 origin = rootPosition + rootRotation * _wheelOffsets[i] + Vector3.up * castLift;
+
+                if (Physics.SphereCast(origin, _suspensionRadius, Vector3.down, out RaycastHit hit,
+                                       maxDistance, _groundMask, QueryTriggerInteraction.Ignore) == false)
+                {
+                    continue;
+                }
+
+                // 위쪽을 향하는 법선만 지면으로 인정해 벽·장애물을 걸러낸다
+                if (hit.normal.y < _groundNormalMinDot)
+                {
+                    continue;
+                }
+
+                float height = hit.distance - castLift + _suspensionRadius;
+                float compression = targetHeight - height;
+                float normalVelocity = Vector3.Dot(_rigidbody.GetPointVelocity(hit.point), hit.normal);
+                float force = _springStrength * compression - _springDamper * normalVelocity;
+
+                _rigidbody.AddForceAtPosition(hit.normal * force, hit.point, ForceMode.Acceleration);
+
+                normalSum += hit.normal;
+                hasGround = true;
             }
 
-            // 도로와는 물리 충돌하지 않으므로, 지면에 충분히 가까울 때만 접지로 본다
-            _groundPoint = hit.point;
-            _isGrounded = Mathf.Abs(_rigidbody.position.y - (hit.point.y - _pivotToBottom)) <= _groundStickRange;
-            _groundNormal = _isGrounded ? hit.normal : Vector3.up;
+            if (hasGround)
+            {
+                _lastGroundedTime = Time.fixedTime;
+            }
+
+            // 경계에서 접지가 한두 프레임 끊겨도 조작이 리셋되지 않도록 짧은 유예를 둔다
+            _isGrounded = hasGround || Time.fixedTime - _lastGroundedTime <= _groundContactGraceSeconds;
+
+            Vector3 targetNormal = hasGround ? normalSum.normalized : Vector3.up;
+            float t = 1f - Mathf.Exp(-_groundNormalSmoothing * Time.fixedDeltaTime);
+            Vector3 smoothed = Vector3.Slerp(_groundNormal, targetNormal, t);
+
+            // 경계에서 법선이 튀어 0에 가까워지면 이후 계산이 무너지므로 방어한다
+            _groundNormal = smoothed.sqrMagnitude > 0.0001f ? smoothed.normalized : Vector3.up;
         }
 
-        private void StickToGround()
+        private void GetGroundBasis(out Vector3 forward, out Vector3 right)
         {
-            // 물리 접촉 대신 레이캐스트로 지면 높이에 붙인다
-            Vector3 position = _rigidbody.position;
-            position.y = _groundPoint.y - _pivotToBottom;
-            _rigidbody.position = position;
+            forward = Vector3.ProjectOnPlane(_rigidbody.transform.forward, _groundNormal);
+
+            if (forward.sqrMagnitude < 0.0001f)
+            {
+                forward = Vector3.ProjectOnPlane(_rigidbody.transform.up, _groundNormal);
+            }
+
+            forward.Normalize();
+            right = Vector3.Cross(_groundNormal, forward);
         }
 
-        private void Drive()
+        private void ApplyDrive()
         {
-            Vector3 velocity = _rigidbody.linearVelocity;
+            GetGroundBasis(out Vector3 forward, out _);
 
-            // 차체 방향을 지면 평면에 투영 → 기울어져도, 경사에서도 정상 이동
-            Vector3 forward = Vector3.ProjectOnPlane(_rigidbody.transform.forward, _groundNormal).normalized;
-            Vector3 right = Vector3.Cross(_groundNormal, forward);
+            float forwardSpeed = Vector3.Dot(_rigidbody.linearVelocity, forward);
+            float targetSpeed = GetTargetForwardSpeed();
+            float changeRate = GetSpeedChangeRate(forwardSpeed);
+            float nextSpeed = Mathf.MoveTowards(forwardSpeed, targetSpeed, changeRate * Time.fixedDeltaTime);
 
-            float forwardSpeed = Vector3.Dot(velocity, forward);
-            float lateralSpeed = Vector3.Dot(velocity, right);
+            // 속도 보정을 힘으로 인가해 접촉·경사·충돌이 그 위에 더해지게 한다
+            _rigidbody.AddForce(forward * ((nextSpeed - forwardSpeed) / Time.fixedDeltaTime),
+                                ForceMode.Acceleration);
 
-            forwardSpeed = UpdateForwardSpeed(forwardSpeed);
-            lateralSpeed = UpdateLateralSpeed(lateralSpeed);
-
-            // 도로와 물리 충돌하지 않으므로 지면 방향 성분은 버린다 (튕김 방지)
-            _rigidbody.linearVelocity = forward * forwardSpeed + right * lateralSpeed;
-
-            _forwardSpeed = forwardSpeed;
+            _forwardSpeed = nextSpeed;
         }
 
-        private float UpdateForwardSpeed(float forwardSpeed)
+        private float GetTargetForwardSpeed()
         {
             float throttle = _input.y;
 
-            float targetSpeed = throttle >= 0f
+            return throttle >= 0f
                 ? throttle * _maxForwardSpeed
                 : throttle * _vehicleConfig.MaxReverseSpeed;
-
-            float rate;
-            if (Mathf.Approximately(throttle, 0f))
-                rate = _vehicleConfig.CoastDeceleration;
-            else if (Mathf.Abs(forwardSpeed) > 0.1f && Mathf.Sign(throttle) != Mathf.Sign(forwardSpeed))
-                rate = _vehicleConfig.BrakeDeceleration;
-            else
-                rate = _acceleration;
-
-            return Mathf.MoveTowards(forwardSpeed, targetSpeed, rate * Time.fixedDeltaTime);
         }
 
-        private float UpdateLateralSpeed(float lateralSpeed)
+        private float GetSpeedChangeRate(float forwardSpeed)
         {
-            float grip = _isDrifting ? _lateralGrip * _vehicleConfig.DriftGripMultiplier : _lateralGrip;
-            float t = 1f - Mathf.Exp(-grip * Time.fixedDeltaTime);
-            return Mathf.Lerp(lateralSpeed, 0f, t);
+            float throttle = _input.y;
+
+            if (Mathf.Approximately(throttle, 0f))
+            {
+                return _vehicleConfig.CoastDeceleration;
+            }
+
+            if (Mathf.Abs(forwardSpeed) > BrakeSpeedThreshold
+                && Mathf.Sign(throttle) != Mathf.Sign(forwardSpeed))
+            {
+                return _vehicleConfig.BrakeDeceleration;
+            }
+
+            return _acceleration;
         }
 
-        private void Steer()
+        private void ApplySteering()
         {
             _steer = Mathf.MoveTowards(_steer, _input.x, _steerSmoothing * Time.fixedDeltaTime);
 
@@ -314,6 +397,19 @@ namespace Game.Player.Movement
             float currentYaw = Vector3.Dot(angularVelocity, _groundNormal);
 
             _rigidbody.angularVelocity = angularVelocity + _groundNormal * (targetYaw - currentYaw);
+        }
+
+        private void ApplyLateralGrip()
+        {
+            GetGroundBasis(out _, out Vector3 right);
+
+            float lateralSpeed = Vector3.Dot(_rigidbody.linearVelocity, right);
+            float grip = _isDrifting ? _lateralGrip * _vehicleConfig.DriftGripMultiplier : _lateralGrip;
+            float nextLateral = Mathf.Lerp(lateralSpeed, 0f, 1f - Mathf.Exp(-grip * Time.fixedDeltaTime));
+
+            // 횡방향 감쇠도 힘으로 인가해, 접지력이 부족한 상황(드리프트·경사)이 물리에 반영되게 한다
+            _rigidbody.AddForce(right * ((nextLateral - lateralSpeed) / Time.fixedDeltaTime),
+                                ForceMode.Acceleration);
         }
 
         private void KeepUpright()

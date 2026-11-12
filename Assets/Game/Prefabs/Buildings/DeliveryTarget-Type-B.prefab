@@ -88,6 +88,10 @@ PrefabInstance:
       propertyPath: m_PresetInfoIsWorld
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3094713446634511843, guid: 7524263bd4c739f4b9f966bcfd7c307a, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 6910349575161622630, guid: 7524263bd4c739f4b9f966bcfd7c307a, type: 3}
       propertyPath: m_RenderMode
       value: 2

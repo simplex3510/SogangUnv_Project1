@@ -12,6 +12,14 @@ PrefabInstance:
       propertyPath: _interactableZone
       value: 
       objectReference: {fileID: 8771291888771215391}
+    - target: {fileID: 1680975766010831367, guid: 7524263bd4c739f4b9f966bcfd7c307a, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3616876507172131211, guid: 7524263bd4c739f4b9f966bcfd7c307a, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7921091265164950644, guid: 7524263bd4c739f4b9f966bcfd7c307a, type: 3}
       propertyPath: m_Name
       value: DeliveryTarget-Type-B
