@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd \\\"/d/Unity Projects/SogangUnv_Project1\\\" && sed -n '5,10p;108,122p' Assets/Game/Scripts/Player/PlayerMovementController.cs && echo \\\"--- unity running? ---\\\" && tasklist 2>/dev/null | g...",
+  "error": "Exit code 127\n{\n    [RequireComponent(typeof(Rigidbody))]\n    // 파일명과 클래스명이 다르면 Unity가 스크립트를 바인딩하지 못해 컴포넌트가 로드되지 않는다\n    public class PlayerMovementController : MonoBehaviour\n    {\n        [Header(\"Required Components\")]\n            KeepUpright();\n        }\n\n        private void CheckGround()\n        {\n            Transform t = _rigidbody.transform;\n            Vector3 origin = _rigidbody.position + t.up * GroundOriginOffset;\n\n            // origin(피벗 + 0.2)이 차체 콜라이더 사이에 있어, 플레이어 레이어를 빼지 않으면\n   ...",
+  "timestamp": "2026-11-07T02:22:53.678Z",
+  "retry_count": 2
+}

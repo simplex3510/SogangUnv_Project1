@@ -1,0 +1,61 @@
+{
+  "updatedAt": "2026-11-12T08:51:42.946Z",
+  "missions": [
+    {
+      "id": "session:065889e8-9b07-40ee-8955-dbc5adea0c5f:none",
+      "source": "session",
+      "name": "none",
+      "objective": "Session mission",
+      "createdAt": "2026-11-12T08:47:45.417Z",
+      "updatedAt": "2026-11-12T08:51:42.946Z",
+      "status": "done",
+      "workerCount": 1,
+      "taskCounts": {
+        "total": 1,
+        "pending": 0,
+        "blocked": 0,
+        "inProgress": 0,
+        "completed": 1,
+        "failed": 0
+      },
+      "agents": [
+        {
+          "name": "fork:a6499b5",
+          "role": "fork",
+          "ownership": "a6499b593602f8a9b",
+          "status": "done",
+          "currentStep": null,
+          "latestUpdate": "completed",
+          "completedSummary": null,
+          "updatedAt": "2026-11-12T08:51:42.946Z"
+        }
+      ],
+      "timeline": [
+        {
+          "id": "session-start:a6499b593602f8a9b:2026-11-12T08:47:45.417Z",
+          "at": "2026-11-12T08:47:45.417Z",
+          "kind": "update",
+          "agent": "fork:a6499b5",
+          "detail": "started fork:a6499b5",
+          "sourceKey": "session-start:a6499b593602f8a9b"
+        },
+        {
+          "id": "session-stop:a6499b593602f8a9b:2026-11-12T08:48:03.962Z",
+          "at": "2026-11-12T08:48:03.962Z",
+          "kind": "completion",
+          "agent": "fork:a6499b5",
+          "detail": "completed",
+          "sourceKey": "session-stop:a6499b593602f8a9b"
+        },
+        {
+          "id": "session-stop:aca023ab964d451d2:2026-11-12T08:51:42.946Z",
+          "at": "2026-11-12T08:51:42.946Z",
+          "kind": "completion",
+          "agent": "fork:a6499b5",
+          "detail": "completed",
+          "sourceKey": "session-stop:aca023ab964d451d2"
+        }
+      ]
+    }
+  ]
+}

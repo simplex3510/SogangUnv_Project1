@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "jobId": "160d0ddc-c316-4445-9fef-ad2b010d69a5",
+  "sessionId": "95133c75-cfbc-403f-b4c1-80f941a38a72",
+  "scopeKey": "296769f01f52a46f710a54a0f67244f659d197b31fa9c9f6de4eaea56bfe0847",
+  "revision": 1,
+  "createdAt": "2026-11-07T07:27:37.501Z",
+  "updatedAt": "2026-11-07T07:27:37.574Z",
+  "producerGraceExpiresAt": "2026-11-07T07:28:07.501Z",
+  "bestEffortDeadlineAt": "2026-11-07T07:28:58.501Z",
+  "producers": {
+    "core": {
+      "state": "prepared",
+      "intentKey": "ba2912b80ca338fc4cbf679fa7c24b560e97574d892daeaf1e27d534bb802eb9",
+      "payloadDigest": "ba2912b80ca338fc4cbf679fa7c24b560e97574d892daeaf1e27d534bb802eb9"
+    },
+    "wiki": {
+      "state": "no-op",
+      "sealedAt": "2026-11-07T07:27:37.574Z",
+      "sealedBy": "wiki-producer"
+    }
+  },
+  "actions": {
+    "foreground-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "1283e8e7a1db04cabd57ecbb4faf6ea4256e7639689940cad8e36df5d247f8bf",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "95133c75-cfbc-403f-b4c1-80f941a38a72",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+          "prompt_id": "96be3c93-2cbb-4632-bdb2-af650e87d2a1",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000
+    },
+    "wiki-capture": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 0,
+      "idempotencyKey": "0b00c9fb9e84a0c5d49903c0893b4bc2e2285f638177525675cfcb68f50e152a",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "95133c75-cfbc-403f-b4c1-80f941a38a72",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+          "prompt_id": "96be3c93-2cbb-4632-bdb2-af650e87d2a1",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000,
+      "completedAt": "2026-11-07T07:27:37.574Z"
+    },
+    "team-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "e2be85a9d556a51c29dd818d4121219b652311b61fa6a6e1a8b218f5a28f5aef",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "95133c75-cfbc-403f-b4c1-80f941a38a72",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+          "prompt_id": "96be3c93-2cbb-4632-bdb2-af650e87d2a1",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000
+    },
+    "python-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "e5f04aa2c3950506907b7259e3e93f4dae616111aae4f4fdb30fe4d92b1047fc",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "95133c75-cfbc-403f-b4c1-80f941a38a72",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+          "prompt_id": "96be3c93-2cbb-4632-bdb2-af650e87d2a1",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000
+    },
+    "reply-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "c67ab4c4ed41f0e9021b3621e7ecdd5ee7d5eb1a1f08fc10204eb4899f268fea",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "95133c75-cfbc-403f-b4c1-80f941a38a72",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+          "prompt_id": "96be3c93-2cbb-4632-bdb2-af650e87d2a1",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000
+    },
+    "callback": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "23c269b8b6cd24cb75b0b885f92a1ae95dd2b6030bfb966e7f737e6711d68cd7",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "95133c75-cfbc-403f-b4c1-80f941a38a72",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+          "prompt_id": "96be3c93-2cbb-4632-bdb2-af650e87d2a1",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000
+    },
+    "notification": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "54bef9d886206fcf78bc58ff02d0e1987cb34daa5e824ed4957a8d1f1bd566ed",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "95133c75-cfbc-403f-b4c1-80f941a38a72",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+          "prompt_id": "96be3c93-2cbb-4632-bdb2-af650e87d2a1",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000
+    },
+    "openclaw": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "a913c7bc9002a2545493002d8c3f574b685c0be35c3d4e8d5d9053b529f8a44d",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "95133c75-cfbc-403f-b4c1-80f941a38a72",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\95133c75-cfbc-403f-b4c1-80f941a38a72.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1",
+          "prompt_id": "96be3c93-2cbb-4632-bdb2-af650e87d2a1",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000
+    }
+  },
+  "owner": null,
+  "phase": "collecting"
+}

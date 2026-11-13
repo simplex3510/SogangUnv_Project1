@@ -238,7 +238,7 @@ GameObject:
   - component: {fileID: 2411554811532941285}
   - component: {fileID: 599280714212779828}
   - component: {fileID: 8506700507362201361}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -354,7 +354,7 @@ GameObject:
   - component: {fileID: 2562686727005290202}
   - component: {fileID: 5852611577065426797}
   - component: {fileID: 3103754721737183023}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -428,7 +428,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7482503864365142466}
   - component: {fileID: 6368635729319420972}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ParcelIcons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -530,8 +530,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.4544692, y: 0.01, z: 1.4109154}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 2.4544692, y: 0.1, z: 1.4109154}
+  m_Center: {x: 0, y: 0.05, z: 0}
 --- !u!1 &7921091265164950644
 GameObject:
   m_ObjectHideFlags: 0

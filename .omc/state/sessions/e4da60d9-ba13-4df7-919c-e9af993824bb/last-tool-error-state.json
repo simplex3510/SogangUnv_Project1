@@ -1,0 +1,7 @@
+{
+  "tool_name": "PowerShell",
+  "tool_input_preview": "{\"command\":\"$code = @'\\nusing UnityEditor;\\nusing UnityEngine.InputSystem;\\nusing System.Text;\\n\\nvar path = \\\"Assets/Game/Input/InputSystem_Actions.inputactions\\\";\\nvar asset = AssetDatabase.LoadAsse...",
+  "error": "Exit code 6\nRuntime Error. InvalidOperationException: Cannot add, remove, or change elements of InputActionAsset InputSystem_Actions (UnityEngine.InputSystem.InputActionAsset) while one or more of its actions are enabled\n  at UnityEngine.InputSystem.InputActionMap.OnWantToChangeSetup () [0x0003d] in .\\Library\\PackageCache\\com.unity.inputsystem@2436e68c60c4\\InputSystem\\Runtime\\Actions\\InputActionMap.cs:1140 \n  at UnityEngine.InputSystem.InputActionSetupExtensions.AddAction (UnityEngine.InputSyste...",
+  "timestamp": "2026-11-11T04:09:49.023Z",
+  "retry_count": 1
+}

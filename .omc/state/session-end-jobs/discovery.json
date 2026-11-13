@@ -1,0 +1,158 @@
+{
+  "version": 2,
+  "cursor": 5,
+  "tickets": [
+    {
+      "sessionId": "50864b35-74f4-49e4-83b7-a6c909fcb4f0",
+      "attempts": 0,
+      "retryAt": "2026-11-06T03:02:52.218Z",
+      "claimNonce": "b8608cb2-2387-42f0-9fe6-1744dd70f8af",
+      "leaseExpiresAt": "2026-11-13T06:37:28.302Z"
+    },
+    {
+      "sessionId": "09004496-84d0-470a-ae33-ae1da1c688a7",
+      "attempts": 0,
+      "retryAt": "2026-11-07T03:27:12.235Z",
+      "claimNonce": "bc856567-4f72-4047-8a0e-410b075b191a",
+      "leaseExpiresAt": "2026-11-13T06:37:47.822Z"
+    },
+    {
+      "sessionId": "6379a26e-c758-444d-aa49-cef82dc862ce",
+      "attempts": 0,
+      "retryAt": "2026-11-07T05:36:27.928Z",
+      "claimNonce": "d3437223-c14f-4d47-9064-5ac996938eda",
+      "leaseExpiresAt": "2026-11-13T06:37:47.822Z"
+    },
+    {
+      "sessionId": "6fb8f72b-4086-48f2-98b9-bb4aa78b1e53",
+      "attempts": 0,
+      "retryAt": "2026-11-07T07:14:45.886Z",
+      "claimNonce": "91f4d098-e198-491a-9aec-cbc4bec3a6bc",
+      "leaseExpiresAt": "2026-11-13T06:37:47.822Z"
+    },
+    {
+      "sessionId": "ac506287-3a74-4e84-9b42-f1dd02a6249c",
+      "attempts": 0,
+      "retryAt": "2026-11-07T07:27:31.600Z",
+      "claimNonce": "4d5543e4-05f5-4834-b2cc-7e17eed1207d",
+      "leaseExpiresAt": "2026-11-13T06:37:47.822Z"
+    },
+    {
+      "sessionId": "cf01bf20-3e29-42e8-8c0f-1c0ddf5f681f",
+      "attempts": 0,
+      "retryAt": "2026-11-07T07:27:33.939Z",
+      "claimNonce": "de3f6f4f-2d31-4481-a53a-4caa1b973cfb",
+      "leaseExpiresAt": "2026-11-12T09:05:48.586Z"
+    },
+    {
+      "sessionId": "95133c75-cfbc-403f-b4c1-80f941a38a72",
+      "attempts": 0,
+      "retryAt": "2026-11-07T07:27:37.509Z",
+      "claimNonce": "ebfc48c6-accf-4ba3-a6ff-eb58493bf11a",
+      "leaseExpiresAt": "2026-11-12T13:05:19.258Z"
+    },
+    {
+      "sessionId": "23238fdb-2739-4190-b19a-d751541cfce9",
+      "attempts": 0,
+      "retryAt": "2026-11-07T07:31:54.025Z",
+      "claimNonce": "e65d78f4-6ee7-46e4-a848-4b0ce380ac43",
+      "leaseExpiresAt": "2026-11-12T13:05:19.258Z"
+    },
+    {
+      "sessionId": "aad26b6a-a0fc-4459-9853-c706e7432d05",
+      "attempts": 0,
+      "retryAt": "2026-11-07T07:32:55.693Z",
+      "claimNonce": "fbe00e2a-dc59-447b-b275-7fbea05982f0",
+      "leaseExpiresAt": "2026-11-12T13:05:19.258Z"
+    },
+    {
+      "sessionId": "b47b4d95-fc02-4fe8-b741-3de088738d3b",
+      "attempts": 0,
+      "retryAt": "2026-11-07T13:43:32.744Z",
+      "claimNonce": "78d25b6e-e61b-44b2-b137-b1fde2a0a25b",
+      "leaseExpiresAt": "2026-11-12T13:05:19.258Z"
+    },
+    {
+      "sessionId": "e41793d2-1a93-41e8-87ad-bf3015c24d8c",
+      "attempts": 0,
+      "retryAt": "2026-11-07T23:19:32.464Z",
+      "claimNonce": "40096a9b-3496-4359-bfd4-5ceb8a622d6c",
+      "leaseExpiresAt": "2026-11-12T21:30:17.106Z"
+    },
+    {
+      "sessionId": "b8d47af3-871b-46c4-8185-3021cb56bffd",
+      "attempts": 0,
+      "retryAt": "2026-11-08T07:26:50.486Z",
+      "claimNonce": "4069d7c7-fc5d-43a0-8207-da36b2ed0a6a",
+      "leaseExpiresAt": "2026-11-12T21:30:17.106Z"
+    },
+    {
+      "sessionId": "fdf330a3-4d47-4f79-abf5-6d00dcb9c13c",
+      "attempts": 0,
+      "retryAt": "2026-11-11T02:21:38.049Z",
+      "claimNonce": "d11b0b30-f2e5-4665-8830-d2632b4750ad",
+      "leaseExpiresAt": "2026-11-12T21:30:17.106Z"
+    },
+    {
+      "sessionId": "e4da60d9-ba13-4df7-919c-e9af993824bb",
+      "attempts": 0,
+      "retryAt": "2026-11-11T06:43:20.834Z",
+      "claimNonce": "64d76918-2871-435e-a056-bfcc1c7c749b",
+      "leaseExpiresAt": "2026-11-12T21:30:17.106Z"
+    },
+    {
+      "sessionId": "9261db8e-ecc5-40e7-885a-9fb62a05a82d",
+      "attempts": 0,
+      "retryAt": "2026-11-12T08:52:32.531Z",
+      "claimNonce": "95816d96-192c-4144-befb-4c6ff179c77a",
+      "leaseExpiresAt": "2026-11-13T06:27:03.375Z"
+    },
+    {
+      "sessionId": "4ab9cdd3-b744-4e17-9d8c-e1c850ab31aa",
+      "attempts": 0,
+      "retryAt": "2026-11-12T08:52:35.174Z",
+      "claimNonce": "d8a385fe-ab56-49c9-b0c9-17bd0eda5554",
+      "leaseExpiresAt": "2026-11-13T06:27:03.375Z"
+    },
+    {
+      "sessionId": "065889e8-9b07-40ee-8955-dbc5adea0c5f",
+      "attempts": 0,
+      "retryAt": "2026-11-12T09:05:33.309Z",
+      "claimNonce": "62fa018a-0911-47df-ad14-9756b4a498c8",
+      "leaseExpiresAt": "2026-11-13T06:27:03.375Z"
+    },
+    {
+      "sessionId": "ace2aa7c-5326-4659-a0b0-7e84f2cd94c8",
+      "attempts": 0,
+      "retryAt": "2026-11-12T13:05:03.921Z",
+      "claimNonce": "cdd7d832-260b-46ac-a73b-b41ccfe7812e",
+      "leaseExpiresAt": "2026-11-13T06:27:03.375Z"
+    },
+    {
+      "sessionId": "09e436f9-4a41-4300-a267-30cc161a7806",
+      "attempts": 0,
+      "retryAt": "2026-11-12T21:30:01.833Z",
+      "claimNonce": "4e3b2b59-040f-43b9-9554-c41b6ed99689",
+      "leaseExpiresAt": "2026-11-13T06:37:28.302Z"
+    },
+    {
+      "sessionId": "3229b985-d380-40f0-b99d-e268e32d9e40",
+      "attempts": 0,
+      "retryAt": "2026-11-13T06:25:44.254Z",
+      "claimNonce": "829575ea-acc8-46f3-b1fd-ed82378f9f18",
+      "leaseExpiresAt": "2026-11-13T06:37:28.302Z"
+    },
+    {
+      "sessionId": "86ddd6a3-6bad-4f32-9817-58a4ec117b5b",
+      "attempts": 0,
+      "retryAt": "2026-11-13T06:25:44.258Z",
+      "claimNonce": "3fa2a9aa-e67b-4baa-b66e-e813cb1b2199",
+      "leaseExpiresAt": "2026-11-13T06:37:28.302Z"
+    },
+    {
+      "sessionId": "9c83bbe6-d4ef-47b4-8757-10c26b149ed3",
+      "attempts": 0,
+      "retryAt": "2026-11-13T06:37:22.690Z"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd \\\"D:/Unity Projects/SogangUnv_Project1\\\" && git status --short | grep -v \\\"^A  .claude/\\\" | head -20; echo \\\"=== untracked dirs ===\\\"; ls -d production design docs prototypes 2>/dev/nul...",
+  "error": "Exit code 2\n M Assets/Game/Editor/MapPainter/MapPainterWindow.cs\n M Assets/Game/Prefabs/DeliveryTargets/DeliveryTarget-Type-B.prefab\n M Assets/Game/Prefabs/DeliveryTargets/_BuildingBase.prefab\n M Assets/Game/Prefabs/LogisticsCenter.prefab\n D Assets/Game/Prefabs/Player.prefab\n D Assets/Game/Prefabs/Player.prefab.meta\n M Assets/Game/Scenes/_DevOnly/SampleMapDesign.unity\n D Assets/Game/Scripts/TestMovementController.cs\n D Assets/Game/Scripts/TestMovementController.cs.meta\n?? Assets/Game/Prefabs/Del...",
+  "timestamp": "2026-11-13T06:32:28.182Z",
+  "retry_count": 1
+}

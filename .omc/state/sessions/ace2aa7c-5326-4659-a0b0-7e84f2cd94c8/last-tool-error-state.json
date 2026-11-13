@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd \\\"D:/Unity Projects/SogangUnv_Project1\\\" && unity command editor.playmode stop 2>&1 | head -2 && cp \\\"C:/Users/simplex3510/AppData/Local/Temp/drive_log.csv\\\" \\\"C:/Users/simplex3510/AppD...",
+  "error": "Exit code 1\nExited play mode\n# terrainPos=(-30.00, 0.03, -30.00) ground=MeshCollider@Body y=0.4860\r\nt,px,py,pz,vx,vy,vz,avx,avy,avz,yaw,dvy\r\nTraceback (most recent call last):\r\n  File \"<stdin>\", line 5, in <module>\r\n  File \"<stdin>\", line 3, in load\r\nKeyError: 't'",
+  "timestamp": "2026-11-12T10:49:54.149Z",
+  "retry_count": 2
+}

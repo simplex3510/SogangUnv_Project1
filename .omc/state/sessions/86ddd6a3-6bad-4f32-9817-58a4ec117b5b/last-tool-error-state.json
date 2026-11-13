@@ -1,0 +1,7 @@
+{
+  "tool_name": "PowerShell",
+  "tool_input_preview": "{\"command\":\"Get-ChildItem \\\"D:\\\\Unity Projects\\\\SogangUnv_Project1\\\\Assets\\\\Game\\\\Scenes\\\" -Recurse -Filter *.unity | Select-Object FullName; Get-ChildItem \\\"D:\\\\Unity Projects\\\\SogangUnv_Project1\\\\As...",
+  "error": "Exit code 1\nFullName\r\n--------\r\nD:\\Unity Projects\\SogangUnv_Project1\\Assets\\Game\\Scenes\\GameScene.unity\r\nD:\\Unity Projects\\SogangUnv_Project1\\Assets\\Game\\Scenes\\_DevOnly\\DevScene.unity\r\nD:\\Unity Projects\\SogangUnv_Project1\\Assets\\Game\\Scenes\\_DevOnly\\SampleMapDesign.unity\r\nGet-ChildItem: 경로 'D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Game\\Prefabs\\Map'이(가) 없으므로 찾을 수 없습니다.\r\nGet-ChildItem: 경로 'D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Game\\Prefabs\\Map\\Roads\\RoadVariants'이(가) 없으므로 찾을 수 없습니다.",
+  "timestamp": "2026-11-12T21:32:09.176Z",
+  "retry_count": 1
+}

@@ -1,0 +1,7 @@
+{
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"D:\\\\Unity Projects\\\\SogangUnv_Project1\\\\Assets\\\\Game\\\\Scripts\\\\Player\\\\DrivingModeSettings.cs\"}",
+  "error": "File does not exist. Note: your current working directory is D:\\Unity Projects\\SogangUnv_Project1.",
+  "timestamp": "2026-11-12T13:06:48.298Z",
+  "retry_count": 1
+}

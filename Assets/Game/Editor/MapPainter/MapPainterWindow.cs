@@ -24,7 +24,7 @@ namespace Game.EditorTools
 
         [SerializeField] private string _folderPath = "Assets/Game/Prefabs/Map";
         [SerializeField] private string _rootName = "Map";
-        [SerializeField] private float _cellSize = 2.25f;
+        [SerializeField] private float _cellSize = 3f;
         [SerializeField] private float _paintHeight;
         [SerializeField] private bool _avoidOverlap = true;
         [SerializeField] private bool _isPaintEnabled;

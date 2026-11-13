@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"U=\\\"/c/Users/simplex3510/AppData/Local/Unity/bin/unity\\\"; cd \\\"D:/Unity Projects/SogangUnv_Project1\\\"; for spec in \\\"택배 물류창고 DeliveryWarehouse\\\" \\\"배달지 집 DeliveryHouse\\\" \\\"Player 1 PlayerIn...",
+  "error": "Exit code 2\n/usr/bin/bash: eval: line 1: syntax error near unexpected token `;'\n/usr/bin/bash: eval: line 1: `U=\"/c/Users/simplex3510/AppData/Local/Unity/bin/unity\"; cd \"D:/Unity Projects/SogangUnv_Project1\"; for spec in \"택배 물류창고 DeliveryWarehouse\" \"배달지 집 DeliveryHouse\" \"Player 1 PlayerInteractor\"; do set -- $spec; path=$1; ; done; $U command component get_fields --target '{\"hierarchyPath\":\"/택배 물류창고\"}' --component DeliveryWarehouse --result-only 2>&1 | python -I -c \"import sys,json;d=json.load(s...",
+  "timestamp": "2026-11-06T04:49:29.909Z",
+  "retry_count": 1
+}

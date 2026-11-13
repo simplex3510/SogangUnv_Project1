@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "jobId": "a13b8216-866b-43a7-b140-1ac46f2a46cd",
+  "sessionId": "09004496-84d0-470a-ae33-ae1da1c688a7",
+  "scopeKey": "296769f01f52a46f710a54a0f67244f659d197b31fa9c9f6de4eaea56bfe0847",
+  "revision": 1,
+  "createdAt": "2026-11-07T03:27:12.227Z",
+  "updatedAt": "2026-11-07T03:27:12.307Z",
+  "producerGraceExpiresAt": "2026-11-07T03:27:42.228Z",
+  "bestEffortDeadlineAt": "2026-11-07T03:28:33.228Z",
+  "producers": {
+    "core": {
+      "state": "prepared",
+      "intentKey": "036bb6b813d4791c76276134445410691810cedf4b2740a5c607b6333a3633dc",
+      "payloadDigest": "036bb6b813d4791c76276134445410691810cedf4b2740a5c607b6333a3633dc"
+    },
+    "wiki": {
+      "state": "no-op",
+      "sealedAt": "2026-11-07T03:27:12.307Z",
+      "sealedBy": "wiki-producer"
+    }
+  },
+  "actions": {
+    "foreground-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "bfb324ca18a8d9eee272f2e635d151cd99192406be171c08b05f8555f2bc0796",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "09004496-84d0-470a-ae33-ae1da1c688a7",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+          "prompt_id": "d2f1bca6-2b6a-40fc-b716-75fbffdb51df",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000
+    },
+    "wiki-capture": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 0,
+      "idempotencyKey": "0e03c1bb64d7d3873d9040bf196f7e8667433496db7678036db40819fa213495",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "09004496-84d0-470a-ae33-ae1da1c688a7",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+          "prompt_id": "d2f1bca6-2b6a-40fc-b716-75fbffdb51df",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000,
+      "completedAt": "2026-11-07T03:27:12.307Z"
+    },
+    "team-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "e18d19fd38b267b729a5166a197106a1b30c2f8e614c39b46d7f3d11fdb357fe",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "09004496-84d0-470a-ae33-ae1da1c688a7",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+          "prompt_id": "d2f1bca6-2b6a-40fc-b716-75fbffdb51df",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000
+    },
+    "python-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "4f735fa8a60a3918f9725834e5c59bde18b5094477c8ac9f76d8de523f2343db",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "09004496-84d0-470a-ae33-ae1da1c688a7",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+          "prompt_id": "d2f1bca6-2b6a-40fc-b716-75fbffdb51df",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000
+    },
+    "reply-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "ecf7809b99e1527b959fb873b7777f16604d2fa0a2f07c1d8519e73de2875611",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "09004496-84d0-470a-ae33-ae1da1c688a7",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+          "prompt_id": "d2f1bca6-2b6a-40fc-b716-75fbffdb51df",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000
+    },
+    "callback": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "39842f54988673c22a9ea18afb0b0c69b83511e651efe3de182cd1978df9a576",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "09004496-84d0-470a-ae33-ae1da1c688a7",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+          "prompt_id": "d2f1bca6-2b6a-40fc-b716-75fbffdb51df",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000
+    },
+    "notification": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "e5de968f5f5ba0f72cf662772e8eccfbf76fe4600fee60a840326a3d8dc13317",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "09004496-84d0-470a-ae33-ae1da1c688a7",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+          "prompt_id": "d2f1bca6-2b6a-40fc-b716-75fbffdb51df",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000
+    },
+    "openclaw": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "pending",
+      "attempts": 0,
+      "idempotencyKey": "a6ce0049a59c9c1ae437cb02550971e4050357513643fb6a84da137b8633e394",
+      "payload": {
+        "transcriptPath": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+        "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+        "reason": "prompt_input_exit",
+        "input": {
+          "session_id": "09004496-84d0-470a-ae33-ae1da1c688a7",
+          "transcript_path": "C:\\Users\\simplex3510\\.claude\\projects\\D--Unity-Projects-SogangUnv-Project1\\09004496-84d0-470a-ae33-ae1da1c688a7.jsonl",
+          "cwd": "D:\\Unity Projects\\SogangUnv_Project1\\Assets\\Resources\\Roads\\FBX",
+          "prompt_id": "d2f1bca6-2b6a-40fc-b716-75fbffdb51df",
+          "hook_event_name": "SessionEnd",
+          "reason": "prompt_input_exit"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000
+    }
+  },
+  "owner": null,
+  "phase": "collecting"
+}

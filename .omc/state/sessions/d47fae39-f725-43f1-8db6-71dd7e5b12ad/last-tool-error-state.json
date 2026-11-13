@@ -1,0 +1,7 @@
+{
+  "tool_name": "PowerShell",
+  "tool_input_preview": "{\"command\":\"unity command component set_field --target \\\"/Canvas/NavigationCompass\\\" --component \\\"DeliveryNavigationCompass\\\" --name \\\"_arrow\\\" --value '{\\\"hierarchyPath\\\":\\\"/Canvas/NavigationCompass...",
+  "error": "Exit code 2",
+  "timestamp": "2026-11-11T17:54:49.081Z",
+  "retry_count": 5
+}

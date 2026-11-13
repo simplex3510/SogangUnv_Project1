@@ -117,11 +117,15 @@ InitTestScene*.unity*
 /[Aa]ssets/Resources/*
 !/[Aa]ssets/Resources/.gitkeep
 
-# Claude Relatived
-/CLAUDE.md
-/.claude
-/.omc
-/.docs
+# /CLAUDE.md
+# /.claude
+# /.omc
+# /.docs
 
+# Claude Temp Relatived
 /AgentScripts
 /ScreenShots
+
+# Claude Code Game Studios — 세션 임시 상태 (커밋 금지)
+/production/session-state/
+/production/session-logs/

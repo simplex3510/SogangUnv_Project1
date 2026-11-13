@@ -1,0 +1,430 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1794551208204,
+  "projectRoot": "D:\\Unity Projects\\SogangUnv_Project1",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "AgentScripts": {
+      "path": "AgentScripts",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1794551208151,
+      "keyFiles": []
+    },
+    "Assets": {
+      "path": "Assets",
+      "purpose": "Static assets",
+      "fileCount": 4,
+      "lastAccessed": 1794551208152,
+      "keyFiles": [
+        "Game.meta",
+        "Resources.meta",
+        "Settings.meta",
+        "TextMesh Pro.meta"
+      ]
+    },
+    "Library": {
+      "path": "Library",
+      "purpose": null,
+      "fileCount": 32,
+      "lastAccessed": 1794551208153,
+      "keyFiles": [
+        "AnnotationManager",
+        "ArtifactDB",
+        "ArtifactDB-lock",
+        "BuildPlayer.prefs",
+        "BuildProfileContext.asset"
+      ]
+    },
+    "Logs": {
+      "path": "Logs",
+      "purpose": null,
+      "fileCount": 67,
+      "lastAccessed": 1794551208154,
+      "keyFiles": [
+        "AssetImportWorkerHW0-prev.log",
+        "AssetImportWorkerHW0-UDS-prev.log",
+        "AssetImportWorkerHW0-UDS.log",
+        "AssetImportWorkerHW0.log",
+        "AssetImportWorkerHW1-prev.log"
+      ]
+    },
+    "Packages": {
+      "path": "Packages",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1794551208154,
+      "keyFiles": [
+        "manifest.json",
+        "packages-lock.json"
+      ]
+    },
+    "ProjectSettings": {
+      "path": "ProjectSettings",
+      "purpose": null,
+      "fileCount": 28,
+      "lastAccessed": 1794551208154,
+      "keyFiles": [
+        "AudioManager.asset",
+        "ClusterInputManager.asset",
+        "DynamicsManager.asset",
+        "EditorBuildSettings.asset",
+        "EditorSettings.asset"
+      ]
+    },
+    "Screenshots": {
+      "path": "Screenshots",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1794551208154,
+      "keyFiles": [
+        "mode_hud_fast.png",
+        "parcel-ui.png"
+      ]
+    },
+    "UserSettings": {
+      "path": "UserSettings",
+      "purpose": null,
+      "fileCount": 5,
+      "lastAccessed": 1794551208154,
+      "keyFiles": [
+        "EditorUserSettings.asset",
+        "HierarchyWindow.settings",
+        "PlayModeUserSettings.asset",
+        "Search.index",
+        "Search.settings"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": ".docs/dev-plan.md",
+      "accessCount": 108,
+      "lastAccessed": 1794519236867,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Player/PlayerInteractionController.cs",
+      "accessCount": 77,
+      "lastAccessed": 1794478123577,
+      "type": "file"
+    },
+    {
+      "path": ".docs/game-design.md",
+      "accessCount": 68,
+      "lastAccessed": 1794519236506,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Player/PlayerMovementController.cs",
+      "accessCount": 54,
+      "lastAccessed": 1794519109807,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Logistics/DeliveryTarget.cs",
+      "accessCount": 28,
+      "lastAccessed": 1794418950989,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Logistics/LogisticsCenter.cs",
+      "accessCount": 21,
+      "lastAccessed": 1794420447965,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Prefabs/Player.prefab",
+      "accessCount": 19,
+      "lastAccessed": 1794488817557,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Player/PlayerDeliveryController.cs",
+      "accessCount": 13,
+      "lastAccessed": 1794092232790,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Player/PlayerUIController.cs",
+      "accessCount": 11,
+      "lastAccessed": 1794418947765,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts",
+      "accessCount": 11,
+      "lastAccessed": 1794519092710,
+      "type": "directory"
+    },
+    {
+      "path": "Assets/Game/Scenes/_DevOnly/DevScene.unity",
+      "accessCount": 10,
+      "lastAccessed": 1794370115751,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Interaction/IInteractable.cs",
+      "accessCount": 9,
+      "lastAccessed": 1794374766139,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Logistics/Parcel.cs",
+      "accessCount": 9,
+      "lastAccessed": 1794418962400,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Manager/GameManager.cs",
+      "accessCount": 8,
+      "lastAccessed": 1794418951200,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/UI/PlayerObjectUI.cs",
+      "accessCount": 7,
+      "lastAccessed": 1794418951399,
+      "type": "file"
+    },
+    {
+      "path": "Assets",
+      "accessCount": 6,
+      "lastAccessed": 1794490517202,
+      "type": "directory"
+    },
+    {
+      "path": "Assets/Game/Scripts/Interaction/InteractionPrompt.cs",
+      "accessCount": 5,
+      "lastAccessed": 1794113894573,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/UI/GameObjectUIBase.cs",
+      "accessCount": 5,
+      "lastAccessed": 1794418978634,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Building/Building.cs",
+      "accessCount": 4,
+      "lastAccessed": 1794115397570,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Interaction/InteractableObject.cs",
+      "accessCount": 4,
+      "lastAccessed": 1794374765951,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Interaction/InteractionTypes.cs",
+      "accessCount": 3,
+      "lastAccessed": 1794374094785,
+      "type": "file"
+    },
+    {
+      "path": "C:/Users/simplex3510/AppData/Local/Temp/dt2_1_circling.png",
+      "accessCount": 2,
+      "lastAccessed": 1793936526108,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Interaction/PlayerInteractor.cs",
+      "accessCount": 2,
+      "lastAccessed": 1793940658098,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Prefabs/Delivery/DeliveryTarget-Type-B.prefab",
+      "accessCount": 2,
+      "lastAccessed": 1794022923724,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Prefabs/Delivery/DeliveryTargetBase.prefab",
+      "accessCount": 2,
+      "lastAccessed": 1794029810136,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Logistics/DeliveryType.cs",
+      "accessCount": 2,
+      "lastAccessed": 1794419881750,
+      "type": "file"
+    },
+    {
+      "path": "C:/Users/simplex3510/AppData/Local/Temp/gv1.png",
+      "accessCount": 1,
+      "lastAccessed": 1793934430145,
+      "type": "file"
+    },
+    {
+      "path": "C:/Users/simplex3510/AppData/Local/Temp/drive_2_cruise.png",
+      "accessCount": 1,
+      "lastAccessed": 1793934481713,
+      "type": "file"
+    },
+    {
+      "path": "C:/Users/simplex3510/AppData/Local/Temp/drive_0_idle.png",
+      "accessCount": 1,
+      "lastAccessed": 1793934481872,
+      "type": "file"
+    },
+    {
+      "path": "C:/Users/simplex3510/AppData/Local/Temp/d2_3_turnR.png",
+      "accessCount": 1,
+      "lastAccessed": 1793934566720,
+      "type": "file"
+    },
+    {
+      "path": "C:/Users/simplex3510/AppData/Local/Temp/d2_6_coast.png",
+      "accessCount": 1,
+      "lastAccessed": 1793934566853,
+      "type": "file"
+    },
+    {
+      "path": "C:/Users/simplex3510/AppData/Local/Temp/dt_2_top.png",
+      "accessCount": 1,
+      "lastAccessed": 1793936366511,
+      "type": "file"
+    },
+    {
+      "path": "C:/Users/simplex3510/AppData/Local/Temp/dt_3_turnR.png",
+      "accessCount": 1,
+      "lastAccessed": 1793936366707,
+      "type": "file"
+    },
+    {
+      "path": "C:/Users/simplex3510/AppData/Local/Temp/dt2_2_circling2.png",
+      "accessCount": 1,
+      "lastAccessed": 1793936566506,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Manager/ManagerBase.cs",
+      "accessCount": 1,
+      "lastAccessed": 1793940192629,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Interaction/Interactable.cs",
+      "accessCount": 1,
+      "lastAccessed": 1793940450534,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Interaction/DeliveryWarehouse.cs",
+      "accessCount": 1,
+      "lastAccessed": 1793940451319,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Interaction/DeliveryHouse.cs",
+      "accessCount": 1,
+      "lastAccessed": 1793940452119,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Interaction/InteractionPrompt.cs.meta",
+      "accessCount": 1,
+      "lastAccessed": 1794022791901,
+      "type": "file"
+    },
+    {
+      "path": "Temp/Claude/wire_prompt.cs",
+      "accessCount": 1,
+      "lastAccessed": 1794022897593,
+      "type": "file"
+    },
+    {
+      "path": "Temp/Claude/wire_zone.cs",
+      "accessCount": 1,
+      "lastAccessed": 1794022916545,
+      "type": "file"
+    },
+    {
+      "path": "Temp/Claude/remove_dup_text.cs",
+      "accessCount": 1,
+      "lastAccessed": 1794022934753,
+      "type": "file"
+    },
+    {
+      "path": "Temp/Claude/verify_scene.cs",
+      "accessCount": 1,
+      "lastAccessed": 1794022949694,
+      "type": "file"
+    },
+    {
+      "path": "Temp/Claude/test_enter.cs",
+      "accessCount": 1,
+      "lastAccessed": 1794022992042,
+      "type": "file"
+    },
+    {
+      "path": "Temp/Claude/test_check.cs",
+      "accessCount": 1,
+      "lastAccessed": 1794023004605,
+      "type": "file"
+    },
+    {
+      "path": "Temp/Claude/test_exit.cs",
+      "accessCount": 1,
+      "lastAccessed": 1794023014420,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/Interaction/IParcelCarrier.cs",
+      "accessCount": 1,
+      "lastAccessed": 1794036804119,
+      "type": "file"
+    },
+    {
+      "path": "Assets/Game/Scripts/UI/PlayerUIController.cs",
+      "accessCount": 1,
+      "lastAccessed": 1794113955109,
+      "type": "file"
+    },
+    {
+      "path": ".docs/Game_Design.md",
+      "accessCount": 1,
+      "lastAccessed": 1794362887407,
+      "type": "file"
+    },
+    {
+      "path": ".docs/Development_Plan.md",
+      "accessCount": 1,
+      "lastAccessed": 1794363353268,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
