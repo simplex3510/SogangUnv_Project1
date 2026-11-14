@@ -172,7 +172,10 @@
       "PowerShell(git *clean* -Xdqf*)",
       "PowerShell(git *clean* -Xqdf*)",
       "PowerShell(Get-Content *.env*)",
-      "PowerShell(*>.env*)"
+      "PowerShell(*>.env*)",
+      "Bash(gh * --repo *)",
+      "Bash(gh * -R *)",
+      "Read(~/.git-credentials)"
     ]
   },
   "hooks": {
@@ -318,5 +321,42 @@
         ]
       }
     ]
-  }
+  },
+  "extraKnownMarketplaces": {
+    "omc": {
+      "source": {
+        "source": "github",
+        "repo": "Yeachan-Heo/oh-my-claudecode"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    },
+    "aseprite-ai-artist": {
+      "source": {
+        "source": "github",
+        "repo": "with-pebbly/aseprite-ai-artist"
+      }
+    },
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "oh-my-claudecode@omc": true,
+    "ponytail@ponytail": true,
+    "unity@claude-plugins-official": true,
+    "aseprite@aseprite-ai-artist": true
+  },
+  "env": {
+    "OMC_SKIP_HOOKS": "keyword-detector,project-memory,wiki",
+    "PONYTAIL_SUBAGENT_MATCHER": "programmer|unity-.*specialist|prototyper|technical-artist|devops|executor|debugger|test-engineer|qa-tester|general-purpose"
+  },
+  "autoMemoryDirectory": "~/claude-brain/memory/unity-ai-template"
 }

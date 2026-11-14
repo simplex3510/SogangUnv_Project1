@@ -27,3 +27,27 @@
 # .gitattributes governs the INDEX. It does not retro-fix a working tree that
 # predates the rule -- run `git add --renormalize .` for that.
 .claude/**/*.md text eol=lf
+
+# === Framework overlay: Unity (docs/framework-design.md C12) ===
+# Unity YAML: LF, and merged by UnityYAMLMerge (driver path is per-PC git config, set by bootstrap).
+*.unity      text eol=lf merge=unityyamlmerge
+*.prefab     text eol=lf merge=unityyamlmerge
+*.asset      text eol=lf merge=unityyamlmerge
+*.meta       text eol=lf merge=unityyamlmerge
+*.controller text eol=lf merge=unityyamlmerge
+*.anim       text eol=lf merge=unityyamlmerge
+*.mat        text eol=lf merge=unityyamlmerge
+# Binary assets under Assets/ go to LFS (scoped to Assets/ so CCGS's own files stay untouched).
+Assets/**/*.png      filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.jpg      filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.psd      filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.tga      filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.aseprite filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.ase      filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.wav      filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.mp3      filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.ogg      filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.fbx      filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.blend    filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.ttf      filter=lfs diff=lfs merge=lfs -text
+Assets/**/*.otf      filter=lfs diff=lfs merge=lfs -text
