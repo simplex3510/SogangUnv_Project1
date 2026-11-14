@@ -119,6 +119,7 @@ InitTestScene*.unity*
 
 # /CLAUDE.md
 # /.claude
+/.claude/settings.local.json
 # /.omc
 # /.docs
 
