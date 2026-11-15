@@ -177,3 +177,5 @@ $RECYCLE.BIN/
 # === Framework overlay (docs/framework-design.md) ===
 # Graphify output is rebuilt per PC by its post-commit hook.
 graphify-out/
+# Unity 6.6+ writes an XML solution file (*.sln is already ignored above).
+*.slnx

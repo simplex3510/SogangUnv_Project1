@@ -8,15 +8,20 @@ $problems = @()
 function Have($cmd) { [bool](Get-Command $cmd -ErrorAction SilentlyContinue) }
 
 Write-Host "== Tools"
-foreach ($t in 'git', 'git-lfs', 'gh', 'node', 'bash', 'unity', 'graphify') {
+foreach ($t in 'git', 'git-lfs', 'gh', 'node', 'unity', 'graphify') {
     if (Have $t) { Write-Host "  ok       $t" } else { Write-Host "  MISSING  $t"; $problems += "$t not on PATH" }
 }
-# CCGS hooks need Git Bash; without it they silently switch off.
-if ((Have 'bash') -and -not ((bash --version) -match 'pc-msys|pc-cygwin|msys')) { $problems += 'bash is not Git Bash: CCGS hooks may not run' }
+# CCGS hooks need Git Bash; without it they silently switch off. Look beside git.exe:
+# `bash` on PATH is often WSL's (System32\bash.exe), which is not what Claude Code runs hooks with.
+$gitBash = if (Have 'git') { Join-Path (Split-Path (Split-Path (Get-Command git).Source)) 'bin\bash.exe' }
+if ($gitBash -and (Test-Path $gitBash)) { Write-Host "  ok       git bash ($gitBash)" } else { $problems += 'Git Bash not found beside git.exe: CCGS hooks will not run (install Git for Windows)' }
 if (Have 'gh') { gh auth status *> $null; if ($LASTEXITCODE) { $problems += 'gh is not logged in (gh auth login)' } }
 
 Write-Host "== Git hooks (LFS first, then Graphify: Graphify appends, LFS refuses to)"
-if (Have 'git-lfs') { git lfs install --local | Out-Null; Write-Host '  ok       git lfs hooks' }
+# On a re-run Graphify has already appended to the hooks, so `git lfs install` would refuse; skip it when LFS is in place.
+$postCommit = Join-Path (git rev-parse --git-path hooks) 'post-commit'
+if ((Test-Path $postCommit) -and (Select-String -Path $postCommit -Pattern 'git lfs' -Quiet)) { Write-Host '  ok       git lfs hooks (already installed)' }
+elseif (Have 'git-lfs') { git lfs install --local | Out-Null; Write-Host '  ok       git lfs hooks' }
 if (Have 'graphify') { graphify hook install | Out-Null; Write-Host '  ok       graphify hooks' } else { Write-Host '  SKIPPED  graphify hooks (graphify missing)' }
 
 Write-Host "== Merge drivers (per-PC git config)"

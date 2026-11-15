@@ -24,7 +24,7 @@ Design and rationale: `docs/framework-design.md`. These rules win over plugin de
 | performance-analyst | optimize-audio, optimize-web |
 | network-programmer, live-ops-designer | setup-multiplayer-services, build-live-game |
 
-- New project: `/start` → `/setup-engine unity` (records the choices) → `unity-cli` creates the project and runs `unity pipeline install`. Do not run the `new-unity-project` interview.
+- New project: create the Unity project at the repo root first (CCGS never creates one): `unity projects create <name> --output-dir <scratch> --editor-version <ver> --no-cloud`, move `Assets/`, `Packages/`, `ProjectSettings/` (and `Library/`, `UserSettings/`) into the repo root, `unity pipeline install`. Then `/start` → `/setup-engine unity`, which detects `ProjectSettings/ProjectVersion.txt` and records it. Do not run the `new-unity-project` interview.
 
 ## Art (Aseprite)
 

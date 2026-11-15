@@ -151,7 +151,12 @@ PC-B: /pickup
 | performance-analyst | `optimize-audio`, `optimize-web` |
 | network-programmer / live-ops-designer | `setup-multiplayer-services`, `build-live-game` |
 
-- 프로젝트 생성 순서: CCGS `/start` → `/setup-engine unity`(인터뷰·설정 기록) → `unity projects create`로 실제 프로젝트 생성 → `unity pipeline install`. `new-unity-project` 인터뷰는 쓰지 않음.
+- 프로젝트 생성 순서: **Unity 프로젝트를 먼저 저장소 루트에 만든다.** CCGS `/setup-engine`은 Unity 프로젝트를 만들지 않고 "먼저 만들어 두라"고 안내하며, `ProjectSettings/ProjectVersion.txt`가 있으면 Unity로 감지해 그 버전을 기록한다(`setup-engine/references/7.5-scaffold.md`, `2-guided-mode.md`).
+  1. `unity projects create <이름> --output-dir <임시 폴더> --editor-version <버전> --no-cloud` (`--template 2d`로 2D URP). CLI는 항상 새 폴더를 만들므로 임시 위치에 만든 뒤
+  2. `Assets/`, `Packages/`, `ProjectSettings/`(+ gitignore 대상인 `Library/`, `UserSettings/`)를 저장소 루트로 옮김
+  3. `unity pipeline install --project-path <저장소>` (Unity 6.6 템플릿에는 이미 포함됨)
+  4. `/start` → `/setup-engine unity`
+  - `new-unity-project` 인터뷰는 쓰지 않음.
 - 코드 루트: CCGS `code-root-resolution.md`가 이미 Unity를 `Assets/`로 인식(`Assets/Scripts/<System>/`).
 
 ### C7 🟢 Aseprite ↔ CCGS 아트 에이전트
@@ -216,7 +221,7 @@ PC-B: /pickup
 
 | 단계 | 주 도구 | 보조 |
 |---|---|---|
-| 시작 | `new-game.ps1` → CCGS `/start` → `/setup-engine unity` | `unity projects create`, `unity pipeline install` |
+| 시작 | `new-game.ps1` → Unity 프로젝트 생성(C6) → CCGS `/start` → `/setup-engine unity` | `unity projects create`, `unity pipeline install` |
 | 컨셉·프로토 | CCGS `/brainstorm`, `/prototype` | Aseprite `brief`/`concept` |
 | 설계 | CCGS GDD·`/design-review`·`/create-architecture`·ADR | Graphify |
 | 계획 | CCGS `/create-epics` → `/create-stories` → `/sprint-plan` | — |
@@ -295,8 +300,8 @@ Assets/ Packages/ ProjectSettings/      # 게임 저장소에서만 생성 (템�
 
 ### `bootstrap.ps1` (PC마다, 재실행 가능)
 
-1. 도구 확인: git, git-lfs, gh, node, Git Bash, graphify, unity. 없으면 실패로 보고.
-2. git 훅: `git lfs install --local` → `graphify hook install` (순서 고정).
+1. 도구 확인: git, git-lfs, gh, node, graphify, unity. 없으면 실패로 보고. Git Bash는 `git.exe` 옆의 `bin\bash.exe`로 확인(PATH의 `bash`는 WSL일 수 있음).
+2. git 훅: `git lfs install --local` → `graphify hook install` (순서 고정. 재실행 때 LFS 훅이 이미 있으면 건너뜀).
 3. merge 드라이버(PC별 git config): `ours`(README), `unityyamlmerge`(설치된 Unity에서 경로 탐색, 없으면 건너뜀).
 4. `.claude/settings.local.json`에 `autoMemoryDirectory` = 이 clone의 `.claude/memory` 절대경로.
 5. GitHub: `gh repo set-default <origin>`, `upstream` remote가 있으면 경고, `credential.helper=store`면 경고.
@@ -311,7 +316,7 @@ Assets/ Packages/ ProjectSettings/      # 게임 저장소에서만 생성 (템�
 | 2. 실측 검증 | 6절 항목 확인, 결과로 설정 확정 | ✅ (OMC·brain 제외 결정으로 이어짐) |
 | 3. 통합 문서 | `integration.md` + CLAUDE.md import, README 교체 | ✅ |
 | 4. 스크립트·스킬 | `bootstrap.ps1`, `new-game.ps1`, `/handoff`, `/pickup` | ✅ (bootstrap은 이 PC에서 실행 확인, new-game은 `-WhatIf`만) |
-| 5. 드라이런 | `new-game.ps1`로 시험 게임 생성 → `/start` → `/setup-engine unity` → `unity projects create` + `pipeline install` → 스토리 1개 `/story-readiness` → `/dev-story` → `/story-done` | ⏳ |
+| 5. 드라이런 | `new-game.ps1`로 시험 게임 생성 → Unity 프로젝트 생성 + `pipeline install` → `/start` → `/setup-engine unity` → 스토리 1개 `/story-readiness` → `/dev-story` → `/story-done` | 🔄 기계적 부분 완료(아래), CCGS 대화형 부분 남음 |
 | 5b. PC 이동 드라이런 | 작업 도중 `/handoff` → 다른 PC(또는 다른 clone)에서 bootstrap → `/pickup` | ⏳ |
 | 6. 버전 고정 | 통과한 플러그인 버전 조합 기록, 템플릿 태그 `v0.1` | ⏳ |
 
@@ -333,6 +338,21 @@ Assets/ Packages/ ProjectSettings/      # 게임 저장소에서만 생성 (템�
 | (OMC) 훅 지연·자동 승인·키워드·README 주입 | 🔴 0절 "제외한 것" 참고 | OMC 제외 |
 
 ---
+
+### 5단계 드라이런 — 기계적 부분 (2026-11-15)
+
+시험 저장소 `simplex3510/unity-ai-dryrun` (private, `D:\Unity Projects\unity-ai-dryrun`).
+
+| 단계 | 결과 |
+|---|---|
+| `new-game.ps1 unity-ai-dryrun` | ✅ private 저장소 생성, clone, remote `origin`/`template`, push, bootstrap 자동 실행 |
+| bootstrap (게임 저장소) | ✅ LFS→Graphify 훅, UnityYAMLMerge 경로 탐색, `settings.local.json` 메모리 경로, gh 기본 저장소 |
+| 🐞 bootstrap Git Bash 판정 | PowerShell에서 `bash`가 **WSL**(`System32\bash.exe`)로 잡혀 오탐. → `git.exe` 옆 `bin\bash.exe`를 확인하도록 수정 |
+| 🐞 bootstrap 재실행 | Graphify가 덧붙인 뒤라 `git lfs install`이 "Hook already exists"로 실패 → 이미 있으면 건너뛰도록 수정 |
+| `unity projects create` (6000.6.8f1, URP 3D) | ✅ 1분 17초. 임시 폴더에 만든 뒤 루트로 이동. 커밋 대상 68개 파일, PNG 1개만 LFS |
+| 🐞 `.gitignore` | Unity 6.6이 만드는 `*.slnx`가 무시 목록에 없음 → 템플릿에 추가 |
+| `unity pipeline install` | ✅ Unity 6.6 URP 템플릿에는 `com.unity.pipeline` 1.0.0이 이미 포함 |
+| Editor 연결 | ✅ `unity open` → `unity status --until-ready` = `ready`, `unity command script eval`로 C# 실행 확인 (`SampleScene`) |
 
 ## 7. 남는 리스크
 
