@@ -168,6 +168,7 @@ Godot/Unreal 에이전트·스킬은 지우지 않는다. 지우면 CCGS가 그 
 
 ```
 .claude/docs/framework/integration.md   # 매 세션 로드되는 규칙
+.claude/rules/unity-assets.md           # Unity 에셋·직렬화·패키지 안전 규칙
 .claude/memory/MEMORY.md                # 공유 메모리
 .claude/skills/handoff/, pickup/        # PC 이동
 scripts/bootstrap.ps1                   # PC 셋업·점검 (재실행 가능)
