@@ -115,7 +115,10 @@ With Aseprite open:
 
 ## Questions about code structure (Graphify)
 
-Every commit refreshes the code graph (`graphify-out/`). Claude uses it first for questions like "where is PlayerController referenced?" or "how does jump input reach the movement code?". After changing design docs, run `/graphify --update`.
+Every commit refreshes the code graph (`graphify-out/`), with no LLM cost. Claude uses it first for questions like "where is PlayerController referenced?" or "how does jump input reach the movement code?".
+
+- The graph holds only game code and game docs. Framework files (`.claude/`, CCGS docs and so on), Unity settings and images are left out by `.graphifyignore`. Add a path there to leave out more.
+- To add the concepts and links inside design docs, run `/graphify --update` (uses the LLM).
 
 ---
 

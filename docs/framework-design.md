@@ -17,7 +17,7 @@
 | 기억 | 프로젝트 지식·공유 메모리·세션 인계 모두 게임 저장소 안에서 git으로 이동 (C5) |
 | PC 이동 | `/handoff`(떠나는 PC) / `/pickup`(도착한 PC) |
 | GitHub | trunk 기반, GitHub MCP 대신 `gh` CLI (C9) |
-| Graphify | post-commit 훅으로 자동 갱신, `graphify-out/`은 커밋 안 함 |
+| Graphify | 게임 코드·게임 문서만 추적(`.graphifyignore`가 프레임워크·Unity 설정·이미지 제외). post-commit 훅으로 자동 갱신(LLM 없음), `graphify-out/`은 커밋 안 함 |
 | Unity | Unity 6 + C# + Pipeline 패키지 + CLI만 고정. 2D/3D·렌더 파이프라인은 프로젝트마다 `/setup-engine`에서 |
 | 언어 | 대화는 한국어. 문서 본문 한국어, 템플릿 제목·YAML 키·상태값은 영어(CCGS 스크립트가 영어 문자열을 찾음). 코드 식별자 영어·주석 한국어, 커밋은 `feat: 한국어 요약` |
 
@@ -172,6 +172,7 @@ Godot/Unreal 에이전트·스킬은 지우지 않는다. 지우면 CCGS가 그 
 scripts/bootstrap.ps1                   # PC 셋업·점검 (재실행 가능)
 scripts/new-game.ps1                    # 새 게임 저장소 생성
 scripts/template.url                    # 게임 저장소가 template remote를 복구할 주소
+.graphifyignore                         # Graphify가 추적하지 않을 프레임워크 파일
 README-en.md, docs/framework-design.md
 ```
 

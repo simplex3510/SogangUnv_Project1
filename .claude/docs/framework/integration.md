@@ -51,7 +51,8 @@ The team is Korean. This rule wins over the English wording of every skill, agen
 ## Graphify
 
 - If `graphify-out/graph.json` exists, answer code-structure questions with `graphify query`, `path` or `explain` before reading files.
-- The post-commit hook refreshes code nodes. After changing design docs run `/graphify --update`. Worktree commits do not refresh it.
+- The graph holds only game code and game docs. `.graphifyignore` keeps out the framework (`.claude/`, CCGS docs, `scripts/`), Unity settings and images; to exclude more, add a path there.
+- The post-commit hook rebuilds the graph from code and document headings, with no LLM. `/graphify --update` adds LLM-extracted concepts and links for changed game docs; run it only when that matters. Worktree commits do not refresh the graph.
 - `graphify-out/` is not committed; each PC rebuilds it.
 
 ## Memory and moving between PCs

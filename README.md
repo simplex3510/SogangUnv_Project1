@@ -115,7 +115,10 @@ Aseprite를 열어 둔 상태에서:
 
 ## 코드 구조 질문 (Graphify)
 
-커밋할 때마다 코드 그래프(`graphify-out/`)가 자동으로 갱신돼요. "PlayerController는 어디서 참조돼?", "점프 입력이 이동 코드까지 어떻게 이어져?" 같은 질문에 Claude가 그래프를 먼저 써서 답해요. 설계 문서를 바꾼 뒤에는 `/graphify --update`를 실행하세요.
+커밋할 때마다 코드 그래프(`graphify-out/`)가 자동으로 갱신돼요(LLM 비용 없음). "PlayerController는 어디서 참조돼?", "점프 입력이 이동 코드까지 어떻게 이어져?" 같은 질문에 Claude가 그래프를 먼저 써서 답해요.
+
+- 그래프에는 게임 코드와 게임 문서만 들어가요. 프레임워크 파일(`.claude/`, CCGS 문서 등), Unity 설정, 이미지는 `.graphifyignore`로 빠져 있어요. 더 빼고 싶은 경로는 이 파일에 추가하세요.
+- 기획 문서의 개념 관계까지 그래프에 넣고 싶으면 `/graphify --update`를 실행하세요(LLM 사용).
 
 ---
 
