@@ -10,10 +10,11 @@ using Game.Player.Interaction;
 
 namespace Game.UI
 {
-    /// <summary>물류센터 상차 UI. 배송지 그룹을 거리순으로, 그룹 안 물류를 남은 제한 시간순으로 늘어놓고 선택 결과를 플레이어에게 넘긴다.</summary>
+    /// <summary>물류센터 상차 UI. 배송지 그룹을 거리순으로, 그룹 안 물류를 처리 순서(기획서 7.4)로 늘어놓고 선택 결과를 플레이어에게 넘긴다.</summary>
     public class LogisticsCenterUI : MonoBehaviour
     {
         private const string FillPath = "Background/Fill";
+        private const string NoDeadlineText = "--:--";
 
         [SerializeField] private LogisticsCenter _center;
         [SerializeField] private GameObject _panel;
@@ -21,6 +22,8 @@ namespace Game.UI
         [SerializeField] private Button _groupTemplate;
         [SerializeField] private Button _parcelTemplate;
         [SerializeField] private Button _closeButton;
+        [Tooltip("차량 적재 용량·무게 사용량 표시(기획서 8.1)")]
+        [SerializeField] private TMP_Text _usageLabel;
         [Tooltip("적재 한도에 도달했거나 이미 실은 항목의 색")]
         [SerializeField] private Color _disabledColor = new(0.5f, 0.5f, 0.5f, 1f);
 
@@ -151,20 +154,41 @@ namespace Game.UI
         {
             ClearRows();
             CollectGroups();
-
-            bool isCargoFull = _controller != null
-                && _controller.LoadedParcels.Count >= _controller.MaxLoadedParcels;
+            RefreshUsageLabel();
 
             for (int i = 0; i < _groups.Count; i++)
             {
                 ParcelGroup group = _groups[i];
-                AddGroupRow(group, isCargoFull);
+                AddGroupRow(group);
 
+                // 현재 사용량으로 실을 수 없는 물류는 행 단위로 비활성 표시한다(기획서 8.5, 16.2-5)
                 for (int j = 0; j < group.Remaining.Count; j++)
                 {
-                    AddParcelRow(group.Remaining[j], isCargoFull);
+                    Parcel parcel = group.Remaining[j];
+                    AddParcelRow(parcel, CanLoad(parcel) == false);
                 }
             }
+        }
+
+        /// <summary>그룹 상차는 처리 순서 첫 물류부터 시작하므로, 그 물류가 실려야 그룹을 누를 수 있다(결정 D5).</summary>
+        private bool CanHoldGroup(ParcelGroup group)
+        {
+            return group.Remaining.Count > 0 && CanLoad(group.Remaining[0]);
+        }
+
+        private bool CanLoad(Parcel parcel)
+        {
+            return _controller != null && _controller.CanLoad(parcel);
+        }
+
+        private void RefreshUsageLabel()
+        {
+            if (_usageLabel == null || _controller == null)
+            {
+                return;
+            }
+
+            _usageLabel.text = $"CARGO {_controller.UsedCapacity}/{_controller.CargoCapacity}   WEIGHT {_controller.UsedWeight}/{_controller.WeightCapacity}";
         }
 
         /// <summary>대기열 물류를 배송지별로 묶고, 그룹은 물류센터에서의 거리순·그룹 내부는 남은 시간순으로 정렬한다(기획서 8.1).</summary>
@@ -212,7 +236,7 @@ namespace Game.UI
 
             for (int i = 0; i < _groups.Count; i++)
             {
-                _groups[i].Remaining.Sort(CompareByRemainingDeadline);
+                _groups[i].Remaining.Sort(Parcel.CompareProcessingOrder);
             }
 
             _groups.Sort((a, b) => a.Distance.CompareTo(b.Distance));
@@ -237,7 +261,7 @@ namespace Game.UI
             return group;
         }
 
-        private void AddGroupRow(ParcelGroup group, bool isCargoFull)
+        private void AddGroupRow(ParcelGroup group)
         {
             Button button = Instantiate(_groupTemplate, _content);
             button.gameObject.SetActive(true);
@@ -248,14 +272,14 @@ namespace Game.UI
             {
                 // 미적재 수량은 차량 적재량과 분리해 표시한다(기획서 8.1)
                 label.text = BuildGroupText(group.Target, group.Distance, group.Remaining.Count);
-                label.color = isCargoFull || group.Remaining.Count == 0 ? _disabledColor : Color.white;
+                label.color = CanHoldGroup(group) ? Color.white : _disabledColor;
                 _groupLabels[group.Target] = label;
             }
 
             _groupDistances[group.Target] = group.Distance;
 
             // 적재 한도에 도달해도 그룹은 숨기지 않고 비활성으로 남긴다(기획서 16.2-5)
-            bool canHold = isCargoFull == false && group.Remaining.Count > 0;
+            bool canHold = CanHoldGroup(group);
             ConfigureButton(button, canHold == false);
 
             if (canHold)
@@ -273,8 +297,7 @@ namespace Game.UI
             TMP_Text label = button.GetComponentInChildren<TMP_Text>(true);
             if (label != null)
             {
-                // 남은 시간이 아니라 생성 시점에 확정된 만료 시각(게임 시계)을 보여 준다
-                label.text = $"#{parcel.Id}  {FormatClock(parcel.CreationTime + parcel.Deadline)}";
+                label.text = BuildParcelText(parcel);
                 label.color = isDisabled ? _disabledColor : Color.white;
             }
 
@@ -283,10 +306,15 @@ namespace Game.UI
             Transform fill = button.transform.Find(FillPath);
             if (fill != null && fill.TryGetComponent(out Image fillImage))
             {
-                _parcelFills[parcel] = fillImage;
-                fillImage.fillAmount = parcel.Deadline > 0f
-                    ? Mathf.Clamp01(parcel.RemainingDeadline / parcel.Deadline)
-                    : 0f;
+                // 제한 시간이 없는 물류는 바를 숨기고 매 프레임 갱신 대상에도 넣지 않는다(기획서 8.2)
+                fillImage.enabled = parcel.HasDeadline;
+                if (parcel.HasDeadline)
+                {
+                    _parcelFills[parcel] = fillImage;
+                    fillImage.fillAmount = parcel.Deadline > 0f
+                        ? Mathf.Clamp01(parcel.RemainingDeadline / parcel.Deadline)
+                        : 0f;
+                }
             }
 
             ConfigureButton(button, isDisabled);
@@ -371,11 +399,10 @@ namespace Game.UI
             }
 
             _heldParcels.Remove(parcel);
+            RefreshUsageLabel();
 
-            bool isCargoFull = _controller != null
-                && _controller.LoadedParcels.Count >= _controller.MaxLoadedParcels;
-
-            if (_heldParcels.Count == 0 || isCargoFull)
+            // 처리 순서상 다음 물류가 한도를 넘으면 컨트롤러가 상차를 끝냈으므로 홀드도 끝낸다(결정 D5)
+            if (_heldParcels.Count == 0 || CanLoad(_heldParcels[0]) == false)
             {
                 _heldButton?.EndHold();
             }
@@ -411,6 +438,23 @@ namespace Game.UI
 
             float distance = _groupDistances.TryGetValue(target, out float stored) ? stored : 0f;
             label.text = BuildGroupText(target, distance, CountAvailable(target));
+        }
+
+        /// <summary>물류 행 표기: 번호, 배송 유형, 특징(F/H/L 자리), 적재 용량·무게 사용량, 만료 시각(기획서 8.1).</summary>
+        private static string BuildParcelText(Parcel parcel)
+        {
+            string type = parcel.Type == DeliveryType.Express ? "EXP" : "NRM";
+
+            CargoTrait traits = parcel.Cargo.Traits;
+            char fragile = (traits & CargoTrait.Fragile) != 0 ? 'F' : '-';
+            char heavy = (traits & CargoTrait.Heavy) != 0 ? 'H' : '-';
+            char large = (traits & CargoTrait.Large) != 0 ? 'L' : '-';
+
+            // 남은 시간이 아니라 생성 시점에 확정된 만료 시각(게임 시계)을 보여 준다. 제한 시간이 없으면 --:--
+            string expiry = parcel.HasDeadline ? FormatClock(parcel.CreationTime + parcel.Deadline) : NoDeadlineText;
+
+            // 비례폭 폰트에서도 행끼리 열이 맞도록 고정폭 태그로 감싼다
+            return $"<mspace=0.62em>#{parcel.Id,-3} {type} {fragile}{heavy}{large} C{parcel.Cargo.CapacityUsage} W{parcel.Cargo.WeightUsage}  {expiry}</mspace>";
         }
 
         private string BuildGroupText(DeliveryTarget target, float distance, int remaining)
@@ -470,11 +514,6 @@ namespace Game.UI
             _parcelFills.Clear();
             _groupLabels.Clear();
             _groupDistances.Clear();
-        }
-
-        private static int CompareByRemainingDeadline(Parcel a, Parcel b)
-        {
-            return a.RemainingDeadline.CompareTo(b.RemainingDeadline);
         }
 
         private static float CalculateXZDistance(Vector3 a, Vector3 b)

@@ -39,26 +39,43 @@ namespace Game.Logistics
             }
         }
 
-        /// <summary>물류를 생성하고 제한 시간을 확정한다. T_limit = T_base(D) * M_type + R</summary>
-        public Parcel CreateParcel(Vector3 origin, DeliveryTarget target, DeliveryType type, float deadlineMultiplier, DeliveryReward reward)
+        /// <summary>물류를 생성하고 제한 시간을 확정한다. T_limit = T_base(D) * M_type + R (제한 시간이 있는 유형만)</summary>
+        public Parcel CreateParcel(
+            Vector3 origin,
+            DeliveryTarget target,
+            DeliveryType type,
+            DeliveryGenerationType generationType,
+            CargoSpec cargo,
+            bool hasDeadline,
+            float deadlineMultiplier,
+            DeliveryReward reward)
         {
             float distance = CalculateXZDistance(origin, target.transform.position);
-            float baseDeadline = _config.BaseSeconds + _config.SecondsPerMeter * distance;
-            float variation = Random.Range(_config.VariationMinSeconds, _config.VariationMaxSeconds);
-            float deadline = Mathf.Max(baseDeadline * deadlineMultiplier + variation, 0f);
+            float deadline = 0f;
+            if (hasDeadline)
+            {
+                float baseDeadline = _config.BaseSeconds + _config.SecondsPerMeter * distance;
+                float variation = Random.Range(_config.VariationMinSeconds, _config.VariationMaxSeconds);
+                deadline = Mathf.Max(baseDeadline * deadlineMultiplier + variation, 0f);
+            }
 
             Parcel parcel = new Parcel(
                 _nextParcelId++,
                 target,
                 type,
+                generationType,
+                cargo,
                 GameTimeSystem.Instance.CurrentSeconds,
+                hasDeadline,
                 deadline,
                 reward);
 
+            // 제한 시간이 없어도 영업 종료 시 미배송 판정을 위해 추적한다
             _trackedParcels.Add(parcel);
             target.AddParcel(parcel);
 
-            Debug.Log($"[Parcel #{parcel.Id}] 배송지 {target.name}, 타입 {type}, 거리 {distance:0.0}m, 제한 시간 {deadline:0}초, 보상 {reward.BaseFee + reward.DistanceFee:0}/{reward.TimeBonus:0}");
+            string deadlineText = hasDeadline ? $"{deadline:0}초" : "없음";
+            Debug.Log($"[Parcel #{parcel.Id}] 배송지 {target.name}, 타입 {type}, 생성 {generationType}, 특징 {cargo.Traits}, 내구도 {cargo.Durability}, 용량 {cargo.CapacityUsage}, 무게 {cargo.WeightUsage}, 거리 {distance:0.0}m, 제한 시간 {deadlineText}, 보상 {reward.BaseFee + reward.DistanceFee:0}/{reward.TimeBonus:0}/특징 {reward.TraitBonus:0}");
 
             return parcel;
         }
@@ -87,7 +104,7 @@ namespace Game.Logistics
             for (int i = 0; i < _trackedParcels.Count; i++)
             {
                 Parcel parcel = _trackedParcels[i];
-                if (parcel.IsOverdue)
+                if (parcel.HasDeadline == false || parcel.IsOverdue)
                 {
                     continue;
                 }

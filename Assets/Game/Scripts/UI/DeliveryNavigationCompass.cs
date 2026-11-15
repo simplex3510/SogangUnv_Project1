@@ -107,7 +107,7 @@ namespace Game.UI
             }
         }
 
-        /// <summary>적재 물류의 배송지를 남은 제한 시간이 짧은 순서로 중복 없이 모은다.</summary>
+        /// <summary>적재 물류의 배송지를 처리 순서(기획서 7.4)가 앞선 물류 기준으로 중복 없이 모은다.</summary>
         private void CollectTargets()
         {
             _targets.Clear();
@@ -124,7 +124,7 @@ namespace Game.UI
                         continue;
                     }
 
-                    if (next == null || parcel.RemainingDeadline < next.RemainingDeadline)
+                    if (next == null || Parcel.CompareProcessingOrder(parcel, next) < 0)
                     {
                         next = parcel;
                     }

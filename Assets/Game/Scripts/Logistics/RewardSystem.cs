@@ -25,7 +25,7 @@ namespace Game.Logistics
         }
 
         /// <summary>생성 시점 값으로 고정되는 보상·손실 묶음을 만든다. 근거 값이 없으면 아무것도 지급·부과하지 않는다.</summary>
-        public DeliveryReward CreateReward(Vector3 origin, Vector3 targetPosition, DeliveryType type)
+        public DeliveryReward CreateReward(Vector3 origin, Vector3 targetPosition, DeliveryType type, float traitBonus)
         {
             if (_config == null || _typeConfig == null)
             {
@@ -34,11 +34,15 @@ namespace Game.Logistics
 
             float distance = CalculateXZDistance(origin, targetPosition);
 
+            // 제한 시간이 없는 유형(Normal)은 시간 추가 보상·시간 초과 손실 판정 자체가 없다(기획서 11.1)
+            bool hasDeadline = _typeConfig.HasDeadline(type);
+
             return new DeliveryReward(
                 _config.BaseFee,
                 _config.DistanceFeePerMeter * distance,
-                _config.TimeBonus,
-                _config.LateLoss * _typeConfig.GetLateLossMultiplier(type),
+                hasDeadline ? _config.TimeBonus : 0f,
+                traitBonus,
+                hasDeadline ? _config.LateLoss * _typeConfig.GetLateLossMultiplier(type) : 0f,
                 _config.FailurePenalty * _typeConfig.GetFailurePenaltyMultiplier(type));
         }
 

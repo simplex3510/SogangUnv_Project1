@@ -6,14 +6,16 @@ namespace Game.Logistics
         public readonly float BaseFee;
         public readonly float DistanceFee;
         public readonly float TimeBonus;
+        public readonly float TraitBonus;
         public readonly float LateLoss;
         public readonly float FailurePenalty;
 
-        public DeliveryReward(float baseFee, float distanceFee, float timeBonus, float lateLoss, float failurePenalty)
+        public DeliveryReward(float baseFee, float distanceFee, float timeBonus, float traitBonus, float lateLoss, float failurePenalty)
         {
             BaseFee = baseFee;
             DistanceFee = distanceFee;
             TimeBonus = timeBonus;
+            TraitBonus = traitBonus;
             LateLoss = lateLoss;
             FailurePenalty = failurePenalty;
         }
@@ -25,7 +27,11 @@ namespace Game.Logistics
         public int Id { get; }
         public DeliveryTarget Target { get; }
         public DeliveryType Type { get; }
+        public DeliveryGenerationType GenerationType { get; }
+        public CargoSpec Cargo { get; }
         public float CreationTime { get; }
+        // 제한 시간이 없는 물류(Normal)는 Deadline·RemainingDeadline·IsOverdue를 사용하지 않는다
+        public bool HasDeadline { get; }
         public float Deadline { get; }
         public float RemainingDeadline { get; set; }
         public ParcelStatus Status { get; set; }
@@ -36,19 +42,45 @@ namespace Game.Logistics
             int id,
             DeliveryTarget target,
             DeliveryType type,
+            DeliveryGenerationType generationType,
+            CargoSpec cargo,
             float creationTime,
+            bool hasDeadline,
             float deadline,
             DeliveryReward reward)
         {
             Id = id;
             Target = target;
             Type = type;
+            GenerationType = generationType;
+            Cargo = cargo;
             CreationTime = creationTime;
-            Deadline = deadline;
+            HasDeadline = hasDeadline;
+            Deadline = hasDeadline ? deadline : 0f;
             Reward = reward;
 
-            RemainingDeadline = deadline;
+            RemainingDeadline = Deadline;
             Status = ParcelStatus.Pending;
+        }
+
+        /// <summary>같은 배송지 물류의 처리 순서(기획서 7.4): 제한 시간 있는 물류를 남은 시간 짧은 순으로 먼저, 그다음 생성 순.</summary>
+        public static int CompareProcessingOrder(Parcel a, Parcel b)
+        {
+            if (a.HasDeadline != b.HasDeadline)
+            {
+                return a.HasDeadline ? -1 : 1;
+            }
+
+            if (a.HasDeadline)
+            {
+                int byRemaining = a.RemainingDeadline.CompareTo(b.RemainingDeadline);
+                if (byRemaining != 0)
+                {
+                    return byRemaining;
+                }
+            }
+
+            return a.Id.CompareTo(b.Id);
         }
     }
 }

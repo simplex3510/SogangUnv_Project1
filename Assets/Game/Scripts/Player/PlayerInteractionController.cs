@@ -15,9 +15,9 @@ namespace Game.Player.Interaction
         [Header("Interact Input")]
         [SerializeField] private InputActionReference _interactionInput;
 
-        [Header("Parcels Settings")]
-        [Tooltip("한 번에 적재할 수 있는 택배 수")]
-        [SerializeField, Min(1)] private int _maxLoadedParcels = 6;
+        [Header("Cargo Settings")]
+        [Tooltip("차량 적재 한도·무게 한도 설정(기획서 8.5)")]
+        [SerializeField] private VehicleCargoConfig _cargoConfig;
 
         // 적재한 물류. 배송지별 필터링과 개별 상태 추적에 사용한다.
         private readonly List<Parcel> _loadedParcels = new();
@@ -57,7 +57,59 @@ namespace Game.Player.Interaction
         public event Action<string> InteractionBlocked;
 
         public IReadOnlyList<Parcel> LoadedParcels => _loadedParcels;
-        public int MaxLoadedParcels => _maxLoadedParcels;
+        public int CargoCapacity => _cargoConfig != null ? _cargoConfig.CargoCapacity : 0;
+        public int WeightCapacity => _cargoConfig != null ? _cargoConfig.WeightCapacity : 0;
+
+        // 적재 목록이 작아 매번 합산한다. 별도 누적값을 두면 상차·하차·실패 경로마다 동기화가 필요하다
+        public int UsedCapacity
+        {
+            get
+            {
+                int sum = 0;
+                for (int i = 0; i < _loadedParcels.Count; i++)
+                {
+                    sum += _loadedParcels[i].Cargo.CapacityUsage;
+                }
+
+                return sum;
+            }
+        }
+
+        public int UsedWeight
+        {
+            get
+            {
+                int sum = 0;
+                for (int i = 0; i < _loadedParcels.Count; i++)
+                {
+                    sum += _loadedParcels[i].Cargo.WeightUsage;
+                }
+
+                return sum;
+            }
+        }
+
+        /// <summary>상차 후에도 적재 한도와 무게 한도를 모두 넘지 않는지(기획서 8.5).</summary>
+        public bool CanLoad(Parcel parcel)
+        {
+            return parcel != null && GetLoadBlockReason(parcel) == null;
+        }
+
+        /// <summary>상차할 수 없는 이유. 둘 다 넘으면 적재 한도를 먼저 알린다. 실을 수 있으면 null.</summary>
+        public string GetLoadBlockReason(Parcel parcel)
+        {
+            if (UsedCapacity + parcel.Cargo.CapacityUsage > CargoCapacity)
+            {
+                return "CARGO FULL";
+            }
+
+            if (UsedWeight + parcel.Cargo.WeightUsage > WeightCapacity)
+            {
+                return "WEIGHT LIMIT";
+            }
+
+            return null;
+        }
 
         /// <summary>물류 하나를 처리하는 중인지. 주행 모드 전환·드리프트 차단에 사용한다.</summary>
         public bool IsInteracting => _activeParcel != null;
@@ -70,6 +122,15 @@ namespace Game.Player.Interaction
             }
 
             return Mathf.Clamp01(_progressSeconds / _currentInteractable.InteractionDuration);
+        }
+
+        private void Awake()
+        {
+            if (_cargoConfig == null)
+            {
+                // 한도가 0이 되어 아무것도 실을 수 없으므로 배선 누락을 바로 알린다
+                Debug.LogError($"VehicleCargoConfig is not assigned in {gameObject.name}");
+            }
         }
 
         private void OnEnable()
@@ -163,10 +224,10 @@ namespace Game.Player.Interaction
                 return;
             }
 
+            // 다음 물류가 한도를 넘으면 TryBeginNextParcel이 선택을 비우므로 여기서 함께 멈춘다
             if (_currentInteractable is LogisticsCenter center
                 && center.IsUIOpen
-                && HasRemainingSelection(center)
-                && _loadedParcels.Count < _maxLoadedParcels)
+                && HasRemainingSelection(center))
             {
                 TickInteraction(Time.deltaTime);
                 return;
@@ -178,7 +239,9 @@ namespace Game.Player.Interaction
         /// <summary>상호작용 키를 유지하는 동안 호출되어 진행도를 쌓는다. 검증용으로도 호출할 수 있다.</summary>
         public void TickInteraction(float deltaSeconds)
         {
-            if (_currentInteractable == null || CanInteract(_currentInteractable) == false)
+            // 고른 물류가 남아 있으면 실을 수 있는지는 TryBeginNextParcel이 판정하고 막힌 이유를 알린다
+            bool continuesSelection = _currentInteractable is LogisticsCenter selectedCenter && HasRemainingSelection(selectedCenter);
+            if (_currentInteractable == null || (continuesSelection == false && CanInteract(_currentInteractable) == false))
             {
                 StopInteraction();
                 return;
@@ -288,7 +351,8 @@ namespace Game.Player.Interaction
 
             if (interactable.InteractionType == InteractionTypes.Load)
             {
-                return _loadedParcels.Count < _maxLoadedParcels;
+                // 실을 수 있는 물류가 하나라도 남아 있어야 물류센터와 상호작용한다
+                return interactable is LogisticsCenter center && HasLoadableParcel(center);
             }
 
             if (interactable.InteractionType == InteractionTypes.Unload)
@@ -347,7 +411,7 @@ namespace Game.Player.Interaction
             {
                 if (CanInteract(center) == false)
                 {
-                    InteractionBlocked?.Invoke("NO PARCELS TO LOAD");
+                    InteractionBlocked?.Invoke(GetBlockedReason(center));
                 }
 
                 // UI 열기와 상차는 키를 유지하는 동안 TickInteraction이 진행한다
@@ -375,25 +439,40 @@ namespace Game.Player.Interaction
                 return "NO PARCEL FOR THIS TARGET";
             }
 
-            if (interactable.InteractionType == InteractionTypes.Load)
+            if (interactable is LogisticsCenter center)
             {
-                return _loadedParcels.Count >= _maxLoadedParcels ? "CARGO FULL" : "NO PARCELS TO LOAD";
+                // 대기열이 남아 있는데 실을 수 없으면 선두 물류 기준으로 어느 한도인지 알린다
+                Parcel head = center.PeekNextParcel();
+                return head != null ? GetLoadBlockReason(head) ?? "NO PARCELS TO LOAD" : "NO PARCELS TO LOAD";
             }
 
             return null;
+        }
+
+        private bool HasLoadableParcel(LogisticsCenter center)
+        {
+            IReadOnlyList<Parcel> available = center.AvailableParcels;
+            for (int i = 0; i < available.Count; i++)
+            {
+                if (CanLoad(available[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool TryBeginNextParcel()
         {
             if (_currentInteractable is LogisticsCenter center)
             {
-                if (_loadedParcels.Count >= _maxLoadedParcels)
+                if (StopLoadingIfBlocked(center))
                 {
                     return false;
                 }
 
-                Parcel next = FindNextLoadParcel(center);
-                return BeginParcel(next);
+                return BeginParcel(FindNextLoadParcel(center));
             }
 
             if (_currentInteractable is DeliveryTarget target)
@@ -402,6 +481,22 @@ namespace Game.Player.Interaction
             }
 
             return false;
+        }
+
+        /// <summary>처리 순서상 다음 물류가 한도를 넘으면 뒤의 물류로 건너뛰지 않고 상차를 끝낸다(기획서 8.5, 결정 D5).</summary>
+        private bool StopLoadingIfBlocked(LogisticsCenter center)
+        {
+            Parcel next = FindNextLoadParcel(center);
+            if (next == null || CanLoad(next))
+            {
+                return false;
+            }
+
+            _loadSelection.Clear();
+            _hasExplicitSelection = false;
+            _isLoadRequested = false;
+            InteractionBlocked?.Invoke(GetLoadBlockReason(next));
+            return true;
         }
 
         private bool BeginParcel(Parcel parcel)
@@ -450,7 +545,7 @@ namespace Game.Player.Interaction
             return false;
         }
 
-        /// <summary>해당 배송지로 보낼 물류 중 남은 제한 시간이 가장 짧은 것(기획서 9.3).</summary>
+        /// <summary>해당 배송지로 보낼 물류 중 처리 순서가 가장 앞선 것(기획서 7.4, 9.3).</summary>
         private Parcel FindNextUnloadParcel(DeliveryTarget target)
         {
             Parcel next = null;
@@ -462,7 +557,7 @@ namespace Game.Player.Interaction
                     continue;
                 }
 
-                if (next == null || parcel.RemainingDeadline < next.RemainingDeadline)
+                if (next == null || Parcel.CompareProcessingOrder(parcel, next) < 0)
                 {
                     next = parcel;
                 }
@@ -484,16 +579,16 @@ namespace Game.Player.Interaction
                 parcel.Status = ParcelStatus.Loaded;
                 _loadedParcels.Add(parcel);
                 _loadSelection.Remove(parcel);
+
+                // UI가 이벤트를 받을 때 선택이 이미 정리되어 있도록 알림보다 먼저 판정한다
+                if (_hasExplicitSelection)
+                {
+                    StopLoadingIfBlocked(center);
+                }
+
                 parcel.Target.NotifyParcelChanged(parcel);
                 LoadedParcelsChanged?.Invoke(parcel);
-                Debug.Log($"[상차] 물류 #{parcel.Id} 적재 완료 ({_loadedParcels.Count}/{_maxLoadedParcels})");
-
-                // 적재 한도에 도달하면 남은 선택을 버리고 상차를 종료한다(기획서 8.5)
-                if (_loadedParcels.Count >= _maxLoadedParcels)
-                {
-                    _loadSelection.Clear();
-                    _hasExplicitSelection = false;
-                }
+                Debug.Log($"[상차] 물류 #{parcel.Id} 적재 완료 {FormatUsage()}");
             }
             else if (_currentInteractable is DeliveryTarget target && _loadedParcels.Remove(parcel))
             {
@@ -514,10 +609,14 @@ namespace Game.Player.Interaction
                 DeliveryDeadlineSystem.Instance.NotifyDelivered(parcel);
             }
 
-            Debug.Log($"[하차] 물류 #{parcel.Id} 배송 완료 ({_loadedParcels.Count}/{_maxLoadedParcels})");
+            Debug.Log($"[하차] 물류 #{parcel.Id} 배송 완료 {FormatUsage()}");
         }
 
-        /// <summary>작업 중인 물류를 취소한다. 완료 전에는 대기열·적재 목록을 건드리지 않으므로 진행도만 초기화하면 된다.</summary>
+        private string FormatUsage()
+        {
+            return $"(용량 {UsedCapacity}/{CargoCapacity}, 무게 {UsedWeight}/{WeightCapacity})";
+        }
+
         /// <summary>진행 중인 작업과 진행도를 초기화한다. 완료 전에는 대기열·적재 목록을 건드리지 않는다.</summary>
         private void StopInteraction()
         {
