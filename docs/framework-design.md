@@ -153,7 +153,7 @@ PC-B: /pickup
 
 - 프로젝트 생성 순서: **Unity 프로젝트를 먼저 저장소 루트에 만든다.** CCGS `/setup-engine`은 Unity 프로젝트를 만들지 않고 "먼저 만들어 두라"고 안내하며, `ProjectSettings/ProjectVersion.txt`가 있으면 Unity로 감지해 그 버전을 기록한다(`setup-engine/references/7.5-scaffold.md`, `2-guided-mode.md`).
   1. `unity projects create <이름> --output-dir <임시 폴더> --editor-version <버전> --no-cloud` (`--template 2d`로 2D URP). CLI는 항상 새 폴더를 만들므로 임시 위치에 만든 뒤
-  2. `Assets/`, `Packages/`, `ProjectSettings/`(+ gitignore 대상인 `Library/`, `UserSettings/`)를 저장소 루트로 옮김
+  2. `Assets/`, `Packages/`, `ProjectSettings/`**만** 저장소 루트로 옮김. **`Library/`는 옮기지 않는다** — 임포트 캐시가 임시 폴더의 절대경로를 기억해서, URP `.urtshader` 임포트가 Editor를 열 때마다 실패함(드라이런에서 확인). 처음 열 때 새로 만들어짐(약 1분)
   3. Hub 등록 경로 교체: `unity projects remove <임시 경로>` → `unity projects add <저장소>` (임시 경로는 `unity projects --all`에 나온 표기 그대로 — 짧은 8.3 경로로 등록될 수 있음)
   4. `unity pipeline install --project-path <저장소>` (Unity 6.6 템플릿에는 이미 포함됨)
   5. `/start` → `/setup-engine unity`
@@ -358,6 +358,7 @@ Assets/ Packages/ ProjectSettings/      # 게임 저장소에서만 생성 (템�
 | 🐞 Hub 등록 | 임시 폴더 경로가 Hub에 남음 → `projects remove`/`add`로 교체 절차 추가 |
 | 🐞 `.vscode/` | Unity가 `extensions.json`·`launch.json`을 생성, CCGS는 `settings.json`만 무시 → 템플릿에 `.vscode/` 추가 |
 | 템플릿 → 게임 merge | ✅ `git merge template/main` 충돌 없음 |
+| 🐞 Unity 콘솔 에러 | Editor를 열 때마다 `Host type is not matching any asset type at Path Packages/com.unity.render-pipelines.core/…/*.urtshader` 2개. 원인: 옮긴 `Library/`의 임포트 캐시가 옛 임시 폴더 절대경로를 참조 → `UnifiedRTShaderImporter`가 `DirectoryNotFoundException`으로 실패 → URP가 시작 때 빈 리소스 필드(`ProbeVolumeGlobalSettings`의 RT/Compute 셰이더)를 다시 채우려다 에러. `unity projects clean`으로 Library를 지우고 재생성 → 재시작 2회 모두 에러 0, 셰이더 정상 로드. 절차에서 `Library/` 이동을 제거 |
 
 ## 7. 남는 리스크
 

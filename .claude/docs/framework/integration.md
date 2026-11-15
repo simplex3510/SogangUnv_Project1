@@ -24,7 +24,7 @@ Design and rationale: `docs/framework-design.md`. These rules win over plugin de
 | performance-analyst | optimize-audio, optimize-web |
 | network-programmer, live-ops-designer | setup-multiplayer-services, build-live-game |
 
-- New project: create the Unity project at the repo root first (CCGS never creates one): `unity projects create <name> --output-dir <scratch> --editor-version <ver> --no-cloud`, move `Assets/`, `Packages/`, `ProjectSettings/` (and `Library/`, `UserSettings/`) into the repo root, re-point the Hub (`unity projects remove <scratch path as listed by unity projects --all>`, `unity projects add <repo>`), `unity pipeline install`. Then `/start` → `/setup-engine unity`, which detects `ProjectSettings/ProjectVersion.txt` and records it. Do not run the `new-unity-project` interview.
+- New project: create the Unity project at the repo root first (CCGS never creates one): `unity projects create <name> --output-dir <scratch> --editor-version <ver> --no-cloud`, move only `Assets/`, `Packages/`, `ProjectSettings/` into the repo root (never `Library/`: its import cache keeps the scratch folder's absolute paths and URP `.urtshader` imports then fail on every Editor start), re-point the Hub (`unity projects remove <scratch path as listed by unity projects --all>`, `unity projects add <repo>`), `unity pipeline install`. Then `/start` → `/setup-engine unity`, which detects `ProjectSettings/ProjectVersion.txt` and records it. Do not run the `new-unity-project` interview.
 
 ## Art (Aseprite)
 
