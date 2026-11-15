@@ -6,7 +6,7 @@
 - 문서 버전: 1.0
 - 최초 작성: 2026-11-14
 - 최종 갱신: 2026-11-14 (R0 완료)
-- **현재 진행 상태: 7.6단계 전체 완료(R0~R6). 남은 결정: `DeliveryDeadlineConfig._baseSeconds` 값(현재 90000, 8단계), GameScene 시스템 배선(7.5c)**
+- **현재 진행 상태: 7.6단계 전체 완료(R0~R6). 남은 결정: `DeliveryDeadlineConfig._baseSeconds` 값(현재 90000, 8단계), 게임용 씬 시스템 배선(7.5c — 현재 게임용 씬 없음, 기존 GameScene은 참고용 `FailedScene`)**
 - 관련 문서: `design/gdd/delivery-cargo-vehicle-rules.md`(개정안), `design/gdd/game-concept.md`(기획 정본), `design/dev-plan.md`(마일스톤 진행 추적)
 
 ### 운영 규칙
