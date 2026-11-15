@@ -1,0 +1,47 @@
+# Graphify가 그래프에 넣지 않을 파일 (gitignore 문법, .gitignore 위에 추가로 적용).
+# 그래프에는 게임 코드(Assets/)와 게임 문서(design/, docs/의 ADR·레지스트리, production/)만 남긴다.
+# 커밋 훅과 /graphify --update 모두 이 파일을 따른다.
+
+# Claude·CCGS 프레임워크: 에이전트, 스킬, 훅, 규칙, 템플릿, 메모리
+.claude/
+studio-tests/
+**/CLAUDE.md
+.github/
+
+# 이 템플릿의 셋업 스크립트와 프레임워크 문서
+scripts/
+docs/framework-guide.md
+docs/framework-design.md
+
+# CCGS 자체 문서와 저장소 파일 (게임 문서가 아님)
+docs/COLLABORATIVE-DESIGN-PRINCIPLE.md
+docs/WORKFLOW-GUIDE.md
+docs/migration-guide-v1.1.md
+docs/skill-flow-diagrams.md
+/CHANGELOG.md
+/CONTRIBUTING.md
+/SECURITY.md
+/UPGRADING.md
+/LICENSE
+
+# 엔진 API 참고 자료 (버전 고정 스냅샷)
+docs/engine-reference/
+
+# 설정과 세션 인계 (그래프로 볼 구조가 없음)
+project.yaml
+production/handoff.md
+
+# CCGS의 Godot·Web용 코드 루트 (Unity는 Assets/ 사용)
+src/
+
+# Unity 패키지·프로젝트 설정 (코드 구조가 아님)
+Packages/
+ProjectSettings/
+
+# 이미지: 스프라이트·스크린샷을 이미지 분석(LLM)에 보내지 않는다
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg

@@ -1,5 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "PONYTAIL_SUBAGENT_MATCHER": "programmer|unity-.*specialist|prototyper|technical-artist|devops|qa-tester|general-purpose"
+  },
   "permissions": {
     "allow": [
       "Bash(dir *)",
@@ -164,7 +167,14 @@
       "PowerShell(git *clean* -Xdqf*)",
       "PowerShell(git *clean* -Xqdf*)",
       "PowerShell(Get-Content *.env*)",
-      "PowerShell(*>.env*)"
+      "PowerShell(*>.env*)",
+      "Bash(gh * --repo *)",
+      "Bash(gh * -R *)",
+      "Read(~/.git-credentials)"
+    ],
+    "ask": [
+      "Bash(git commit*)",
+      "Bash(git tag*)"
     ],
     "defaultMode": "default"
   },
@@ -181,16 +191,6 @@
           {
             "type": "command",
             "command": "echo `# <#` >/dev/null; bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/detect-gaps.sh\"; exit $? #> ; exit 0",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "compact",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "graphify hook-guard compact",
             "timeout": 10
           }
         ]
@@ -233,26 +233,6 @@
           {
             "type": "command",
             "command": "echo `# <#` >/dev/null; bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/validate-read.sh\"; exit $? #> ; exit 0",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Bash|Grep",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "graphify hook-guard search",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Read|Glob",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "graphify hook-guard read",
             "timeout": 10
           }
         ]
@@ -348,5 +328,33 @@
   "statusLine": {
     "type": "command",
     "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/statusline.sh\""
+  },
+  "enabledPlugins": {
+    "ponytail@ponytail": true,
+    "unity@claude-plugins-official": true,
+    "aseprite@aseprite-ai-artist": true
+  },
+  "extraKnownMarketplaces": {
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      },
+      "autoUpdate": true
+    },
+    "aseprite-ai-artist": {
+      "source": {
+        "source": "github",
+        "repo": "with-pebbly/aseprite-ai-artist"
+      },
+      "autoUpdate": true
+    },
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      },
+      "autoUpdate": true
+    }
   }
 }
