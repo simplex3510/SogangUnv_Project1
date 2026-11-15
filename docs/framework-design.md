@@ -2,7 +2,7 @@
 
 > 구성: CCGS(Claude Code Game Studios) · Ponytail · Graphify · Unity 플러그인/CLI · Aseprite · git · gh
 > 검증한 버전: CCGS 1.3.0 (`abc0de7`) · Ponytail 5.2.0 · Unity plugin 0.1.9-beta · Unity CLI 1.0.0 · graphify 0.9.88 · aseprite 0.8.2 · git 2.56.1 · git-lfs 3.8.1 · gh 2.101.0
-> 사용법은 [README](../README.md), 매 세션 로드되는 규칙은 [`integration.md`](../.claude/docs/framework/integration.md). 이 문서는 그 규칙이 왜 그렇게 정해졌는지를 담는다.
+> 사용법은 [사용 가이드](framework-guide.md), 매 세션 로드되는 규칙은 [`integration.md`](../.claude/docs/framework/integration.md). 이 문서는 그 규칙이 왜 그렇게 정해졌는지를 담는다.
 
 ---
 
@@ -20,7 +20,7 @@
 | 업데이트 | 게임은 마일스톤 사이에 템플릿 태그만 받고, PC 도구는 최신을 따라가되 bootstrap이 점검 (5절) |
 | Graphify | 게임 코드·게임 문서만 추적(`.graphifyignore`가 프레임워크·Unity 설정·이미지 제외). post-commit 훅으로 자동 갱신(LLM 없음), `graphify-out/`은 커밋 안 함 |
 | Unity | Unity 6 + C# + Pipeline 패키지 + CLI만 고정. 2D/3D·렌더 파이프라인은 프로젝트마다 `/setup-engine`에서 |
-| 언어 | 대화는 한국어. 문서 본문 한국어, 템플릿 제목·YAML 키·상태값은 영어(CCGS 스크립트가 영어 문자열을 찾음). 코드 식별자 영어·주석 한국어, 커밋은 `feat: 한국어 요약` |
+| 언어 | 대화는 한국어. 문서 본문 한국어, 템플릿 제목·YAML 키·상태값은 영어(CCGS 스크립트가 영어 문자열을 찾음). 코드 식별자 영어·주석 한국어, 커밋은 `feat: 한국어 요약`. 프레임워크 문서는 한국어만 둔다: 사용자가 한국어 사용자 한 명이고, Claude가 매 세션 읽는 규칙(integration.md)은 이미 영어라 영어판의 토큰 이점보다 두 벌 유지 비용이 크다 |
 
 ### 쓰지 않는 것
 
@@ -135,7 +135,7 @@ CCGS 훅은 Git Bash가 없으면 조용히 꺼진다. PATH의 `bash`는 WSL일 
 | GitHub "Use this template"는 히스토리를 끊음 | `new-game.ps1`이 clone으로 만들고 `template` remote를 남김 |
 | `credential.helper=store`면 토큰이 평문 | bootstrap이 경고, `gh auth setup-git` 권장, deny `Read(~/.git-credentials)` |
 | Unity YAML 병합·줄바꿈 | `.gitattributes`에 `eol=lf merge=unityyamlmerge`, `Assets/` 바이너리는 LFS |
-| CCGS merge가 README를 덮어씀 | `README.md merge=ours` |
+| README 하나를 CCGS·템플릿·게임이 함께 씀 | 사용 가이드는 `docs/framework-guide.md`로 분리. `README.md merge=ours`로 템플릿은 CCGS README를, 게임은 자기 README를 지킴. `new-game.ps1`이 게임 README를 첫 커밋으로 만들어 이후 merge에서 항상 게임 쪽이 남음 |
 
 커밋은 사용자 지시가 있을 때만(`git commit`/`git tag`는 `ask`). 워크트리는 `Library/` 재임포트가 무거워 꼭 필요할 때만 쓰고, 워크트리 커밋은 Graphify를 갱신하지 않는다. CI(Unity 빌드)는 라이선스 시크릿과 private 저장소 실행 시간 제한 때문에 범위 밖.
 
@@ -160,7 +160,7 @@ CCGS 훅은 Git Bash가 없으면 조용히 꺼진다. PATH의 `bash`는 WSL일 
 | `.claude/settings.json` | 추가만: `extraKnownMarketplaces`(`autoUpdate: true`), `enabledPlugins`, `env`, deny 3개, ask 2개 |
 | `.gitignore` | `graphify-out/`, `*.slnx`, `.vscode/` |
 | `.gitattributes` | Unity YAML·LFS·`MEMORY.md merge=union`·`README.md merge=ours` |
-| `README.md` | 이 프레임워크 가이드로 교체 |
+| `README.md` | 템플릿 소개와 가이드 링크로 교체 |
 
 Godot/Unreal 에이전트·스킬은 지우지 않는다. 지우면 CCGS가 그 파일을 고칠 때마다 merge 충돌이 난다.
 
@@ -174,7 +174,8 @@ scripts/bootstrap.ps1                   # PC 셋업·점검 (재실행 가능)
 scripts/new-game.ps1                    # 새 게임 저장소 생성
 scripts/template.url                    # 게임 저장소가 template remote를 복구할 주소
 .graphifyignore                         # Graphify가 추적하지 않을 프레임워크 파일
-README-en.md, docs/framework-design.md
+docs/framework-guide.md                 # 사용 가이드 (게임에도 그대로 따라감)
+docs/framework-design.md                # 이 문서
 ```
 
 ### `settings.json`에 추가한 키

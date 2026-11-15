@@ -10,7 +10,7 @@ studio-tests/
 
 # 이 템플릿의 셋업 스크립트와 프레임워크 문서
 scripts/
-README-en.md
+docs/framework-guide.md
 docs/framework-design.md
 
 # CCGS 자체 문서와 저장소 파일 (게임 문서가 아님)

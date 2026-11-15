@@ -55,6 +55,6 @@ Assets/**/*.otf      filter=lfs diff=lfs merge=lfs -text
 .claude/memory/MEMORY.md merge=union
 # Two PCs or collaborators each appending a pointer line merge cleanly.
 .claude/memory/MEMORY.md merge=union
-# Keep our README when merging CCGS updates (driver "ours" is registered per PC by scripts/bootstrap.ps1).
+# Keep our README on merges: CCGS's README in the template, the game's own README in a game (driver "ours" is registered per PC by scripts/bootstrap.ps1).
 README.md merge=ours
 graphify-out/graph.json merge=graphify
