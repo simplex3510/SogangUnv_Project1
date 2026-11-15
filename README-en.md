@@ -144,15 +144,27 @@ pwsh scripts/bootstrap.ps1
 
 ## Updates
 
+Each part updates on its own schedule.
+
+| What | How | When |
+|---|---|---|
+| Unity, Ponytail and Aseprite plugins | Automatic (Claude Code downloads in the background, applies on next launch) | Always |
+| Unity CLI, Graphify | `unity self-update`, `uv tool upgrade graphifyy` | When `bootstrap.ps1` says a new version is out |
+| Template improvements (game repository) | Merge a tag | Between milestones only |
+| New CCGS version (template repository) | Merge → check → new tag | When you need something it adds |
+
 ```powershell
+# In a game repository: take a new template tag
+git fetch template --tags
+git merge template-v0.2
+
 # In the template repository: take a new CCGS version
 git fetch ccgs
 git merge ccgs/main
-
-# In a game repository: take template improvements
-git fetch template
-git merge template/main
+pwsh scripts/bootstrap.ps1   # check, then tag a new template version
 ```
+
+If a plugin update renames a skill, `bootstrap.ps1` lists the names in the rules file that no longer exist.
 
 ---
 

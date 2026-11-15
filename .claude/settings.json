@@ -339,19 +339,22 @@
       "source": {
         "source": "github",
         "repo": "DietrichGebert/ponytail"
-      }
+      },
+      "autoUpdate": true
     },
     "aseprite-ai-artist": {
       "source": {
         "source": "github",
         "repo": "with-pebbly/aseprite-ai-artist"
-      }
+      },
+      "autoUpdate": true
     },
     "claude-plugins-official": {
       "source": {
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
-      }
+      },
+      "autoUpdate": true
     }
   }
 }

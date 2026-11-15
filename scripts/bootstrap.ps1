@@ -59,6 +59,39 @@ if ($templateUrl -and $origin -ne $templateUrl -and -not ((git remote) -contains
 if ((git remote) -contains 'upstream') { $problems += "a remote is named 'upstream': gh prefers it over origin; rename it (git remote rename upstream ccgs)" }
 if ((git config --global credential.helper) -eq 'store') { $problems += 'git stores your token in plain text (credential.helper=store); run: gh auth setup-git' }
 
+Write-Host "== Versions (PC tools follow latest, see docs/framework-design.md section 5)"
+# Template tags are template-v*; plain v* tags are CCGS releases that came in with its history.
+$tag = git describe --tags --abbrev=0 --match 'template-v*' 2>$null
+Write-Host "  template $(if ($tag) { $tag } else { '(no tag)' })"
+$installed = Join-Path $HOME '.claude/plugins/installed_plugins.json'
+$plugins = if (Test-Path $installed) { (Get-Content $installed -Raw | ConvertFrom-Json -AsHashtable)['plugins'] } else { @{} }
+foreach ($id in 'ponytail@ponytail', 'unity@claude-plugins-official', 'aseprite@aseprite-ai-artist') {
+    $p = $plugins[$id] | Select-Object -First 1
+    if ($p) { Write-Host "  ok       $id $($p['version'])" } else { $problems += "plugin $id not installed: open Claude Code here and accept the plugin prompt" }
+}
+if (Have 'unity') {
+    $u = unity self-update --check --format json 2>$null | ConvertFrom-Json
+    if ($u.success) {
+        Write-Host "  ok       unity cli $($u.data.currentVersion)"
+        if ($u.data.latestVersion -ne $u.data.currentVersion) { Write-Host "  NOTICE   unity cli $($u.data.latestVersion) is out: unity self-update" }
+    }
+}
+if (Have 'graphify') { Write-Host "  ok       $(graphify --version 2>$null)" }
+
+# The Unity plugin is beta and auto-updates, so skills get renamed. Every skill named in
+# integration.md's Unity routing table must exist in the installed plugin.
+$unityPlugin = $plugins['unity@claude-plugins-official'] | Select-Object -First 1
+if ($unityPlugin) {
+    $inUnity = $false
+    $skills = foreach ($line in Get-Content (Join-Path $root '.claude/docs/framework/integration.md')) {
+        if ($line -match '^## ') { $inUnity = $line -eq '## Unity'; continue }
+        if ($inUnity -and $line -cmatch '^\| [a-z]') { (($line -split '\|')[2] -split '[,→/]').Trim() | Where-Object { $_ } }
+    }
+    $missing = @($skills | Where-Object { -not (Test-Path (Join-Path $unityPlugin['installPath'] "skills/$_/SKILL.md")) })
+    if ($missing) { $problems += "integration.md routes to Unity skills the installed plugin ($($unityPlugin['version'])) does not have: $($missing -join ', '). Update the table." }
+    else { Write-Host "  ok       $(@($skills).Count) Unity skills in the routing table exist" }
+}
+
 Write-Host ''
 if ($problems) { Write-Host "== $($problems.Count) problem(s):"; $problems | ForEach-Object { Write-Host "  - $_" }; exit 1 }
 Write-Host '== All checks passed.'

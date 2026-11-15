@@ -17,6 +17,7 @@
 | 기억 | 프로젝트 지식·공유 메모리·세션 인계 모두 게임 저장소 안에서 git으로 이동 (C5) |
 | PC 이동 | `/handoff`(떠나는 PC) / `/pickup`(도착한 PC) |
 | GitHub | trunk 기반, GitHub MCP 대신 `gh` CLI (C9) |
+| 업데이트 | 게임은 마일스톤 사이에 템플릿 태그만 받고, PC 도구는 최신을 따라가되 bootstrap이 점검 (5절) |
 | Graphify | 게임 코드·게임 문서만 추적(`.graphifyignore`가 프레임워크·Unity 설정·이미지 제외). post-commit 훅으로 자동 갱신(LLM 없음), `graphify-out/`은 커밋 안 함 |
 | Unity | Unity 6 + C# + Pipeline 패키지 + CLI만 고정. 2D/3D·렌더 파이프라인은 프로젝트마다 `/setup-engine`에서 |
 | 언어 | 대화는 한국어. 문서 본문 한국어, 템플릿 제목·YAML 키·상태값은 영어(CCGS 스크립트가 영어 문자열을 찾음). 코드 식별자 영어·주석 한국어, 커밋은 `feat: 한국어 요약` |
@@ -156,7 +157,7 @@ CCGS 훅은 Git Bash가 없으면 조용히 꺼진다. PATH의 `bash`는 WSL일 
 | 파일 | 변경 |
 |---|---|
 | `CLAUDE.md` | `@.claude/docs/framework/integration.md` import 1줄 |
-| `.claude/settings.json` | 추가만: `extraKnownMarketplaces`, `enabledPlugins`, `env`, deny 3개, ask 2개 |
+| `.claude/settings.json` | 추가만: `extraKnownMarketplaces`(`autoUpdate: true`), `enabledPlugins`, `env`, deny 3개, ask 2개 |
 | `.gitignore` | `graphify-out/`, `*.slnx`, `.vscode/` |
 | `.gitattributes` | Unity YAML·LFS·`MEMORY.md merge=union`·`README.md merge=ours` |
 | `README.md` | 이 프레임워크 가이드로 교체 |
@@ -207,10 +208,27 @@ OMC가 전역 설치된 PC라면 `"oh-my-claudecode@omc": false`를 추가해 �
 3. merge 드라이버: `ours`, `unityyamlmerge`(설치된 Unity에서 경로 탐색)
 4. `settings.local.json`에 `autoMemoryDirectory`
 5. `gh repo set-default`, `template` remote 복구, `upstream` remote·평문 자격증명 경고
+6. 버전 출력(템플릿 태그, 플러그인, Unity CLI, Graphify)과 Unity CLI 새 버전 안내. integration.md 라우팅표의 Unity 스킬이 설치된 플러그인에 모두 있는지 확인
 
 ---
 
-## 5. 진행 상태
+## 5. 업데이트 정책
+
+전부 최신으로 따라가면 개발 도중 작업 흐름이 흔들리고, 전부 유지하면 PC마다 버전이 갈라지고 수정을 못 받는다. 그래서 층마다 다르게 한다.
+
+| 층 | 대상 | 방식 | 언제 |
+|---|---|---|---|
+| 게임 저장소 | 템플릿, Unity 에디터, Pipeline 패키지 | **고정.** 템플릿은 태그(`template-v*`)를 merge | 마일스톤 사이에만 |
+| 템플릿 | CCGS | `git merge ccgs/main` → bootstrap 점검 → 짧은 드라이런 → 새 태그 | 필요한 기능이 생겼을 때나 몇 달에 한 번 |
+| PC | Unity 플러그인·CLI, Ponytail, Aseprite, Graphify | **최신을 따라감.** 플러그인 3개 모두 `autoUpdate: true`(외부 마켓플레이스는 기본이 꺼짐이라 명시), CLI·Graphify는 bootstrap 안내를 보고 직접 | 언제든 |
+
+- PC 층이 깨질 수 있는 곳은 우리 파일에 적힌 스킬 이름뿐이다. bootstrap이 라우팅표 이름을 실제 설치본과 대조해 잡는다.
+- 플러그인 버전 고정(`ref`에 커밋 지정)은 가능하지만 올릴 때마다 커밋 ID를 바꿔야 하고, 공식 마켓플레이스는 예약 이름이라 고정이 안 될 수 있어 택하지 않았다.
+- 템플릿 태그는 `template-v<번호>`. CCGS 히스토리에 딸려 온 `v*` 태그와 구분하기 위해서다.
+
+---
+
+## 6. 진행 상태
 
 검증 완료 (Windows, 시험 저장소 `unity-ai-dryrun`):
 - 새 게임 생성, bootstrap(첫 실행·재실행·두 번째 clone), 템플릿 → 게임 merge
@@ -222,15 +240,15 @@ OMC가 전역 설치된 PC라면 `"oh-my-claudecode@omc": false`를 추가해 �
 - CCGS 대화형 흐름: `/start` → `/setup-engine unity` → 스토리 1개 `/story-readiness` → `/dev-story` → `/story-done`
 - 실제 PC 이동: `/handoff` → 다른 PC에서 bootstrap → `/pickup`
 - 한국어 규칙과 Unity 스킬 전달 규칙이 실제 세션에서 지켜지는지
-- 버전 고정: 통과한 조합 기록, 템플릿 태그 `v0.1`
+- 첫 템플릿 태그 `template-v0.1`
 
 ---
 
-## 6. 리스크
+## 7. 리스크
 
-- **플러그인 버전 고정 불가**: 마켓플레이스는 최신을 따라가 PC마다 버전이 어긋날 수 있다. 검증한 조합을 기록하는 정도가 한계.
+- **PC 도구는 최신을 따라간다**: 플러그인이 동작 방식을 바꾸면 우리 규칙과 어긋날 수 있다. 스킬 이름은 bootstrap이 잡지만, 이름이 같고 내용이 바뀐 경우는 못 잡는다.
 - **CCGS 업데이트**: 4절의 고친 파일 5개는 merge마다 확인. 특히 `settings.json`.
-- **Unity 플러그인이 beta**: 스킬 이름·CLI 명령이 바뀔 수 있다. 라우팅표는 integration.md 한 곳에만 둔다.
+- **Unity 플러그인이 beta**: CLI 명령도 바뀔 수 있다. 새 프로젝트 절차(C6)는 플러그인을 올린 뒤 처음 쓸 때 확인한다.
 - **`/handoff`를 잊으면 인계가 안 된다**: CCGS 규칙 때문에 자동 push는 없다.
 - **공유 메모리 충돌**: `MEMORY.md`는 union merge지만 개별 메모리 파일은 수동 해결.
 - **Git LFS 용량**: GitHub 무료 한도를 넘으면 데이터 팩이 필요하다.

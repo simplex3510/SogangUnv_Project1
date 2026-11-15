@@ -144,15 +144,27 @@ pwsh scripts/bootstrap.ps1
 
 ## 업데이트 받기
 
+구성요소마다 받는 시점이 달라요.
+
+| 대상 | 방법 | 언제 |
+|---|---|---|
+| Unity·Ponytail·Aseprite 플러그인 | 자동 (Claude Code가 백그라운드로 받고 다음 실행 때 적용) | 항상 |
+| Unity CLI, Graphify | `unity self-update`, `uv tool upgrade graphifyy` | `bootstrap.ps1`이 새 버전을 알려줄 때 |
+| 템플릿 개선 (게임 저장소) | 태그 단위로 merge | 마일스톤 사이에만 |
+| CCGS 새 버전 (템플릿 저장소) | merge → 점검 → 새 태그 | 필요한 기능이 생겼을 때 |
+
 ```powershell
+# 게임 저장소에서: 템플릿 새 태그 받기
+git fetch template --tags
+git merge template-v0.2
+
 # 템플릿 저장소에서: CCGS 새 버전 받기
 git fetch ccgs
 git merge ccgs/main
-
-# 게임 저장소에서: 템플릿 개선 받기
-git fetch template
-git merge template/main
+pwsh scripts/bootstrap.ps1   # 점검 후 새 태그를 붙여요
 ```
+
+플러그인이 업데이트되면서 스킬 이름이 바뀌면, `bootstrap.ps1`이 규칙 파일에 적힌 이름 중 사라진 것을 알려줘요.
 
 ---
 

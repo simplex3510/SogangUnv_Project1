@@ -32,6 +32,7 @@ The team is Korean. This rule wins over the English wording of every skill, agen
 | performance-analyst | optimize-audio, optimize-web |
 | network-programmer, live-ops-designer | setup-multiplayer-services, build-live-game |
 
+- The Unity plugin auto-updates. `scripts/bootstrap.ps1` checks that every skill in this table still exists; when one is renamed, fix the table here.
 - Subagents have no Skill tool, so a CCGS agent cannot load these skills itself. Before you delegate Unity work, load the matching skill in the main session and copy the steps the task needs into the agent's prompt, along with `--project-path <project>` and `--caller plugin --skill <that skill>`. Where the prompt carries no procedure, the agent finds Editor commands with `unity command --query <term>`.
 
 - New project: create the Unity project at the repo root first (CCGS never creates one): `unity projects create <name> --output-dir <scratch> --editor-version <ver> --no-cloud`, move only `Assets/`, `Packages/`, `ProjectSettings/` into the repo root (never `Library/`: its import cache keeps the scratch folder's absolute paths and URP `.urtshader` imports then fail on every Editor start), re-point the Hub (`unity projects remove <scratch path as listed by unity projects --all>`, `unity projects add <repo>`), `unity pipeline install`. Then `/start` → `/setup-engine unity`, which detects `ProjectSettings/ProjectVersion.txt` and records it. Do not run the `new-unity-project` interview.
