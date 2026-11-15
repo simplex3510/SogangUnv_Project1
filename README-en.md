@@ -136,7 +136,22 @@ cd <game>
 pwsh scripts/bootstrap.ps1
 ```
 
-`bootstrap.ps1` checks the tools and sets up git hooks, merge drivers, the shared memory path and the gh default repository. It is safe to re-run and lists any problems at the end.
+`bootstrap.ps1` checks the tools, sets up git hooks, merge drivers, the shared memory path and the gh default repository, and checks tool versions and Unity skill names. It is safe to re-run and lists any problems at the end.
+
+### When to run `bootstrap.ps1`
+
+It does not run when a session opens. Run it yourself, or ask Claude to, in these cases:
+
+| When | Why |
+|---|---|
+| **Required:** first clone on another PC | Git hooks, merge drivers, the memory path, the gh default repository and the `template` remote do not come with a clone |
+| **Required:** you moved or renamed the repository folder | The shared memory path is stored as an absolute path |
+| **Required:** you installed or removed a Unity Editor | It finds the scene and prefab merge tool (UnityYAMLMerge) again |
+| After merging a template tag or CCGS | Checks that the changed rules match the installed tools |
+| Now and then (for example at the start of a milestone) | Plugins auto-update, so this tells you if a skill was renamed or a new Unity CLI is out |
+| When something breaks | Most cases of hooks not running or `gh` pointing at the wrong repository are fixed by this |
+
+`new-game.ps1` runs it once when it creates a game.
 
 **Claude's memory**: what Claude learns about the game and how you work on it is saved in `.claude/memory/` and travels with git. Personal preferences go in your own `~/.claude/CLAUDE.md`.
 
