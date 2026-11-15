@@ -9,7 +9,7 @@ studio-tests/
 .github/
 
 # 이 템플릿의 셋업 스크립트와 프레임워크 문서
-scripts/
+/scripts/
 docs/framework-guide.md
 docs/framework-design.md
 
@@ -32,7 +32,7 @@ project.yaml
 production/handoff.md
 
 # CCGS의 Godot·Web용 코드 루트 (Unity는 Assets/ 사용)
-src/
+/src/
 
 # Unity 패키지·프로젝트 설정 (코드 구조가 아님)
 Packages/
@@ -45,3 +45,7 @@ ProjectSettings/
 *.gif
 *.webp
 *.svg
+
+# 에디터 설정과 TextMesh Pro 기본 리소스 (게임 코드·문서가 아님)
+/.vscode/
+Assets/TextMesh Pro/
