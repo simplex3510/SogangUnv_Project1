@@ -154,8 +154,9 @@ PC-B: /pickup
 - 프로젝트 생성 순서: **Unity 프로젝트를 먼저 저장소 루트에 만든다.** CCGS `/setup-engine`은 Unity 프로젝트를 만들지 않고 "먼저 만들어 두라"고 안내하며, `ProjectSettings/ProjectVersion.txt`가 있으면 Unity로 감지해 그 버전을 기록한다(`setup-engine/references/7.5-scaffold.md`, `2-guided-mode.md`).
   1. `unity projects create <이름> --output-dir <임시 폴더> --editor-version <버전> --no-cloud` (`--template 2d`로 2D URP). CLI는 항상 새 폴더를 만들므로 임시 위치에 만든 뒤
   2. `Assets/`, `Packages/`, `ProjectSettings/`(+ gitignore 대상인 `Library/`, `UserSettings/`)를 저장소 루트로 옮김
-  3. `unity pipeline install --project-path <저장소>` (Unity 6.6 템플릿에는 이미 포함됨)
-  4. `/start` → `/setup-engine unity`
+  3. Hub 등록 경로 교체: `unity projects remove <임시 경로>` → `unity projects add <저장소>` (임시 경로는 `unity projects --all`에 나온 표기 그대로 — 짧은 8.3 경로로 등록될 수 있음)
+  4. `unity pipeline install --project-path <저장소>` (Unity 6.6 템플릿에는 이미 포함됨)
+  5. `/start` → `/setup-engine unity`
   - `new-unity-project` 인터뷰는 쓰지 않음.
 - 코드 루트: CCGS `code-root-resolution.md`가 이미 Unity를 `Assets/`로 인식(`Assets/Scripts/<System>/`).
 
@@ -353,6 +354,10 @@ Assets/ Packages/ ProjectSettings/      # 게임 저장소에서만 생성 (템�
 | 🐞 `.gitignore` | Unity 6.6이 만드는 `*.slnx`가 무시 목록에 없음 → 템플릿에 추가 |
 | `unity pipeline install` | ✅ Unity 6.6 URP 템플릿에는 `com.unity.pipeline` 1.0.0이 이미 포함 |
 | Editor 연결 | ✅ `unity open` → `unity status --until-ready` = `ready`, `unity command script eval`로 C# 실행 확인 (`SampleScene`) |
+| 🐞 GitHub LFS | 첫 push가 "exceeded its LFS budget"으로 거절(계정 LFS 예산 문제, PNG 1개). 사용자가 GitHub 결제 설정에서 해결 → 재push 성공 |
+| 🐞 Hub 등록 | 임시 폴더 경로가 Hub에 남음 → `projects remove`/`add`로 교체 절차 추가 |
+| 🐞 `.vscode/` | Unity가 `extensions.json`·`launch.json`을 생성, CCGS는 `settings.json`만 무시 → 템플릿에 `.vscode/` 추가 |
+| 템플릿 → 게임 merge | ✅ `git merge template/main` 충돌 없음 |
 
 ## 7. 남는 리스크
 

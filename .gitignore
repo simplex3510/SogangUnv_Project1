@@ -179,3 +179,5 @@ $RECYCLE.BIN/
 graphify-out/
 # Unity 6.6+ writes an XML solution file (*.sln is already ignored above).
 *.slnx
+# IDE files Unity regenerates per editor (CCGS above ignores only .vscode/settings.json).
+.vscode/
