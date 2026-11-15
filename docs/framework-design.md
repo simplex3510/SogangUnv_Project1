@@ -305,7 +305,7 @@ Assets/ Packages/ ProjectSettings/      # 게임 저장소에서만 생성 (템�
 2. git 훅: `git lfs install --local` → `graphify hook install` (순서 고정. 재실행 때 LFS 훅이 이미 있으면 건너뜀).
 3. merge 드라이버(PC별 git config): `ours`(README), `unityyamlmerge`(설치된 Unity에서 경로 탐색, 없으면 건너뜀).
 4. `.claude/settings.local.json`에 `autoMemoryDirectory` = 이 clone의 `.claude/memory` 절대경로.
-5. GitHub: `gh repo set-default <origin>`, `upstream` remote가 있으면 경고, `credential.helper=store`면 경고.
+5. GitHub: `gh repo set-default <origin>`, `template` remote가 없으면 `scripts/template.url`(템플릿 주소, 게임 저장소가 물려받음)로 추가, `upstream` remote가 있으면 경고, `credential.helper=store`면 경고.
 
 ---
 
@@ -358,6 +358,7 @@ Assets/ Packages/ ProjectSettings/      # 게임 저장소에서만 생성 (템�
 | 🐞 Hub 등록 | 임시 폴더 경로가 Hub에 남음 → `projects remove`/`add`로 교체 절차 추가 |
 | 🐞 `.vscode/` | Unity가 `extensions.json`·`launch.json`을 생성, CCGS는 `settings.json`만 무시 → 템플릿에 `.vscode/` 추가 |
 | 템플릿 → 게임 merge | ✅ `git merge template/main` 충돌 없음 |
+| 다른 PC 흉내 (두 번째 clone + bootstrap) | ✅ LFS 파일 수신, 메모리 경로가 clone 위치로, gh 기본 저장소 설정. 🐞 clone에는 `template` remote가 없어 템플릿 업데이트를 못 받음 → `scripts/template.url` + bootstrap이 자동 추가. 🐞 Git Bash 셸에서 실행하면 `git.exe`가 `mingw64\bin`으로 잡혀 Git Bash 판정 실패 → 상위 폴더를 올라가며 탐색 |
 | 🐞 Unity 콘솔 에러 | Editor를 열 때마다 `Host type is not matching any asset type at Path Packages/com.unity.render-pipelines.core/…/*.urtshader` 2개. 원인: 옮긴 `Library/`의 임포트 캐시가 옛 임시 폴더 절대경로를 참조 → `UnifiedRTShaderImporter`가 `DirectoryNotFoundException`으로 실패 → URP가 시작 때 빈 리소스 필드(`ProbeVolumeGlobalSettings`의 RT/Compute 셰이더)를 다시 채우려다 에러. `unity projects clean`으로 Library를 지우고 재생성 → 재시작 2회 모두 에러 0, 셰이더 정상 로드. 절차에서 `Library/` 이동을 제거 |
 
 ## 7. 남는 리스크

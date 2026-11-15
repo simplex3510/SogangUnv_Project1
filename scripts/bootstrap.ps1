@@ -13,8 +13,10 @@ foreach ($t in 'git', 'git-lfs', 'gh', 'node', 'unity', 'graphify') {
 }
 # CCGS hooks need Git Bash; without it they silently switch off. Look beside git.exe:
 # `bash` on PATH is often WSL's (System32\bash.exe), which is not what Claude Code runs hooks with.
-$gitBash = if (Have 'git') { Join-Path (Split-Path (Split-Path (Get-Command git).Source)) 'bin\bash.exe' }
-if ($gitBash -and (Test-Path $gitBash)) { Write-Host "  ok       git bash ($gitBash)" } else { $problems += 'Git Bash not found beside git.exe: CCGS hooks will not run (install Git for Windows)' }
+# git.exe sits in Git\cmd from PowerShell but in Git\mingw64\bin from Git Bash, so walk up to Git\bin\bash.exe.
+$gitBash = $null
+if (Have 'git') { $d = Split-Path (Get-Command git).Source; for ($i = 0; $i -lt 3 -and -not $gitBash; $i++) { $d = Split-Path $d; $c = Join-Path $d 'bin\bash.exe'; if (Test-Path $c) { $gitBash = $c } } }
+if ($gitBash) { Write-Host "  ok       git bash ($gitBash)" } else { $problems += 'Git Bash not found beside git.exe: CCGS hooks will not run (install Git for Windows)' }
 if (Have 'gh') { gh auth status *> $null; if ($LASTEXITCODE) { $problems += 'gh is not logged in (gh auth login)' } }
 
 Write-Host "== Git hooks (LFS first, then Graphify: Graphify appends, LFS refuses to)"
@@ -49,6 +51,11 @@ $origin = git remote get-url origin 2>$null
 if ($origin -match 'github\.com[:/](.+?)(\.git)?$') {
     if (Have 'gh') { gh repo set-default $Matches[1] | Out-Null; Write-Host "  ok       gh default repo -> $($Matches[1])" }
 } else { $problems += 'origin is not a GitHub remote: gh default repo not set' }
+# A fresh clone of a game has only origin; restore the template remote so template updates still merge.
+$templateUrl = (Get-Content (Join-Path $PSScriptRoot 'template.url') -ErrorAction SilentlyContinue | Select-Object -First 1)
+if ($templateUrl -and $origin -ne $templateUrl -and -not ((git remote) -contains 'template')) {
+    git remote add template $templateUrl; Write-Host "  ok       template remote -> $templateUrl (added)"
+} elseif ((git remote) -contains 'template') { Write-Host "  ok       template remote" }
 if ((git remote) -contains 'upstream') { $problems += "a remote is named 'upstream': gh prefers it over origin; rename it (git remote rename upstream ccgs)" }
 if ((git config --global credential.helper) -eq 'store') { $problems += 'git stores your token in plain text (credential.helper=store); run: gh auth setup-git' }
 
