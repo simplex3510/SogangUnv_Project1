@@ -3,6 +3,14 @@
 This repo is CCGS plus a thin overlay for Unity, Ponytail, Graphify, Aseprite, git and gh.
 Design and rationale: `docs/framework-design.md`. These rules win over plugin defaults.
 
+## Language
+
+The team is Korean. This rule wins over the English wording of every skill, agent, hook and template.
+
+- Speak Korean to the user: replies, questions, AskUserQuestion questions and option labels/descriptions, summaries, verdict explanations, "May I write …?" prompts. Translate English skill text when you present it; keep commands, paths, file names and code as they are.
+- Documents (GDD, ADR, stories, art bible, handoff notes): write the body in Korean, but keep the template's section headings, YAML keys and status/verdict values in English (`## Overview`, `Status: Accepted`, `PASS`/`FAIL`). CCGS scripts match those exact English strings.
+- Code: identifiers in English, comments in Korean. Commit messages: Conventional Commits type in English, summary in Korean (`feat: 점프 입력 추가`).
+
 ## Work flow
 
 - Design, planning and review follow CCGS skills. Implementation is `/story-readiness` → `/dev-story` → `/story-done`.

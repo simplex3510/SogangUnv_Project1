@@ -20,6 +20,7 @@
 | Graphify | post-commit 훅 자동 갱신, `graphify-out/`은 커밋 안 함 |
 | 추가 플러그인 | Aseprite 포함, Warp 제외(전역에만) |
 | Unity 기본값 | Unity 6 + C# + Pipeline 패키지 + CLI만 고정. 2D/3D·렌더 파이프라인은 프로젝트마다 `/setup-engine`에서 |
+| 언어 | 대화·질문·선택지는 **한국어**. 문서 본문 한국어, 단 템플릿 제목·YAML 키·상태값(`## Overview`, `Status: Accepted`, `PASS`)은 영어 유지 — CCGS 스크립트(`gdd-structure-check.sh` 등)가 영어 문자열을 그대로 찾음. 코드 식별자 영어·주석 한국어, 커밋은 `feat: 한국어 요약`. 규칙은 integration.md "Language" 절(매 세션 로드). CCGS 훅이 출력하는 원문은 영어 그대로지만 Claude가 한국어로 전달 |
 
 ### 검토 후 제외한 것
 
