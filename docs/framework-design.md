@@ -7,6 +7,15 @@
 
 ## 0. 확정된 설계 방향
 
+> **2026-11-15 결정: OMC 제외.** CCGS가 구현(`/dev-story`)·조율(`team-*`)·리뷰(`/code-review`, `/story-done`)를 이미 갖추고 있고, 2단계에서 고친 문제(프롬프트당 8초 훅, `git commit` 자동 승인, 키워드 오발동, README 주입)가 전부 OMC에서 나왔다. `DISABLE_OMC`/`OMC_SKIP_HOOKS`도 같은 지연 버그(8.1초)가 있어 부분 사용도 불가.
+> 프로젝트 settings에서 `"oh-my-claudecode@omc": false`(전역 설치는 유지, 이 저장소에서만 꺼짐). 실행 경계는 **`/story-readiness` → `/dev-story` → `/story-done`** 으로 대체. 이 문서의 OMC 관련 서술(C1·C2·C5·C6의 OMC 부분, 리뷰표의 OMC 항목, `omc.jsonc`, OMC 권한 훅 대응)은 **폐기**된 것으로 읽는다. `git commit`/`git tag` `ask` 규칙은 CCGS "지시 없이 커밋 금지"를 강제하므로 유지. 이 PC에서 OMC 플러그인·마켓플레이스·HUD statusline 설정도 제거함(실측: 프롬프트 훅 8,129ms → 111ms).
+>
+> **2026-11-15 결정: brain 저장소 폐기 → 게임 저장소 안 `.claude/memory/`.** 저장소가 2개(template, game)로 줄고, 협업자도 같은 기억을 clone으로 받는다. C6 ③과 `~/claude-brain` 관련 서술은 폐기.
+> - `autoMemoryDirectory`는 절대경로만 허용 → 커밋되는 `settings.json`에는 넣을 수 없고, **bootstrap이 PC마다 `.claude/settings.local.json`(gitignore)에 `<저장소 절대경로>/.claude/memory`를 기록**. 실측: 새 세션의 memory 경로가 `D:\Unity Projects\Custom_AI_Env\.claude\memory\`로 잡힘.
+> - `.claude/memory/`는 커밋. `MEMORY.md`는 `merge=union`.
+> - 공유 기억이므로 **게임·팀 작업 방식에 관한 사실만** 저장. 개인 선호는 각자 `~/.claude/CLAUDE.md` (PC 간 동기화 안 됨 — 필요하면 직접 복사). 이 규칙을 `MEMORY.md` 머리말에 적어 매 세션 로드되게 함.
+> - SessionStart brain pull 훅, `brain-sync.mjs`는 불필요. `/handoff`·`/pickup`은 게임 저장소 하나만 push/pull.
+
 | 항목 | 결정 |
 |---|---|
 | 작업 주도권 | **CCGS 주도 + OMC 실행**. 기획·설계·게이트는 CCGS 협업 흐름, 승인된 스토리 구현만 OMC 자율 실행 |
@@ -62,7 +71,7 @@
 
 - OMC 자율 모드는 **`/story-readiness` 통과한 스토리 하나**에만 사용. 스토리 경로를 인자로 넘김.
 - `/oh-my-claudecode:autopilot`(아이디어→코드 전체)은 CCGS 기획 단계를 건너뛰므로 **금지**. 프로토타입이 목적이면 CCGS `/prototype`을 씀.
-- `team` 키워드 오발동 방지: CCGS에 `/team-combat`, `/team-ui` 등 `team-*` 스킬이 9개 있어 대화에 "team"이 자주 나온다. → `OMC_SKIP_HOOKS`에 `keyword-detector`를 넣고 OMC 모드는 **슬래시 명령으로만** 켠다. (키워드 편의를 잃는 대신 C4의 "코드 리뷰" 오발동도 같이 사라짐)
+- 키워드 오발동 방지: OMC 모드는 **슬래시 명령으로만** 켠다. 프로젝트 `.claude/omc.jsonc`의 `keywordDetector.disabled`에 키워드 13개(cancel 제외 전부)를 넣는다. C4의 "코드 리뷰" 오발동도 같이 사라짐. (실측: `team`은 OMC 5.5에서 이미 명시 호출 전용이라 원래 오발동 대상이 아니었음. `OMC_SKIP_HOOKS` 방식은 6절 참고 — 쓰지 않음)
 - CCGS `modes.automation`은 `collaborative` 유지(기본값). OMC 실행 중에도 커밋은 CCGS 규칙대로 사용자 지시 시에만.
 
 ### C2 🟠 훅 중첩 — 같은 이벤트에 3~4개 플러그인
@@ -115,9 +124,9 @@
 |---|---|---|
 | 스토리 구현 직후 | `/ponytail-review` | 과잉 구현만 잡음(가장 쌈) |
 | 스토리 완료 판정 | CCGS `/code-review` → `/story-done` | 코딩 표준·ADR·테스트 증거를 아는 유일한 리뷰어 |
-| 버그 헌팅 (선택) | 내장 `/code-review high` | 정확성 결함 전용 |
+| 버그 헌팅 (선택) | `oh-my-claudecode:code-reviewer` 에이전트 | 정확성 결함 전용. (실측: 프로젝트 안에서 `/code-review`는 CCGS 스킬 하나만 노출 → 내장 `/code-review`는 이름으로 호출 불가) |
 | 마일스톤/아키텍처 | CCGS `/architecture-review` | — |
-| (안 씀) | `oh-my-claudecode:code-reviewer`, `omc-review` | 위와 중복 |
+| (안 씀) | `omc-review`, 내장 `/code-review` | 위와 중복 / 이름이 가려짐 |
 
 ### C5 🟠 "최소 코드" 규칙 3중 중복 — Ponytail · OMC · CCGS 표준
 
@@ -341,14 +350,17 @@ OMC 자율 실행           git switch -c story/<id>
 
 ```
 템플릿 저장소:  origin   = github.com/<나>/unity-ai-template (private)
-                upstream = github.com/Donchitos/Claude-Code-Game-Studios
+                ccgs     = github.com/Donchitos/Claude-Code-Game-Studios (push 주소 DISABLED)
 게임 저장소:    origin   = github.com/<나>/<게임> (private)       ← gh repo set-default
                 template = github.com/<나>/unity-ai-template
-                upstream = (선택) CCGS — 보통은 template 경유로 받음
+                ccgs     = (선택) CCGS — 보통은 template 경유로 받음
+
+※ CCGS remote 이름을 `upstream`으로 두면 안 됨: gh는 기본 저장소가 없을 때
+  `upstream`이라는 이름의 remote를 우선 선택한다 (6절 실측).
 별도:           ~/claude-brain = github.com/<나>/claude-brain (private)
 ```
 
-- CCGS 업데이트: 템플릿에서 `git fetch upstream && git merge upstream/main` (squash 아님 — 히스토리 유지해야 다음 merge가 쉬움)
+- CCGS 업데이트: 템플릿에서 `git fetch ccgs && git merge ccgs/main` (squash 아님 — 히스토리 유지해야 다음 merge가 쉬움)
 - 템플릿 개선을 게임에 반영: 게임에서 `git fetch template && git merge template/main`
 - 새 게임: `scripts/new-game.ps1 <게임-slug>` — `gh repo create <게임> --private` → 템플릿 clone → remote 재구성(`origin`→`template`, 새 `origin` 추가) → `autoMemoryDirectory` 슬러그 기입 → push → `gh repo set-default`. "Use this template" 버튼은 히스토리가 끊겨서 쓰지 않음(C12-5).
 
@@ -399,7 +411,6 @@ Assets/ Packages/ ProjectSettings/   # /setup-engine 이후 생성 (템플릿엔
     "aseprite@aseprite-ai-artist": true
   },
   "env": {
-    "OMC_SKIP_HOOKS": "keyword-detector,project-memory,wiki",
     "PONYTAIL_SUBAGENT_MATCHER": "programmer|unity-.*specialist|prototyper|technical-artist|devops|executor|debugger|test-engineer|qa-tester|general-purpose"
   },
   "autoMemoryDirectory": "~/claude-brain/memory/<게임-slug>",
@@ -409,10 +420,13 @@ Assets/ Packages/ ProjectSettings/   # /setup-engine 이후 생성 (템플릿엔
     ]
   },
   "permissions": {
-    "deny": [ "Bash(gh * --repo *)", "Bash(gh * -R *)", "Read(~/.git-credentials)" ]
+    "deny": [ "Bash(gh * --repo *)", "Bash(gh * -R *)", "Read(~/.git-credentials)" ],
+    "ask":  [ "Bash(git commit*)", "Bash(git tag*)" ]
   }
 }
 ```
+
+추가로 커밋되는 `.claude/omc.jsonc` (키워드 자동 실행 차단), 그리고 bootstrap이 PC마다 쓰는 `.claude/settings.local.json`(같은 `ask` 규칙 — OMC 권한 훅은 이 파일만 읽음, 6절).
 
 (`hooks.SessionStart`와 `permissions.deny`는 CCGS 기존 배열 **뒤에 항목을 추가**하는 것이지 덮어쓰는 것이 아님)
 
@@ -454,7 +468,40 @@ Assets/ Packages/ ProjectSettings/   # /setup-engine 이후 생성 (템플릿엔
 
 ---
 
-## 6. 남는 리스크
+### 3·4단계 진행 상황 (2026-11-15)
+
+- ✅ `.claude/docs/framework/integration.md` (세션마다 로드되는 규칙) + `CLAUDE.md` import 1줄
+- ✅ `README.md` 교체 + `.gitattributes` `README.md merge=ours` (CCGS README 5천 토큰 주입 문제 해소)
+- ✅ `/handoff`, `/pickup` 스킬 — CCGS `active.md`가 이미 "콜드 재개용" 체크포인트라, 그 파일을 `production/handoff.md`로 복사·커밋하는 방식
+- ✅ `scripts/bootstrap.ps1` — 도구 확인, LFS→Graphify 훅, ours/UnityYAMLMerge 드라이버, `settings.local.json` 기억 경로, gh 기본 저장소, `upstream` remote·평문 자격증명 경고. 이 PC에서 실행 확인
+- ✅ `scripts/new-game.ps1` — `-WhatIf`로 미리보기만 확인 (실제 저장소 생성은 5단계 드라이런)
+- ⏸ `doctor.ps1`은 만들지 않음 — bootstrap이 재실행 가능한 점검을 겸함
+- ⏳ 아직: `/handoff`·`/pickup` 실제 동작, `new-game.ps1` 실제 실행, Unity 프로젝트 생성 (5단계)
+
+## 6. 2단계 실측 결과 (2026-11-15)
+
+새 Claude 세션(headless)과 훅 스크립트 단독 실행으로 확인. 이 PC는 CLI 로그인이 안 되어 모델 응답 없이 **세션 초기화·훅·설정 로딩까지만** 검증함.
+
+| # | 항목 | 결과 | 조치 |
+|---|---|---|---|
+| 1 | `OMC_SKIP_HOOKS` 토큰 | 🔴 `wiki`·`project-memory` 토큰은 존재하지 않음(정확한 이름은 `project-memory-posttool`, `post-tool-use`). **더 큰 문제: 스킵을 켜면 오히려 느려짐** — keyword-detector 155ms→**8,110ms**, project-memory-posttool 135ms→**2,610ms** (Windows, 반복 측정 동일). 실제 세션의 `prompt_submit_hooks_ms`도 8,129ms | `OMC_SKIP_HOOKS` 제거. 키워드는 `.claude/omc.jsonc`로 차단(264ms, 차단 확인). project-memory는 켜 둠(`.omc/`라 gitignore됨). wiki 훅은 `.omc/wiki/`가 없으면 아무것도 안 함 |
+| 2 | 프로젝트 `env` → 훅 전달 | ✅ 훅 프로세스에서 `PONYTAIL_SUBAGENT_MATCHER` 값 확인 | 없음 |
+| 3 | `/code-review` 충돌 | 프로젝트 안에서는 CCGS 스킬 하나만 노출. 내장 리뷰는 이름으로 못 부름 | 리뷰 분담표 수정(C4) |
+| 4 | OMC 권한 훅 | 🔴 heredoc 형식 `git commit`·`git tag`를 **자동 승인**. `ask` 규칙이 있으면 양보하지만 **프로젝트 `settings.json`은 안 읽고 `settings.local.json`과 전역 설정만 읽음** | `settings.json`에 `ask` 추가(Claude Code용) + bootstrap이 `settings.local.json`에 같은 `ask`를 씀(OMC용). 실측: local 파일이 있으면 `defer-to-user`로 바뀜 |
+| 5 | Stop 훅 간섭 | ✅ 코드상 CCGS `session-stop.sh`는 async 로그 기록, OMC `persistent-mode`는 OMC 모드 활성 시에만 차단 → 간섭 없음 (실제 ralph 실행은 5단계에서) | 없음 |
+| 6 | 훅 지연 | 세션 시작 훅 초기화 ~1.8초. 툴 호출당 OMC Pre 155ms + Post 4개 약 640ms + CCGS 88ms ≈ **0.9초** (스킵 미사용 기준) | 수용. 5단계에서 체감 확인 |
+| 7 | Graphify on C# | ✅ 클래스·메서드·상속(`MonoBehaviour`)·호출·`GetComponent<T>` 참조까지 추출, `.gitignore`의 `Library/` 제외 확인. 이벤트 구독 관계는 안 잡힘. **post-commit 훅은 워크트리에서는 스킵** | 워크트리에서 작업 후엔 main에서 갱신됨을 문서화 |
+| 8 | `autoMemoryDirectory` `~/` | ✅ `C:\Users\simplex3510\claude-brain\memory\unity-ai-template\` 로 해석됨 | 없음 |
+| 9 | gh 기본 저장소 | 🔴 기본 저장소 미설정 시 gh가 **`upstream` 이름의 remote(CCGS 공개 저장소)를 선택** (`gh pr list`가 CCGS PR을 보여줌). remote 이름을 `ccgs`로 바꾸면 `origin`을 선택 | 템플릿 remote `upstream`→`ccgs` 변경 완료, push 주소 DISABLED. set-default도 계속 설정 |
+| 10 | git 훅 순서 | ✅ `git lfs install` → `graphify hook install` 순서에서 post-commit·post-checkout에 둘 다 남음. Graphify는 `graph.json` merge 드라이버도 등록 | 없음 |
+
+**추가 발견**
+- 🟠 OMC `post-tool-directory-context-injector`가 파일을 처음 건드릴 때 **루트 README.md를 컨텍스트에 주입**(세션당 1회, 최대 약 5,000토큰). 지금 README는 CCGS 홍보용 30KB 문서라 토큰 낭비. → 3단계에서 README를 템플릿 사용법으로 교체하고, `.gitattributes`에 `README.md merge=ours`(드라이버는 bootstrap이 PC별 등록)로 CCGS 업데이트 때 우리 README를 유지.
+- 🟢 이 세션은 CCGS 설정이 생긴 뒤 deny 규칙이 즉시 적용됨(`rm -rf` 차단 확인). 훅·플러그인은 세션 재시작 후 적용.
+
+---
+
+## 7. 남는 리스크
 
 - **플러그인 버전 고정 불가**: 마켓플레이스는 최신을 따라가므로 PC마다 버전이 어긋날 수 있음. `versions.md`에 검증 조합을 기록하고 `doctor.ps1`이 차이를 경고하는 수준이 현실적 한계.
 - **CCGS 업데이트 속도**: 패치한 4개 파일은 merge마다 확인 필요. 특히 `.claude/settings.json`은 upstream이 자주 바꿈.

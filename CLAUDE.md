@@ -67,6 +67,8 @@ See `docs/COLLABORATIVE-DESIGN-PRINCIPLE.md` for full protocol and examples.
 
 @.claude/docs/coding-standards.md
 
+@.claude/docs/framework/integration.md
+
 ## Context Management
 
 Read `.claude/docs/context-management.md` on demand — it is a reference, not

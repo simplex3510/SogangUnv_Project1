@@ -177,6 +177,3 @@ $RECYCLE.BIN/
 # === Framework overlay (docs/framework-design.md) ===
 # Graphify output is rebuilt per PC by its post-commit hook.
 graphify-out/
-# OMC runtime state is per PC; only project-scoped skills are shared.
-.omc/*
-!.omc/skills/

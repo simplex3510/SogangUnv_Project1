@@ -51,3 +51,10 @@ Assets/**/*.fbx      filter=lfs diff=lfs merge=lfs -text
 Assets/**/*.blend    filter=lfs diff=lfs merge=lfs -text
 Assets/**/*.ttf      filter=lfs diff=lfs merge=lfs -text
 Assets/**/*.otf      filter=lfs diff=lfs merge=lfs -text
+# Two PCs or collaborators each appending a pointer line merge cleanly.
+.claude/memory/MEMORY.md merge=union
+# Two PCs or collaborators each appending a pointer line merge cleanly.
+.claude/memory/MEMORY.md merge=union
+# Keep our README when merging CCGS updates (driver "ours" is registered per PC by scripts/bootstrap.ps1).
+README.md merge=ours
+graphify-out/graph.json merge=graphify
