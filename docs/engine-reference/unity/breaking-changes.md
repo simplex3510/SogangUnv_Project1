@@ -152,3 +152,32 @@ When upgrading from 2022 LTS to Unity 6.3 LTS:
 **Sources:**
 - https://docs.unity3d.com/6000.0/Documentation/Manual/upgrade-guides.html
 - https://docs.unity3d.com/Packages/com.unity.entities@1.3/manual/upgrade-guide.html
+
+## 6.3 → 6.6 (verified 2026-11-16)
+
+Sources: upgrade-guide-unity64 / 65 / 66 at https://docs.unity.com/en-us/engine/6000.6/manual/upgrade-guides/ (6.4, 6.6) and https://docs.unity.com/en-us/engine/6000.5/manual/upgrade-guides/upgrade-guide-unity65 (6.5).
+
+### 6.4
+- `OnDisable` is now invoked on descendants' components when a GameObject is destroyed with `Object.Destroy`; workarounds that propagate it cause duplicate calls and must go.
+- Asset import: artifact dependencies reimport only when the artifact changes; custom `ScriptedImporter`/`AssetPostprocessor` may need `AssetImportContext.DependsOnSourceAsset` or `DependsOnArtifact`.
+- URP Compatibility Mode removed (`URP_COMPATIBILITY_MODE` define gone); custom render passes must use Render Graph.
+- `LightShadowCasterMode`: `NonLightmappedOnly` → `ShadowMask`, `Everything` → `DistanceShadowMask`.
+- `InstanceID` replaced by an `EntityId` type; `InstanceID` methods deprecated. Never cast `EntityId` to/from int.
+
+### 6.5
+- `InstanceID` APIs removed: `go.GetInstanceID()` → `go.GetEntityId()`. `EntityId` is 8 bytes; storing it in an int loses data.
+- Obsolete GameObject/Component shortcuts removed: `GameObject.rigidbody` etc. → `GetComponent<T>()`; `AddComponent(string)` → `AddComponent<T>()`.
+- Built-In Render Pipeline deprecated (supported through 6.7 LTS); Legacy Render Graph API obsolete (custom SRPs only); dynamic batching deprecated.
+- Render Pipeline Core no longer depends on `com.unity.ugui`: add it explicitly if it came in indirectly.
+- Texture Read/Write now required for Particle System Shape and Terrain Paint Detail, otherwise the build fails.
+- Editor log defaults to `ProjectName/Logs/Editor.log`; use `Application.consoleLogPath`.
+- 2D only: `LowLevelPhysics2D` → `PhysicsCore2D` (`Unity.U2D.Physics`). 3D physics: NOT STATED.
+
+### 6.6
+- Play Mode: "reload scene only" is the default for new projects (code not reloaded, static state not reset). Existing-project behaviour: NOT SOURCEABLE.
+- YAML serialization: word wrapping disabled and "Reduce Version Control Noise" removed — expect unrelated YAML diffs after reserialize.
+- Mesh Read/Write now also required for Mesh Collider (plus Particle System Shape, Terrain Detail Mesh), otherwise the build fails.
+- `UNITY_64` and `DEVELOPMENT_BUILD` deprecated; both removed in 6.8.
+- UI Toolkit: `DefaultEventSystem.LegacyInputProcessor` removed; `UIToolkitInputConfiguration.SetRuntimeInputBackend` is a compile error; legacy UXML Factory/Traits removed.
+- Cinemachine 2 auto-upgraded to Cinemachine 3 (different API and data format). Render Pipeline Core no longer depends on Terrain.
+- UGUI and Input System breaking changes: NOT STATED in the fetched guides.

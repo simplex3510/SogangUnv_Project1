@@ -154,3 +154,22 @@ rootVisualElement.Q<Label>("score-label").text = "Score: 100";
 **Sources:**
 - https://docs.unity3d.com/6000.0/Documentation/Manual/deprecated-features.html
 - https://docs.unity3d.com/Packages/com.unity.inputsystem@1.11/manual/Migration.html
+
+## 6.3 → 6.6 (verified 2026-11-16)
+
+Sources: the 6.4 / 6.5 / 6.6 upgrade guides listed in `breaking-changes.md`.
+
+| Don't use | Use instead | Since |
+|-----------|-------------|-------|
+| `GetInstanceID()` / `InstanceID` | `GetEntityId()` / `EntityId` | deprecated 6.4, removed 6.5 |
+| `go.rigidbody`, `.renderer`, `.camera`, `.collider`, `.light` ... | `GetComponent<T>()` | removed 6.5 |
+| `AddComponent(string)` | `AddComponent<T>()` | removed 6.5 |
+| `UNITY_64` | runtime `IntPtr.Size` check | deprecated 6.6, removed 6.8 |
+| `DEVELOPMENT_BUILD` | `UNITY_ENABLE_CHECKS`, `UNITY_INCLUDE_INSTRUMENTATION`, `Debug.isDebugBuild` | deprecated 6.6, removed 6.8 |
+| `BuildOptions.ForceEnableAssertions` | `PlayerSettings.SetManagedCodeVariant(..., ManagedCodeVariant.Checked)` | 6.6 |
+| UXML Factory / Traits | `UxmlElement` / `UxmlAttribute` | removed 6.6 |
+| `UIToolkitInputConfiguration.SetRuntimeInputBackend` | none, delete the call | compile error 6.6 |
+| Built-In Render Pipeline | URP | deprecated 6.5 |
+| Dynamic batching | NOT SOURCEABLE — the 6.6 guide only points to "Choose a method for optimizing calls" | deprecated 6.5, obsolete 6.6 |
+| Progressive CPU Lightmapper | Unity Compute Light Baker or Progressive GPU Lightmapper | deprecated 6.6 |
+| `LowLevelPhysics2D` | `PhysicsCore2D` (`Unity.U2D.Physics`) | 6.5 |

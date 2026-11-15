@@ -31,3 +31,28 @@ engine:
   name: Unity
   version: 6000.6.8f1
   language: C#
+  rendering: URP
+  physics: PhysX
+  path: "C:/Program Files/Unity/Hub/Editor/6000.6.8f1/Editor/Unity.exe"
+
+specialists:
+  code: unity-specialist
+  shader: unity-shader-specialist
+  ui: unity-ui-specialist
+  additional: [unity-dots-specialist, unity-addressables-specialist]
+
+naming:
+  classes: PascalCase
+  variables: camelCase
+  constants: SCREAMING_SNAKE   # UNVERIFIED — not sourceable from
+                               # docs/engine-reference/unity/; confirm before relying on it
+  signals: PascalCase On<Event>
+  files: PascalCase
+  scenes: PascalCase
+
+commands:
+  # build: -buildWindows64Player picks the platform itself; "OverLoad" is a placeholder game name — change via /project-settings
+  build: '"C:/Program Files/Unity/Hub/Editor/6000.6.8f1/Editor/Unity.exe" -batchmode -quit -projectPath . -buildWindows64Player Builds/Win64/OverLoad.exe'
+  test: '"C:/Program Files/Unity/Hub/Editor/6000.6.8f1/Editor/Unity.exe" -batchmode -runTests -projectPath . -testPlatform EditMode -testResults test-results/editmode.xml'
+  run: "Builds/Win64/OverLoad.exe -screen-width 1280 -screen-height 720 -screen-fullscreen 0"
+  smoke: '"C:/Program Files/Unity/Hub/Editor/6000.6.8f1/Editor/Unity.exe" -batchmode -quit -projectPath . -logFile -'

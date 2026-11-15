@@ -2,12 +2,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Engine Version** | Unity 6.3 LTS |
-| **Installed at pin time** | NOT DETERMINED — `/setup-engine` §3 probes the installed editor and records the result here. |
+| **Engine Version** | Unity 6000.6.8f1 (Unity 6.6; the sections below still describe the 6.3 LTS baseline, 6.3 → 6.6 changes are in `breaking-changes.md`, `deprecated-apis.md`, `current-best-practices.md`) |
+| **Installed at pin time** | 6000.6.8f1 (Hub editor directory, matches `ProjectSettings/ProjectVersion.txt`; probed 2026-11-16; 6000.6.3f1 is also installed) |
 | **Release Date** | December 2025 |
 | **Latest editor on the pinned line** | 6000.3.26f1 (Oct 8, 2026) |
-| **Project Pinned** | 2026-02-13 |
-| **Last Docs Verified** | 2026-10-17 (release timeline, newer releases, latest 6.3 LTS editor); 2026-02-13 (rest of directory) |
+| **Project Pinned** | 6000.6.8f1 (re-pinned 2026-11-16; earlier pin 6.3 LTS on 2026-02-13) |
+| **Last Docs Verified** | 2026-11-16 (6.3 → 6.6 upgrade guides, see the 6.3 → 6.6 sections); 2026-10-17 (release timeline, newer releases, latest 6.3 LTS editor); 2026-02-13 (rest of directory) |
 | **LLM Knowledge Cutoff** | May 2025 |
 
 ## Knowledge Gap Warning
@@ -37,9 +37,10 @@ version-qualified claim** — `NOT DETERMINED` means the gap is unknown, not abs
 
 ## Newer Releases After the Pin (6.4 to 6.7)
 
-**The pin does not change: it stays Unity 6.3 LTS, the newest LTS.** These are
-Supported Update releases that shipped after it. Nothing else in this directory
-covers their APIs, so treat any 6.4+ API as unconfirmed until checked against
+**The project pin moved to 6000.6.8f1 (Unity 6.6) on 2026-11-16; 6.3 LTS is the documented baseline of this directory.** These are
+Supported Update releases that shipped after it. The 6.3 → 6.6 upgrade-guide findings are in the `## 6.3 → 6.6` sections of
+`breaking-changes.md`, `deprecated-apis.md` and `current-best-practices.md`; anything not
+listed there is unconfirmed until checked against
 Unity's docs for that release. 6.0 LTS support ended in October 2026.
 
 | Version | Release | Status (2026-10-17) | Key Theme |
@@ -123,3 +124,17 @@ October 2026, 6.3 LTS until December 2027).
 - Unity 6.6 announcement: https://discussions.unity.com/t/unity-6-6-is-now-available/1735357
 - Editor release API: https://services.api.unity.com/unity/editor/release/v1/releases
 - C# API reference: https://docs.unity3d.com/6000.0/Documentation/ScriptReference/index.html
+
+## 6.3 → 6.6 Update (verified 2026-11-16)
+
+Sources fetched this run, all official: the Unity 6.4, 6.5 and 6.6 *What's new* pages and upgrade guides at
+https://docs.unity.com/en-us/engine/6000.6/manual/upgrade-guides/upgrade-guide-unity64,
+https://docs.unity.com/en-us/engine/6000.5/manual/upgrade-guides/upgrade-guide-unity65 and
+https://docs.unity.com/en-us/engine/6000.6/manual/upgrade-guides/upgrade-guide-unity66,
+plus the 6.6 announcement https://discussions.unity.com/t/unity-6-6-is-now-available/1735357.
+The 6.5 and 6.6 *What's new* pages were only partly read verbatim (the rest was a model summary),
+so items marked `[summary]` in the sibling files are unconfirmed.
+
+- NOT SOURCEABLE — whether a project upgraded from an older editor keeps its previous Play Mode (domain reload) setting; no fetched page states it. Check Project Settings > Editor.
+- NOT SOURCEABLE — built-in 3D physics and Input System behaviour changes in 6.4–6.6; the fetched guides state none.
+- NOT SOURCEABLE — UGUI runtime behaviour changes in 6.4–6.6; the fetched guides state none.

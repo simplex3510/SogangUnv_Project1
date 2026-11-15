@@ -373,3 +373,16 @@ Debug.Log($"Player {playerName} scored {score} points");
 - https://docs.unity3d.com/6000.0/Documentation/Manual/BestPracticeGuides.html
 - https://docs.unity3d.com/Packages/com.unity.entities@1.3/manual/index.html
 - https://docs.unity3d.com/Packages/com.unity.inputsystem@1.11/manual/index.html
+
+## 6.3 → 6.6 (verified 2026-11-16)
+
+Sources: the 6.4 / 6.5 / 6.6 upgrade guides and the 6.6 Configurable Enter Play Mode page
+https://docs.unity.com/en-us/engine/6000.6/manual/programming-environment/code-reload-serialization/code-reload/code-reloading-editor/configurable-enter-play-mode.
+
+- Use Render Graph for custom URP passes (Compatibility Mode is gone since 6.4).
+- Leave domain reload off in Play Mode (the page recommends it); that makes static state survive between Play sessions, so reset statics yourself. Static-state pitfalls: NOT SOURCEABLE (the linked page was not fetched).
+- Migrate off `UNITY_64` and `DEVELOPMENT_BUILD` before 6.8 turns them into errors.
+- Use `Application.consoleLogPath` instead of a hard-coded editor log path.
+- Mark every `[SerializeReference]` type `[Serializable]` (the Editor warns since 6.4).
+- Enable Read/Write on meshes used by Mesh Collider, Particle System Shape and Terrain Detail Mesh, or the build fails.
+- Use the Project Auditor (built into the Editor since 6.4) to find APIs obsoleted between versions.

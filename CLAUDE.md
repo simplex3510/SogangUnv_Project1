@@ -8,8 +8,8 @@ Each agent owns a specific domain, enforcing separation of concerns and quality.
 - **Engine**: Unity 6000.6.8f1
 - **Language**: C#
 - **Version Control**: Git with trunk-based development
-- **Build System**: [SPECIFY after choosing engine]
-- **Asset Pipeline**: [SPECIFY after choosing engine]
+- **Build System**: Unity Build Pipeline
+- **Asset Pipeline**: Unity Asset Import Pipeline
 
 > **Note**: Engine-specialist agents exist for Godot, Unity, and Unreal with
 > dedicated sub-specialists. Use the set matching your engine.
@@ -25,6 +25,8 @@ Each agent owns a specific domain, enforcing separation of concerns and quality.
      step and /project-settings (engine.name) write
      @docs/engine-reference/<engine>/VERSION.md here for the chosen engine. Skills
      that need the pinned version read that file on demand either way. -->
+
+@docs/engine-reference/unity/VERSION.md
 
 
 ## Technical Preferences
