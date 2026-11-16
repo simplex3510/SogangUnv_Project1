@@ -22,7 +22,7 @@
 | 011 | 카탈로그 정적 오브젝트 프리팹화 | Integration | Ready | N/A (minimal) |
 | 012 | NPC 차량 골격 | Integration | Ready | N/A (minimal) |
 | 013 | 고속 모드 게이지와 속도계 HUD | Logic | Complete | N/A (minimal) |
-| 014 | 적재 물류 패널 접기/펼치기와 스크롤 | UI | In Review | N/A (minimal) |
+| 014 | 적재 물류 패널 접기/펼치기와 스크롤 | UI | Complete | N/A (minimal) |
 | 015 | 일차·시각 HUD 좌상단 | UI | Ready | N/A (minimal) |
 | 016 | 오늘 수익 HUD | UI | Ready | N/A (minimal) |
 | 017 | 방향 안내를 적재 물류 패널로 이전 | UI | Ready | N/A (minimal) |

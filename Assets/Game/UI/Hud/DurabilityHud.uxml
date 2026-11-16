@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="DurabilityHud.uss" />
+    <ui:VisualElement name="hudRoot" class="hud-root" picking-mode="Ignore">
+        <ui:VisualElement name="cargoPanel" class="cargo-panel cargo-panel--empty" picking-mode="Ignore">
+            <ui:ScrollView name="cargoList" mode="Vertical" vertical-scroller-visibility="Hidden" horizontal-scroller-visibility="Hidden" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:Label name="discardNotice" class="discard-notice" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>
