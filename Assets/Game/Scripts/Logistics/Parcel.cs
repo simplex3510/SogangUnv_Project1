@@ -44,6 +44,15 @@ namespace Game.Logistics
         /// <summary>내구도가 0이 되어 폐기 대상이 된 물류인지.</summary>
         public bool IsDepleted => CurrentDurability <= 0f;
 
+        /// <summary>폐기(Spoiled) 상태인지. 폐기 물류의 목적지는 처분 장소이며 원래 배송지에서는 빠진다(기획서 11.6).</summary>
+        public bool IsSpoiled => Status == ParcelStatus.Spoiled;
+
+        /// <summary>해당 배송지에 하차할 수 있는 물류인지. 폐기 물류는 원래 배송지로 하차하지 않는다.</summary>
+        public bool IsDeliverableTo(DeliveryTarget target)
+        {
+            return IsSpoiled == false && Target == target;
+        }
+
         public Parcel(
             int id,
             DeliveryTarget target,

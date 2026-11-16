@@ -11,9 +11,9 @@
 |---|-------|------|--------|-----|
 | 001 | 맵 레벨 게임플레이 배선과 1회 완주 | Integration | Deferred | N/A (minimal) |
 | 002 | 하루 별점 피드백(3구간) | Logic | Complete | N/A (minimal) |
-| 003 | 밸런싱 수치 확정과 마무리 | Config/Data | Ready | N/A (minimal) |
+| 003 | 밸런싱 수치 확정과 마무리 | Config/Data | Deferred | N/A (minimal) |
 | 004 | 충돌 내구도 감소 | Logic | Complete | N/A (minimal) |
-| 005 | 폐기 물류 전환과 처분 장소 | Integration | Ready | N/A (minimal) |
+| 005 | 폐기 물류 전환과 처분 장소 | Integration | Complete | N/A (minimal) |
 | 006 | 내구도 피드백 UI 3종 | UI | Ready | N/A (minimal) |
 | 007 | 차량 리셋·복구 | Logic | Ready | N/A (minimal) |
 | 008 | Fresh 배송 유형 | Integration | Ready | N/A (minimal) |

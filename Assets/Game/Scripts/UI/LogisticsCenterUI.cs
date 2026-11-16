@@ -173,6 +173,45 @@ namespace Game.UI
                     AddParcelRow(parcel, CanLoad(parcel) == false);
                 }
             }
+
+            AddDisposalGroupRow();
+        }
+
+        /// <summary>폐기 물류는 목적지가 처분 장소이므로 마지막에 처분 장소 그룹으로 묶어 보여 준다(기획서 11.6). 상차 대상이 아니라 누를 수 없다.</summary>
+        private void AddDisposalGroupRow()
+        {
+            if (_controller == null || DisposalSite.Instance == null)
+            {
+                return;
+            }
+
+            int spoiled = 0;
+            IReadOnlyList<Parcel> loaded = _controller.LoadedParcels;
+            for (int i = 0; i < loaded.Count; i++)
+            {
+                if (loaded[i].IsSpoiled)
+                {
+                    spoiled++;
+                }
+            }
+
+            if (spoiled == 0)
+            {
+                return;
+            }
+
+            Button button = Instantiate(_groupTemplate, _content);
+            button.gameObject.SetActive(true);
+            _spawned.Add(button.gameObject);
+            ConfigureButton(button, true);
+
+            TMP_Text label = button.GetComponentInChildren<TMP_Text>(true);
+            if (label != null)
+            {
+                float distance = CalculateXZDistance(_center.transform.position, DisposalSite.Instance.transform.position);
+                label.text = $"{DisposalSite.Instance.name}  {distance:0}m  spoiled {spoiled}";
+                label.color = _warningColor;
+            }
         }
 
         /// <summary>그룹 상차는 처리 순서 첫 물류부터 시작하므로, 그 물류가 실려야 그룹을 누를 수 있다(결정 D5).</summary>
@@ -230,7 +269,7 @@ namespace Game.UI
                 for (int i = 0; i < loaded.Count; i++)
                 {
                     Parcel parcel = loaded[i];
-                    if (parcel == null || parcel.Target == null)
+                    if (parcel == null || parcel.Target == null || parcel.IsSpoiled)
                     {
                         continue;
                     }
@@ -498,7 +537,7 @@ namespace Game.UI
             IReadOnlyList<Parcel> loaded = _controller.LoadedParcels;
             for (int i = 0; i < loaded.Count; i++)
             {
-                if (loaded[i].Target == target)
+                if (loaded[i].Target == target && loaded[i].IsSpoiled == false)
                 {
                     count++;
                 }

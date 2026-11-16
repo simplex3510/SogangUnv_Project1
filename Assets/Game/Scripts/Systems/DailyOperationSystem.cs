@@ -99,6 +99,9 @@ namespace Game.Systems
             SetControlEnabled(false);
             _generationSystem.StopDay();
 
+            // 차량에 남은 폐기 물류는 정리한다. 페널티는 이미 정산에 잡혀 있다(기획서 11.6-6)
+            _interactionController.ClearSpoiledParcels();
+
             Debug.Log($"[하루 운영] 종료: {reason}");
 
             // 정산은 미배송 물류를 실패 처리하고 결과 화면을 띄운다

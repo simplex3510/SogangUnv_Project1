@@ -1,0 +1,16 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DisposalSite.cs c355d8405fa8f2012b5dcc69fef96c76f3d72c8d
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DisposalConfig.cs ea416bba11f0ae58680d13da0e5cfd382225c6a0
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DisposalSiteParcelUI.cs 683477a48ba0b846a474446f6fdd14f5b02344b1
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/Parcel.cs 9ee4f61e65ffc3b2c81e8b4e4159d9a2049b7ffd
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/ParcelStatus.cs 7fa82a2a830643bf95e3fd267e053a3f94a334e8
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DeliveryTarget.cs 6f0e235527449198201d8eb9f4d7e0e797e97eea
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DeliveryDeadlineSystem.cs 3266823ed41e998ac9fdffa7af5a3be7879f27b4
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/SettlementSystem.cs 59173b564ee3fd776b4180cc89cefcb41d9c237e
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/PlayerInteractionController.cs 94eafb7815dc7a792fc6d5b02c3f05dc5994a91c
+Reviewed-Content-Hash: Assets/Game/Scripts/Systems/DailyOperationSystem.cs ceb4f236b4fdb467e540f9acf5094c79832832a6
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DeliveryTargetParcelUI.cs 4a0ca7ed2cecfd98f43295d3e99b6c463c5bf6d0
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DeliveryNavigationCompass.cs 17529399c3c485fc5d33ae721fa60d46beeeec87
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/LogisticsCenterUI.cs a35a14e0b73801fd90e9b2c7f64c659f68cbcecf
+Reviewed-Content-Hash: Assets/Game/Configs/DisposalConfig.asset befc19dd21ec7aa8be8d7c61c5f02a2e18e91ebe
+Reviewed-Content-Hash: Assets/Game/Prefabs/DisposalSite.prefab ebdbff5c8bccd79da1d78377fac17d0809238633
+Reviewed-Content-Hash: Assets/Game/Scenes/_DevOnly/SampleMapDesign.unity d76d0d55682479f59aa82edf98f17357d8a2c3ac

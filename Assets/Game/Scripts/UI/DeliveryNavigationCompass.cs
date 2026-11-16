@@ -25,6 +25,11 @@ namespace Game.UI
         [SerializeField, Min(0f)] private float _arrowSpacing = 48f;
         [SerializeField] private Color _logisticsCenterColor = new Color(0.549f, 0.778f, 0.961f);
 
+        [SerializeField] private Color _disposalColor = new Color(0.9f, 0.4f, 0.3f);
+
+        // 폐기 물류를 싣고 있는지(CollectTargets가 갱신)
+        private bool _hasSpoiled;
+
         // 표시 중인 화살표. 화살표 하나가 목적지 하나를 담당한다.
         private readonly List<TMP_Text> _arrows = new();
 
@@ -84,7 +89,10 @@ namespace Game.UI
                 CollectTargets();
             }
 
-            int arrowCount = _targets.Count + (_logisticsCenter != null ? 1 : 0);
+            // 폐기 물류를 실었으면 처분 장소 화살표를 배송지 화살표 다음에 붙인다(기획서 11.6)
+            DisposalSite disposalSite = _hasSpoiled ? DisposalSite.Instance : null;
+
+            int arrowCount = _targets.Count + (_logisticsCenter != null ? 1 : 0) + (disposalSite != null ? 1 : 0);
             EnsureArrowCount(arrowCount);
 
             if (arrowCount == 0)
@@ -105,21 +113,37 @@ namespace Game.UI
                 PlaceArrow(index, _targets[i].transform.position, arrowCount, Color.white);
                 index++;
             }
+
+            if (disposalSite != null)
+            {
+                PlaceArrow(index, disposalSite.transform.position, arrowCount, _disposalColor);
+            }
         }
 
         /// <summary>적재 물류의 배송지를 처리 순서(기획서 7.4)가 앞선 물류 기준으로 중복 없이 모은다.</summary>
         private void CollectTargets()
         {
             _targets.Clear();
+            _hasSpoiled = false;
 
             var loadedParcels = _interactionController.LoadedParcels;
+            for (int i = 0; i < loadedParcels.Count; i++)
+            {
+                if (loadedParcels[i] != null && loadedParcels[i].IsSpoiled)
+                {
+                    _hasSpoiled = true;
+                    break;
+                }
+            }
+
             while (true)
             {
                 Parcel next = null;
                 for (int i = 0; i < loadedParcels.Count; i++)
                 {
                     Parcel parcel = loadedParcels[i];
-                    if (parcel == null || parcel.Target == null || _targets.Contains(parcel.Target))
+                    // 폐기 물류의 목적지는 처분 장소이므로 원래 배송지 화살표에서는 뺀다
+                    if (parcel == null || parcel.Target == null || parcel.IsSpoiled || _targets.Contains(parcel.Target))
                     {
                         continue;
                     }

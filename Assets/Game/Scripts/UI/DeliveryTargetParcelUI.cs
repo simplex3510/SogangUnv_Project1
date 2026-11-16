@@ -92,7 +92,8 @@ namespace Game.UI
 
         private static bool IsRemaining(Parcel parcel)
         {
-            return parcel.Status != ParcelStatus.Delivered && parcel.Status != ParcelStatus.Failed;
+            // 폐기 물류의 아이콘은 처분 장소로 옮겨 간다(기획서 11.6)
+            return parcel.Status != ParcelStatus.Delivered && parcel.Status != ParcelStatus.Failed && parcel.IsSpoiled == false;
         }
     }
 }

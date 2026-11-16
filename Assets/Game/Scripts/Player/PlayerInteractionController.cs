@@ -40,6 +40,7 @@ namespace Game.Player.Interaction
         // 마지막 콜라이더가 빠질 때만 목록에서 제거하기 위해 겹침 개수를 센다.
         private readonly Dictionary<IInteractable, int> _overlapCounts = new();
 
+        private PlayerCargoImpactController _impactController;
         private IInteractable _currentInteractable;
         private Parcel _activeParcel;
         private float _progressSeconds;
@@ -175,11 +176,64 @@ namespace Game.Player.Interaction
         private void OnEnable()
         {
             _interactionInput.action.Enable();
+
+            // 내구도 0 도달은 같은 차량의 충돌 컨트롤러가 알린다(Story 004)
+            _impactController = GetComponent<PlayerCargoImpactController>();
+            if (_impactController != null)
+            {
+                _impactController.ParcelDepleted += SpoilParcel;
+            }
         }
 
         private void OnDisable()
         {
             _interactionInput.action.Disable();
+
+            if (_impactController != null)
+            {
+                _impactController.ParcelDepleted -= SpoilParcel;
+            }
+        }
+
+        /// <summary>
+        /// 적재 물류를 폐기로 전환한다(기획서 11.6). 원인과 무관하게 공통이며 내구도 0·신선도 0(Fresh)이 같은 경로를 쓴다.
+        /// 배송 실패 확정(페널티는 정산이 집계), 목적지 재설정(처분 장소), 진행 중 하차 중단을 처리한다.
+        /// </summary>
+        public void SpoilParcel(Parcel parcel)
+        {
+            if (parcel == null || parcel.IsSpoiled || _loadedParcels.Contains(parcel) == false)
+            {
+                return;
+            }
+
+            parcel.Status = ParcelStatus.Spoiled;
+
+            // 하차 진행 중이던 물류면 중단하고 진행도를 초기화한다(규칙 5)
+            if (_activeParcel == parcel)
+            {
+                StopInteraction();
+            }
+
+            if (DeliveryDeadlineSystem.Instance != null)
+            {
+                DeliveryDeadlineSystem.Instance.NotifySpoiled(parcel);
+            }
+
+            // 원래 배송지의 아이콘에서 빠지고 적재·처분 UI가 갱신되도록 알린다. 적재·무게 사용량은 그대로다(규칙 4)
+            parcel.Target.NotifyParcelChanged(parcel);
+            LoadedParcelsChanged?.Invoke(parcel);
+            Debug.Log($"[폐기] 물류 #{parcel.Id} 폐기 전환, 배송 실패 확정 {FormatUsage()}");
+        }
+
+        /// <summary>영업 종료 시 차량에 남은 폐기 물류를 정리한다. 페널티는 폐기 전환 때 이미 정산에 잡혔다(기획서 11.6-6).</summary>
+        public void ClearSpoiledParcels()
+        {
+            if (_loadedParcels.RemoveAll(parcel => parcel.IsSpoiled) > 0)
+            {
+                RecomputeSpeedMultiplier();
+                // 처분 장소 아이콘 등이 남지 않도록 갱신을 알린다(대상 물류가 여럿이라 null)
+                LoadedParcelsChanged?.Invoke(null);
+            }
         }
 
         private void OnTriggerEnter(Collider other)
@@ -397,9 +451,15 @@ namespace Game.Player.Interaction
 
             if (interactable.InteractionType == InteractionTypes.Unload)
             {
+                // 처분 장소는 폐기 물류를 실고 있을 때만 허용한다
+                if (interactable is DisposalSite)
+                {
+                    return _loadedParcels.Exists(parcel => parcel.IsSpoiled);
+                }
+
                 // 해당 배송지로 배송할 물류를 실고 있을 때만 하차를 허용한다
                 return interactable is DeliveryTarget target
-                    && _loadedParcels.Exists(parcel => parcel.Target == target);
+                    && _loadedParcels.Exists(parcel => parcel.IsDeliverableTo(target));
             }
 
             return false;
@@ -476,9 +536,14 @@ namespace Game.Player.Interaction
         {
             // 배송지에 도착했지만 배송할 물류가 없는 경우에만 사유를 알린다(기획서 16.2-6)
             if (interactable is DeliveryTarget target
-                && _loadedParcels.Exists(parcel => parcel.Target == target) == false)
+                && _loadedParcels.Exists(parcel => parcel.IsDeliverableTo(target)) == false)
             {
                 return "NO PARCEL FOR THIS TARGET";
+            }
+
+            if (interactable is DisposalSite && _loadedParcels.Exists(parcel => parcel.IsSpoiled) == false)
+            {
+                return "NO PARCEL TO DISPOSE";
             }
 
             if (interactable is LogisticsCenter center)
@@ -526,6 +591,11 @@ namespace Game.Player.Interaction
             if (_currentInteractable is DeliveryTarget target)
             {
                 return BeginParcel(FindNextUnloadParcel(target));
+            }
+
+            if (_currentInteractable is DisposalSite)
+            {
+                return BeginParcel(_loadedParcels.Find(parcel => parcel.IsSpoiled));
             }
 
             return false;
@@ -601,7 +671,7 @@ namespace Game.Player.Interaction
             for (int i = 0; i < _loadedParcels.Count; i++)
             {
                 Parcel parcel = _loadedParcels[i];
-                if (parcel.Target != target)
+                if (parcel.IsDeliverableTo(target) == false)
                 {
                     continue;
                 }
@@ -645,8 +715,22 @@ namespace Game.Player.Interaction
             {
                 DeliverParcel(parcel, target);
             }
+            else if (_currentInteractable is DisposalSite && _loadedParcels.Remove(parcel))
+            {
+                DisposeParcel(parcel);
+            }
 
             StopInteraction();
+        }
+
+        /// <summary>폐기 물류를 차량에서 내린다. 보상·비용 없이 적재·무게 한도만 회복한다(기획서 11.6).</summary>
+        private void DisposeParcel(Parcel parcel)
+        {
+            // 폐기 전환 때 실패가 이미 확정·집계되었으므로 추적 목록에는 더 알리지 않는다
+            parcel.Status = ParcelStatus.Failed;
+            RecomputeSpeedMultiplier();
+            LoadedParcelsChanged?.Invoke(parcel);
+            Debug.Log($"[처분] 폐기 물류 #{parcel.Id} 처분 완료 {FormatUsage()}");
         }
 
         private void DeliverParcel(Parcel parcel, DeliveryTarget target)

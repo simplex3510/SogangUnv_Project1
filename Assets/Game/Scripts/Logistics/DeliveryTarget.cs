@@ -92,7 +92,8 @@ namespace Game.Logistics
             for (int i = 0; i < _allocatedParcels.Count; i++)
             {
                 Parcel parcel = _allocatedParcels[i];
-                if (parcel.Status != ParcelStatus.Delivered && parcel.Status != ParcelStatus.Failed)
+                // 폐기 물류는 목적지가 처분 장소로 바뀌어 하차 대상에서 빠진다(기획서 11.6)
+                if (parcel.Status != ParcelStatus.Delivered && parcel.Status != ParcelStatus.Failed && parcel.IsSpoiled == false)
                 {
                     return true;
                 }

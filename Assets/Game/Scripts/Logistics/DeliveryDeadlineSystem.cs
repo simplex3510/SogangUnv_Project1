@@ -7,6 +7,8 @@ using Game.Systems;
 namespace Game.Logistics
 {
     /// <summary>물류의 배송 제한 시간을 생성 시점에 산정하고, 게임 시간에 따라 감소시키는 시스템.</summary>
+    // 물류 생성 뒤, 상·하차 완료 판정 전에 제한 시간을 감소·판정한다(기획서 3.7)
+    [DefaultExecutionOrder(150)]
     public class DeliveryDeadlineSystem : MonoBehaviour
     {
         public static DeliveryDeadlineSystem Instance { get; private set; }
@@ -21,6 +23,9 @@ namespace Game.Logistics
 
         /// <summary>배송이 완료되어 추적이 끝난 시점에 발생한다.</summary>
         public event System.Action<Parcel> ParcelDelivered;
+
+        /// <summary>물류가 폐기로 전환되어 추적이 끝난 시점에 발생한다. 정산이 실패로 집계한다.</summary>
+        public event System.Action<Parcel> ParcelSpoiled;
 
         /// <summary>생성됐지만 아직 배송되지 않은 물류. 영업 종료 시 미배송 판정에 사용한다.</summary>
         public IReadOnlyList<Parcel> TrackedParcels => _trackedParcels;
@@ -91,6 +96,13 @@ namespace Game.Logistics
         {
             Unregister(parcel);
             ParcelDelivered?.Invoke(parcel);
+        }
+
+        /// <summary>폐기 전환을 알린다. 제한 시간 추적을 끝내(시간 초과 손실 없음) 정산 집계에 넘긴다.</summary>
+        public void NotifySpoiled(Parcel parcel)
+        {
+            Unregister(parcel);
+            ParcelSpoiled?.Invoke(parcel);
         }
 
         private void Update()

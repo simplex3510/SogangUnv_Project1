@@ -15,6 +15,9 @@ namespace Game.Logistics
 
         private readonly List<Parcel> _deliveredParcels = new();
 
+        // 폐기 전환으로 배송 실패가 확정된 물류. 영업 종료 때 페널티를 한 번만 매긴다(기획서 11.6)
+        private readonly List<Parcel> _spoiledParcels = new();
+
         private DeliveryDeadlineSystem _deadlineSystem;
         private bool _hasSettled;
 
@@ -39,6 +42,7 @@ namespace Game.Logistics
             }
 
             _deadlineSystem.ParcelDelivered += OnParcelDelivered;
+            _deadlineSystem.ParcelSpoiled += OnParcelSpoiled;
 
             if (_starRatingConfig == null)
             {
@@ -51,6 +55,15 @@ namespace Game.Logistics
             if (_deadlineSystem != null)
             {
                 _deadlineSystem.ParcelDelivered -= OnParcelDelivered;
+                _deadlineSystem.ParcelSpoiled -= OnParcelSpoiled;
+            }
+        }
+
+        private void OnParcelSpoiled(Parcel parcel)
+        {
+            if (parcel != null)
+            {
+                _spoiledParcels.Add(parcel);
             }
         }
 
@@ -131,7 +144,14 @@ namespace Game.Logistics
                 _deadlineSystem.Unregister(parcel);
             }
 
-            // N = 배송 완료 + 미배송. TODO(Story 005): 폐기 물류도 실패로 센다
+            // 폐기 물류는 전환 시점에 실패가 확정되어 추적에서 빠졌으므로 여기서 실패 페널티만 매긴다. 시간 초과 손실은 없다
+            for (int i = 0; i < _spoiledParcels.Count; i++)
+            {
+                failedCount++;
+                failurePenaltyTotal += _spoiledParcels[i].Reward.FailurePenalty;
+            }
+
+            // N = 배송 완료 + 미배송 + 폐기(실패로 센다)
             int totalCount = _deliveredParcels.Count + failedCount;
 
             // 최종 금액 산식을 중복하지 않으려고 별점 없는 결과로 먼저 구한다
