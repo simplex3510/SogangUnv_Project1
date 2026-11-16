@@ -1,0 +1,5 @@
+Reviewed-Content-Hash: Assets/Game/UI/Hud/StatusHud.cs 2a55a7c06e5789d55060278b7adac7204b1d39c9
+Reviewed-Content-Hash: Assets/Game/UI/Hud/StatusHud.uxml 351f323471e31b52f4ad34fed60f571c15e153e5
+Reviewed-Content-Hash: Assets/Game/UI/Hud/StatusHud.uss 5206b64597b46632a7d6d0fdbbd62318d5f2c0a7
+Reviewed-Content-Hash: Assets/Game/Scripts/Systems/DailyOperationSystem.cs 312b1cc71099c28d76d906b449982a95ba51394d
+Reviewed-Content-Hash: Assets/Game/Scenes/_DevOnly/SampleMapDesign.unity c5f5ea55cfd4883f742d9c94efe36af2abc6b57d

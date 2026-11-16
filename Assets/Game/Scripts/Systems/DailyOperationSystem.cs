@@ -21,6 +21,10 @@ namespace Game.Systems
         // 영업 중인지. 종료 후에는 조기 종료 판정과 조작을 다시 켜지 않는다
         public bool IsOperating { get; private set; }
 
+        /// <summary>오늘 일차. 1부터 시작하고 하루 동안 바뀌지 않는다.</summary>
+        // shortcut: 여러 날 진행이 없어 1 고정이다. 일차 증가가 생기면 StartDay()에서 올린다
+        public int CurrentDay { get; private set; } = 1;
+
         private void Awake()
         {
             Instance = this;

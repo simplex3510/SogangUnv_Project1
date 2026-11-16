@@ -1,0 +1,31 @@
+/* 임시 GUI(Story 015). DurabilityHud와 같은 슬레이트 팔레트·한글 폰트 */
+.status-hud {
+    flex-grow: 1;
+    color: rgb(255, 255, 255);
+    -unity-font-definition: url("MalgunGothicDynamic.asset");
+}
+
+.status-hud--hidden {
+    display: none;
+}
+
+.status-block {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    padding: 10px 18px;
+    background-color: rgba(38, 44, 54, 0.92);
+    border-width: 3px;
+    border-color: rgb(78, 88, 104);
+    border-radius: 18px;
+}
+
+/* 시각은 크게 위, 일차는 작게 아래 (TODO(tuning)) */
+.clock-time {
+    font-size: 40px;
+    -unity-font-style: bold;
+}
+
+.day-label {
+    font-size: 18px;
+}

@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="StatusHud.uss" />
+    <ui:VisualElement name="statusHud" class="status-hud" picking-mode="Ignore">
+        <ui:VisualElement name="statusBlock" class="status-block" picking-mode="Ignore">
+            <ui:Label name="clockTime" text="00:00" class="clock-time" picking-mode="Ignore" />
+            <ui:Label name="dayLabel" text="DAY 1" class="day-label" picking-mode="Ignore" />
+            <!-- 3행(오늘 수익)은 Story 016이 이 블록 안에 붙인다 -->
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
