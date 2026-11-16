@@ -1,0 +1,4 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DailyStarRating.cs 90e33e3598edec4d9efcd5f3405a231c223aab79
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/SettlementSystem.cs 09e50687f9413176a3b979f8b4b1e6b78b2dbd1c
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/StarRatingConfig.cs 3ad6fd6c6b5ba83b4e1354ce78ccf904236a5a6f
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/SettlementUI.cs 2782e9600849dd460fdd3e9c312e2c0af82fc712

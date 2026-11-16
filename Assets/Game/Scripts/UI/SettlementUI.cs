@@ -57,7 +57,12 @@ namespace Game.UI
         {
             _finalLabel.text = $"FINAL  {result.FinalAmount:0}";
             _finalLabel.color = result.FinalAmount < 0f ? _lossColor : Color.white;
-            _summaryLabel.text = $"DELIVERED {result.DeliveredCount}      FAILED {result.FailedCount}";
+            // 별점은 SettlementSystem이 판정한다. 여기서는 표시만 한다
+            string starText = result.Stars.HasValue
+                ? $"STARS {result.Stars.Value}"
+                : "NO PARCELS TO RATE";
+            // 요약 라벨 높이에 맞춰 2줄로 둔다(3줄이면 FINAL 라벨과 겹친다)
+            _summaryLabel.text = $"{starText}      SUCCESS {result.SuccessCount} / TOTAL {result.TotalCount}\nDELIVERED {result.DeliveredCount}      FAILED {result.FailedCount}";
 
             _builder.Clear();
 

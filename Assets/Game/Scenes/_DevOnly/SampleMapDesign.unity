@@ -8664,6 +8664,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7801f4c7732ac84e9ecad34595fe184, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Logistics.SettlementSystem
+  _starRatingConfig: {fileID: 11400000, guid: 402d4733821007b468637756176987b9, type: 2}
 --- !u!4 &2094521324
 Transform:
   m_ObjectHideFlags: 0

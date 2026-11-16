@@ -10,6 +10,9 @@ namespace Game.Logistics
     {
         public static SettlementSystem Instance { get; private set; }
 
+        [Tooltip("별점 경계값 T1·T2 설정(기획서 12.4)")]
+        [SerializeField] private StarRatingConfig _starRatingConfig;
+
         private readonly List<Parcel> _deliveredParcels = new();
 
         private DeliveryDeadlineSystem _deadlineSystem;
@@ -36,6 +39,11 @@ namespace Game.Logistics
             }
 
             _deadlineSystem.ParcelDelivered += OnParcelDelivered;
+
+            if (_starRatingConfig == null)
+            {
+                Debug.LogError($"SettlementSystem requires StarRatingConfig in {gameObject.name}");
+            }
         }
 
         private void OnDestroy()
@@ -57,7 +65,8 @@ namespace Game.Logistics
         /// <summary>미배송 물류를 실패 처리하고 하루 정산을 확정한다. 영업 종료와 조기 종료(7단계)가 호출한다.</summary>
         public void FinalizeDay()
         {
-            if (_hasSettled || _deadlineSystem == null)
+            // 별점 설정이 없으면 정산하지 않는다. 시작 시 오류를 이미 남겼다
+            if (_hasSettled || _deadlineSystem == null || _starRatingConfig == null)
             {
                 return;
             }
@@ -94,6 +103,17 @@ namespace Game.Logistics
                 }
             }
 
+            // 조건부 성공 S: 배송 완료 중 Express 제한 시간 초과 완료는 별점상 실패(기획서 12.4)
+            int successCount = 0;
+            for (int i = 0; i < _deliveredParcels.Count; i++)
+            {
+                Parcel delivered = _deliveredParcels[i];
+                if (!(delivered.Type == DeliveryType.Express && delivered.IsOverdue))
+                {
+                    successCount++;
+                }
+            }
+
             int failedCount = 0;
             float failurePenaltyTotal = 0f;
 
@@ -111,6 +131,14 @@ namespace Game.Logistics
                 _deadlineSystem.Unregister(parcel);
             }
 
+            // N = 배송 완료 + 미배송. TODO(Story 005): 폐기 물류도 실패로 센다
+            int totalCount = _deliveredParcels.Count + failedCount;
+
+            // 최종 금액 산식을 중복하지 않으려고 별점 없는 결과로 먼저 구한다
+            float finalAmount = new SettlementResult(
+                baseFeeTotal, distanceFeeTotal, timeBonusEarned, timeBonusMissed, traitBonusTotal,
+                lateLossTotal, failurePenaltyTotal, _deliveredParcels.Count, failedCount, successCount, totalCount, null).FinalAmount;
+
             SettlementResult result = new(
                 baseFeeTotal,
                 distanceFeeTotal,
@@ -120,10 +148,14 @@ namespace Game.Logistics
                 lateLossTotal,
                 failurePenaltyTotal,
                 _deliveredParcels.Count,
-                failedCount);
+                failedCount,
+                successCount,
+                totalCount,
+                DailyStarRating.Evaluate(totalCount, successCount, finalAmount, _starRatingConfig.Threshold2, _starRatingConfig.Threshold1));
 
             LastResult = result;
-            Debug.Log($"[정산] 최종 {result.FinalAmount:0} (배송 {result.DeliveredCount} · 미배송 {result.FailedCount}), 수익 {result.Income:0}, 손실 {result.Loss:0}");
+            string starText = result.Stars.HasValue ? $"별 {result.Stars.Value}" : "별점 없음";
+            Debug.Log($"[정산] 최종 {result.FinalAmount:0} (배송 {result.DeliveredCount} · 미배송 {result.FailedCount}), 수익 {result.Income:0}, 손실 {result.Loss:0}, {starText} (성공 {result.SuccessCount}/발생 {result.TotalCount})");
             Settled?.Invoke(result);
         }
 
@@ -140,6 +172,15 @@ namespace Game.Logistics
             public readonly int DeliveredCount;
             public readonly int FailedCount;
 
+            /// <summary>조건부 성공 수 S(기획서 12.4).</summary>
+            public readonly int SuccessCount;
+
+            /// <summary>발생 물류 수 N(기획서 12.4).</summary>
+            public readonly int TotalCount;
+
+            /// <summary>별 0~3개. 판정할 물류가 없으면 null.</summary>
+            public readonly int? Stars;
+
             public SettlementResult(
                 float baseFeeTotal,
                 float distanceFeeTotal,
@@ -149,7 +190,10 @@ namespace Game.Logistics
                 float lateLoss,
                 float failurePenalty,
                 int deliveredCount,
-                int failedCount)
+                int failedCount,
+                int successCount,
+                int totalCount,
+                int? stars)
             {
                 BaseFeeTotal = baseFeeTotal;
                 DistanceFeeTotal = distanceFeeTotal;
@@ -160,6 +204,9 @@ namespace Game.Logistics
                 FailurePenalty = failurePenalty;
                 DeliveredCount = deliveredCount;
                 FailedCount = failedCount;
+                SuccessCount = successCount;
+                TotalCount = totalCount;
+                Stars = stars;
             }
 
             public float Income => BaseFeeTotal + DistanceFeeTotal + TimeBonusEarned + TraitBonusTotal;
