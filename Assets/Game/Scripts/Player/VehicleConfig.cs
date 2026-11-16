@@ -43,6 +43,29 @@ namespace Game.Player.Movement
         [Tooltip("모드 전환 시 성능 값이 새 모드 값까지 이동하는 시간(초)")]
         [SerializeField, Min(0f)] private float _modeTransitionSeconds = 0.4f; // TODO(tuning)
 
+        [Header("고속 게이지 (quick-specs/fast-mode-gauge-speedometer)")]
+        [Tooltip("게이지가 가득 찬 상태에서 고속 모드를 유지할 수 있는 시간(초)")]
+        [SerializeField, Min(0.01f)] private float _fastGaugeDrainSeconds = 8f; // TODO(tuning)
+
+        [Tooltip("일반 모드로 바뀐 뒤 게이지 충전이 시작되기까지 지연(초)")]
+        [SerializeField, Min(0f)] private float _fastGaugeRechargeDelaySeconds = 1.5f; // TODO(tuning)
+
+        [Tooltip("게이지가 0에서 가득 찰 때까지 걸리는 시간(초)")]
+        [SerializeField, Min(0.01f)] private float _fastGaugeRechargeSeconds = 12f; // TODO(tuning)
+
+        [Tooltip("모드가 바뀐 뒤 다시 전환할 수 없는 시간(초)")]
+        [SerializeField, Min(0f)] private float _modeChangeCooldownSeconds = 1f; // TODO(tuning)
+
+        [Tooltip("게이지 소진으로 강제 전환된 뒤 고속에 다시 들어가는 데 필요한 게이지 비율")]
+        [SerializeField, Range(0f, 1f)] private float _fastGaugeReentryRatio = 0.3f; // TODO(tuning)
+
+        [Header("속도계 표시")]
+        [Tooltip("km/h 환산값에 곱하는 표시 배율. 소형 차량이라 실제 속도가 작다")]
+        [SerializeField, Min(0f)] private float _speedometerDisplayScale = 4f; // TODO(tuning)
+
+        [Tooltip("속도계 아크가 가득 차는 표시 속도(km/h)")]
+        [SerializeField, Min(1f)] private float _speedometerMaxKmh = 80f; // TODO(tuning)
+
         [Header("공통 주행")]
         [SerializeField, Min(0f)] private float _maxReverseSpeed = 2.5f;
         [SerializeField, Min(0f)] private float _brakeDeceleration = 20f;
@@ -66,6 +89,9 @@ namespace Game.Player.Movement
 
         [Tooltip("드리프트 중 최대 회전 속도 배율")]
         [SerializeField, Min(0f)] private float _driftTurnMultiplier = 1.3f; // TODO(tuning)
+
+        [Tooltip("드리프트 중 앞뒤 입력이 없을 때의 감속(m/s²). 일반 타력 감속보다 낮게 두어 악셀 없이도 드리프트가 이어지게 한다")]
+        [SerializeField, Min(0f)] private float _driftCoastDeceleration = 1f; // TODO(tuning)
 
         [Header("서스펜션")]
         [Tooltip("바퀴 중심에서 쏘는 스피어캐스트 반지름(m). 바퀴 반지름보다 약간 작게 둔다")]
@@ -129,6 +155,15 @@ namespace Game.Player.Movement
 
         public float ModeTransitionSeconds => _modeTransitionSeconds;
 
+        public float FastGaugeDrainSeconds => _fastGaugeDrainSeconds;
+        public float FastGaugeRechargeDelaySeconds => _fastGaugeRechargeDelaySeconds;
+        public float FastGaugeRechargeSeconds => _fastGaugeRechargeSeconds;
+        public float ModeChangeCooldownSeconds => _modeChangeCooldownSeconds;
+        public float FastGaugeReentryRatio => _fastGaugeReentryRatio;
+
+        public float SpeedometerDisplayScale => _speedometerDisplayScale;
+        public float SpeedometerMaxKmh => _speedometerMaxKmh;
+
         public float MaxReverseSpeed => _maxReverseSpeed;
         public float BrakeDeceleration => _brakeDeceleration;
         public float CoastDeceleration => _coastDeceleration;
@@ -137,6 +172,7 @@ namespace Game.Player.Movement
         public float DriftMinForwardSpeed => _driftMinForwardSpeed;
         public float DriftGripMultiplier => _driftGripMultiplier;
         public float DriftTurnMultiplier => _driftTurnMultiplier;
+        public float DriftCoastDeceleration => _driftCoastDeceleration;
 
         public float BrakeSpeedThreshold => _brakeSpeedThreshold;
 
