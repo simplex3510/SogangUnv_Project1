@@ -38,8 +38,18 @@ namespace Game.Logistics
         [SerializeField, Min(1)] private int _baseCapacityUsage = 1; // TODO(tuning)
         [SerializeField, Min(1)] private int _baseWeightUsage = 1; // TODO(tuning)
 
+        [Header("충돌")]
+        [Tooltip("Fragile 물류의 충돌 내구도 감소 배율. 특징이 여럿이어도 이 배율 하나만 적용한다(기획서 6.4·10.2)")]
+        [SerializeField, Min(1f)] private float _fragileDamageMultiplier = 1.5f; // TODO(tuning)
+
         [Header("특징")]
         [SerializeField] private CargoTraitEntry[] _entries = Array.Empty<CargoTraitEntry>();
+
+        /// <summary>충돌 내구도 감소 배율. Fragile이면 Fragile 배율, 그 밖에는 1.</summary>
+        public float GetDamageMultiplier(CargoTrait traits)
+        {
+            return (traits & CargoTrait.Fragile) != 0 ? _fragileDamageMultiplier : 1f;
+        }
 
         /// <summary>특징을 독립 추첨하고, 기준값에 특징별 가감값을 합산한 스냅샷을 만든다.</summary>
         public CargoSpec CreateSpec()

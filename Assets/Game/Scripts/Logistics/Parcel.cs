@@ -38,6 +38,12 @@ namespace Game.Logistics
         public DeliveryReward Reward { get; }
         public bool IsOverdue { get; set; }
 
+        /// <summary>현재 내구도. 초기 내구도(Cargo.Durability)에서 시작해 충돌로만 감소하며 0 아래로 내려가지 않는다.</summary>
+        public float CurrentDurability { get; private set; }
+
+        /// <summary>내구도가 0이 되어 폐기 대상이 된 물류인지.</summary>
+        public bool IsDepleted => CurrentDurability <= 0f;
+
         public Parcel(
             int id,
             DeliveryTarget target,
@@ -61,6 +67,19 @@ namespace Game.Logistics
 
             RemainingDeadline = Deadline;
             Status = ParcelStatus.Pending;
+            CurrentDurability = cargo.Durability;
+        }
+
+        /// <summary>현재 내구도를 damage만큼 줄이고(0 하한), 이번 호출로 0에 도달했으면 true를 돌려준다.</summary>
+        public bool ApplyDurabilityDamage(float damage)
+        {
+            if (IsDepleted || damage <= 0f)
+            {
+                return false;
+            }
+
+            CurrentDurability = System.Math.Max(CurrentDurability - damage, 0f);
+            return IsDepleted;
         }
 
         /// <summary>같은 배송지 물류의 처리 순서(기획서 7.4): 제한 시간 있는 물류를 남은 시간 짧은 순으로 먼저, 그다음 생성 순.</summary>

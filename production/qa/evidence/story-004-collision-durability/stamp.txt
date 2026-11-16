@@ -1,0 +1,7 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/PlayerCargoImpactController.cs 9ace3c40e0467753b729edaec398ee69a23db8dc
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/CargoImpactConfig.cs 4b7b50ea10ba08132be8494cc5b01b9afd2fddad
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/Parcel.cs f8189fc80af09ee851be7cdb528e1202e8ae9fa8
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/CargoTraitConfig.cs 907064e0423b4ff1fc71dc991373e4f59ec92ee7
+Reviewed-Content-Hash: Assets/Game/Configs/CargoTraitConfig.asset d7cdb57244b724bf0c21d9e2cc1caaca407f10e5
+Reviewed-Content-Hash: Assets/Game/Configs/CargoImpactConfig.asset 6acdacc10212e92566636804ec680d9f846350e7
+Reviewed-Content-Hash: Assets/Game/Prefabs/Delivery.prefab 7c5da3c370257c093fe90879171373b6304767a0

@@ -12,13 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04e0621973cd71742812294d3c447a1d, type: 3}
   m_Name: CargoTraitConfig
   m_EditorClassIdentifier: Assembly-CSharp::Game.Logistics.CargoTraitConfig
-  _baseDurability: 100
+  _baseDurability: 1
   _baseCapacityUsage: 1
   _baseWeightUsage: 1
+  _fragileDamageMultiplier: 1.5
   _entries:
   - _trait: 1
     _spawnProbability: 0.2
-    _durabilityReduction: 50
+    _durabilityReduction: 0
     _capacityUsageBonus: 0
     _weightUsageBonus: 0
     _rewardBonus: 50
