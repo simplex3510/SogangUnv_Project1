@@ -1,0 +1,4 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/SettlementSystem.cs 1fa6ef79c050d474dea92437e9de3075154828e9
+Reviewed-Content-Hash: Assets/Game/UI/Hud/StatusHud.cs 36d1fb32146f1565fbbae51c5db0773277c0d324
+Reviewed-Content-Hash: Assets/Game/UI/Hud/StatusHud.uxml 5df167a6b69b8d60ea930b9e7b92e63cd42cbdd3
+Reviewed-Content-Hash: Assets/Game/UI/Hud/StatusHud.uss 02e0a25dea171cb24cf408328534c8ea7def9cbe

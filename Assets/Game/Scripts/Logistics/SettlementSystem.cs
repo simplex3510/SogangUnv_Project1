@@ -26,6 +26,12 @@ namespace Game.Logistics
 
         public SettlementResult? LastResult { get; private set; }
 
+        /// <summary>오늘 배송 완료된 물류의 보상 합계에서 시간 초과 손실을 뺀 값. 실패 페널티(폐기·미배송)는 정산 때만 반영한다.</summary>
+        public float TodayIncome { get; private set; }
+
+        /// <summary>배송 완료로 오늘 수익이 바뀔 때마다 새 값과 함께 발생한다.</summary>
+        public event Action<float> TodayIncomeChanged;
+
         private void Awake()
         {
             Instance = this;
@@ -72,6 +78,12 @@ namespace Game.Logistics
             if (parcel != null)
             {
                 _deliveredParcels.Add(parcel);
+
+                // FinalizeDay 배송 완료 루프와 같은 항목 정의다. 한쪽을 바꾸면 다른 쪽도 맞춘다. 실패 페널티는 넣지 않는다
+                DeliveryReward reward = parcel.Reward;
+                TodayIncome += reward.BaseFee + reward.DistanceFee + reward.TraitBonus
+                    + (parcel.IsOverdue ? -reward.LateLoss : reward.TimeBonus);
+                TodayIncomeChanged?.Invoke(TodayIncome);
             }
         }
 

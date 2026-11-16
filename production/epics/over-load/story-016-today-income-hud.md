@@ -1,7 +1,7 @@
 # Story 016: 오늘 수익 HUD
 
 > **Epic**: over-load
-> **Status**: Ready
+> **Status**: Complete
 > **Layer**: Presentation
 > **Type**: UI
 > **Estimate**: S
@@ -55,8 +55,10 @@
 
 ## Files
 
-- `Assets/Game/Scripts/Logistics/SettlementSystem.cs` (오늘 수익 값·이벤트)
-- Story 015의 좌상단 HUD 스크립트와 `Assets/Game/UI/Hud/` UXML/USS
+- `Assets/Game/Scripts/Logistics/SettlementSystem.cs`
+- `Assets/Game/UI/Hud/StatusHud.cs`
+- `Assets/Game/UI/Hud/StatusHud.uxml`
+- `Assets/Game/UI/Hud/StatusHud.uss`
 
 ## QA Test Cases
 
@@ -77,3 +79,16 @@
 
 - Depends on: `production/epics/over-load/story-015-day-clock-hud.md` (좌상단 HUD 블록)
 - Unlocks: None
+
+## Completion Notes
+**Completed**: 2026-11-17
+**Criteria**: 7/7 passing (none deferred)
+**Deviations**: None. 작업 트리의 다른 진행 작업(Story 008 등) 변경은 이 스토리 범위 밖(참고)
+**Test Evidence**: waived at qa.level minimal; retained screenshots `production/qa/evidence/story-016-today-income-hud/` (01~07)
+**Reviewed by**: self, no independent review
+**Note**: 수익 패널은 일차·시각 패널과 별도 패널로 분리했고 왼쪽에 아이콘 칸을 두었다(StatusHud `_incomeIcon`에 Sprite 지정). 양수·음수 상태는 테스트 물류를 배송 완료 처리 함수에 넣어 확인했다.
+
+## Calls beyond the design
+- 하루 리셋 처리 없음, 씬 시작 시 0, 이벤트는 배송 완료 때만 (`SettlementSystem.cs`) · kept 2026-11-17
+- 금액 숫자만 표시, 22px 흰색, 반올림, 0은 흰색 (`StatusHud.cs`, `StatusHud.uss`) · kept 2026-11-17
+- 아이콘 칸 28×28px, 미지정 시 옅은 테두리의 빈 칸 (`StatusHud.uss`) · kept 2026-11-17

@@ -9,10 +9,15 @@
     display: none;
 }
 
-.status-block {
+/* 일차·시각 패널과 수익 패널을 좌상단에 세로로 쌓는다 */
+.status-column {
     position: absolute;
     top: 24px;
     left: 24px;
+    align-items: flex-start;
+}
+
+.status-panel {
     padding: 10px 18px;
     background-color: rgba(38, 44, 54, 0.92);
     border-width: 3px;
@@ -28,4 +33,37 @@
 
 .day-label {
     font-size: 18px;
+}
+
+/* 오늘 수익 패널: 왼쪽 아이콘, 오른쪽 금액 (TODO(tuning)) */
+.income-panel {
+    margin-top: 8px;
+    padding: 6px 18px 6px 10px;
+    flex-direction: row;
+    align-items: center;
+}
+
+/* 아이콘 칸. StatusHud._incomeIcon 스프라이트가 없으면 빈 테두리 칸만 보인다 */
+.income-icon {
+    width: 28px;
+    height: 28px;
+    margin-right: 8px;
+    -unity-background-scale-mode: scale-to-fit;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+}
+
+.income-icon--set {
+    border-width: 0;
+}
+
+.income-label {
+    font-size: 22px;
+    color: rgb(255, 255, 255);
+}
+
+/* 음수 경고색. SettlementUI._lossColor(0.95, 0.40, 0.35)와 같다 (TODO(tuning)) */
+.income-label--loss {
+    color: rgb(242, 102, 89);
 }

@@ -6,16 +6,22 @@ using Game.Systems;
 
 namespace Game.UI.Hud
 {
-    /// <summary>화면 좌상단 일차·시각 HUD. 정산이 열리면 숨는다. 표시만 하고 상태는 바꾸지 않는다.</summary>
+    /// <summary>화면 좌상단 일차·시각 패널과 오늘 수익 패널. 정산이 열리면 숨는다. 표시만 하고 상태는 바꾸지 않는다.</summary>
     [RequireComponent(typeof(PanelRenderer))]
     public class StatusHud : MonoBehaviour
     {
         private const string HiddenClass = "status-hud--hidden";
+        private const string IncomeLossClass = "income-label--loss";
+        private const string IncomeIconSetClass = "income-icon--set";
+
+        [Tooltip("수익 패널 왼쪽 아이콘. 비우면 빈 칸만 보인다")]
+        [SerializeField] private Sprite _incomeIcon;
 
         private SettlementSystem _settlementSystem;
         private VisualElement _statusHud;
         private Label _clockTime;
         private Label _dayLabel;
+        private Label _incomeLabel;
         private string _shownTime;
         private int _shownDay = -1;
         private bool _settled;
@@ -37,10 +43,11 @@ namespace Game.UI.Hud
             _statusHud = root.Q("statusHud");
             _clockTime = root.Q<Label>("clockTime");
             _dayLabel = root.Q<Label>("dayLabel");
+            _incomeLabel = root.Q<Label>("incomeLabel");
             _shownTime = null;
             _shownDay = -1;
 
-            if (_statusHud == null || _clockTime == null || _dayLabel == null)
+            if (_statusHud == null || _clockTime == null || _dayLabel == null || _incomeLabel == null)
             {
                 Debug.LogError($"StatusHud UXML elements are missing in {gameObject.name}");
                 enabled = false;
@@ -49,6 +56,26 @@ namespace Game.UI.Hud
 
             // 정산 뒤 UI를 다시 불러와도 숨김을 유지한다
             _statusHud.EnableInClassList(HiddenClass, _settled);
+
+            VisualElement incomeIcon = root.Q("incomeIcon");
+            if (incomeIcon != null && _incomeIcon != null)
+            {
+                incomeIcon.style.backgroundImage = new StyleBackground(_incomeIcon);
+                incomeIcon.AddToClassList(IncomeIconSetClass);
+            }
+
+            ShowIncome(_settlementSystem != null ? _settlementSystem.TodayIncome : 0f);
+        }
+
+        private void ShowIncome(float value)
+        {
+            if (_incomeLabel == null)
+            {
+                return;
+            }
+
+            _incomeLabel.text = $"{Mathf.RoundToInt(value)}";
+            _incomeLabel.EnableInClassList(IncomeLossClass, value < 0f);
         }
 
         private void Start()
@@ -57,6 +84,8 @@ namespace Game.UI.Hud
             if (_settlementSystem != null)
             {
                 _settlementSystem.Settled += OnSettled;
+                _settlementSystem.TodayIncomeChanged += ShowIncome;
+                ShowIncome(_settlementSystem.TodayIncome);
             }
         }
 
@@ -65,6 +94,7 @@ namespace Game.UI.Hud
             if (_settlementSystem != null)
             {
                 _settlementSystem.Settled -= OnSettled;
+                _settlementSystem.TodayIncomeChanged -= ShowIncome;
             }
         }
 
