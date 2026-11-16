@@ -1,48 +1,47 @@
 using System.Collections.Generic;
 
 using UnityEngine;
-using UnityEngine.UI;
-
-using TMPro;
+using UnityEngine.UIElements;
 
 using Game.Logistics;
 using Game.Player.Interaction;
 
 namespace Game.UI
 {
-    /// <summary>물류센터 상차 UI. 배송지 그룹을 거리순으로, 그룹 안 물류를 처리 순서(기획서 7.4)로 늘어놓고 선택 결과를 플레이어에게 넘긴다.</summary>
+    /// <summary>
+    /// 물류센터 상차 창(기획서 8.1·8.2, quick-specs/logistics-center-window-layout). 배송지 카드를 거리순 1열로,
+    /// 카드 안 물류를 처리 순서(7.4)대로 늘어놓고 누르고 있는 항목을 플레이어에게 넘긴다. 표시만 하고 상차는 컨트롤러가 한다.
+    /// </summary>
+    [RequireComponent(typeof(PanelRenderer))]
     public class LogisticsCenterUI : MonoBehaviour
     {
-        private const string FillPath = "Background/Fill";
-        private const string NoDeadlineText = "--:--";
+        private const string HiddenClass = "lc-root--hidden";
+        private const string HoldableClass = "lc-holdable";
+        private const string HoldingClass = "lc-holding";
+        private const string DisabledClass = "lc-disabled";
+        private const string TargetClass = "lc-row--target";
+        private const string WeightLimitReason = "WEIGHT LIMIT";
+        private const string DisposalTitle = "처분 장소";
 
         [SerializeField] private LogisticsCenter _center;
-        [SerializeField] private GameObject _panel;
-        [SerializeField] private Transform _content;
-        [SerializeField] private Button _groupTemplate;
-        [SerializeField] private Button _parcelTemplate;
-        [SerializeField] private Button _closeButton;
-        [Tooltip("차량 적재 용량·무게 사용량 표시(기획서 8.1)")]
-        [SerializeField] private TMP_Text _usageLabel;
-        [Tooltip("적재 한도에 도달했거나 이미 실은 항목의 색")]
-        [SerializeField] private Color _disabledColor = new(0.5f, 0.5f, 0.5f, 1f);
-
-        [Tooltip("무게 한도 W를 넘는 사용량·상차 시 W를 넘게 되는 행의 경고색")]
-        [SerializeField] private Color _warningColor = new(1f, 0.6f, 0.1f, 1f);
-
-        private const string WeightLimitReason = "WEIGHT LIMIT";
 
         private PlayerInteractionController _controller;
-        private readonly List<GameObject> _spawned = new();
         private readonly List<ParcelGroup> _groups = new();
-        private readonly Dictionary<Parcel, GameObject> _parcelRows = new();
-        private readonly Dictionary<Parcel, Image> _parcelFills = new();
-        private readonly Dictionary<DeliveryTarget, TMP_Text> _groupLabels = new();
-        private readonly Dictionary<DeliveryTarget, float> _groupDistances = new();
+        private readonly Dictionary<Parcel, VisualElement> _parcelRows = new();
+        private readonly Dictionary<Parcel, VisualElement> _parcelFills = new();
+        private readonly Dictionary<DeliveryTarget, Label> _groupCounts = new();
+        private VisualElement _windowRoot;
+        private ScrollView _cardList;
+        private Label _totalLabel;
+        private Label _capacityBadge;
+        private Label _weightBadge;
         private bool _isHolding;
         private bool _needsRefresh;
         private List<Parcel> _heldParcels;
-        private HoldInteractButton _heldButton;
+        private VisualElement _heldElement;
+        // 지금 상차 중인 물류 행 테두리를 따라 차오르는 진행 표시. 한 번에 한 행에만 붙는다
+        // PanelRenderer가 다시 불러오면 이전 요소는 해제되므로 트리를 받을 때마다 새로 만든다
+        private BorderProgress _trace;
 
         public bool IsOpen { get; private set; }
 
@@ -51,32 +50,57 @@ namespace Game.UI
             public DeliveryTarget Target;
             public float Distance;
             public readonly List<Parcel> Remaining = new();
-            public int LoadedCount;
         }
 
         private void Awake()
         {
-            // UI를 화면 캔버스에 두는 구성을 허용하기 위해 씬 참조를 우선 사용한다
             if (_center == null)
             {
                 _center = GetComponentInParent<LogisticsCenter>();
             }
 
-            if (_center == null || _panel == null || _content == null
-                || _groupTemplate == null || _parcelTemplate == null)
+            if (_center == null)
             {
                 Debug.LogError($"LogisticsCenterUI references are missing in {gameObject.name}");
+                enabled = false;
+            }
+        }
+
+        private void OnEnable()
+        {
+            GetComponent<PanelRenderer>().RegisterUIReloadCallback(OnUIReload);
+        }
+
+        private void OnDisable()
+        {
+            GetComponent<PanelRenderer>().UnregisterUIReloadCallback(OnUIReload);
+            _cardList = null;
+        }
+
+        // PanelRenderer는 트리를 만들거나 다시 불러올 때마다 루트를 넘겨준다. 트리가 오기 전에는 표시를 건너뛴다(_cardList == null)
+        private void OnUIReload(PanelRenderer _, VisualElement root, int version)
+        {
+            _windowRoot = root.Q("windowRoot");
+            _cardList = root.Q<ScrollView>("cardList");
+            _totalLabel = root.Q<Label>("totalLabel");
+            _capacityBadge = root.Q<Label>("capacityBadge");
+            _weightBadge = root.Q<Label>("weightBadge");
+            Button closeButton = root.Q<Button>("closeButton");
+            if (_windowRoot == null || _cardList == null || _totalLabel == null
+                || _capacityBadge == null || _weightBadge == null || closeButton == null)
+            {
+                Debug.LogError($"LogisticsCenterWindow.uxml is not assigned to the PanelRenderer in {gameObject.name}");
+                _cardList = null;
                 enabled = false;
                 return;
             }
 
-            _groupTemplate.gameObject.SetActive(false);
-            _parcelTemplate.gameObject.SetActive(false);
-            _panel.SetActive(false);
-
-            if (_closeButton != null)
+            _trace = new BorderProgress();
+            closeButton.clicked += Close;
+            _windowRoot.EnableInClassList(HiddenClass, IsOpen == false);
+            if (IsOpen)
             {
-                _closeButton.onClick.AddListener(Close);
+                Build();
             }
         }
 
@@ -96,17 +120,13 @@ namespace Game.UI
                 return;
             }
 
-            // 제한 시간은 게임 시간에 따라 줄어들므로 행의 프로그레스 바를 매 프레임 갱신한다
-            foreach (KeyValuePair<Parcel, Image> pair in _parcelFills)
+            // 제한 시간은 게임 시간에 따라 줄어들므로 바를 매 프레임 갱신한다
+            foreach (KeyValuePair<Parcel, VisualElement> pair in _parcelFills)
             {
-                if (pair.Value == null || pair.Key == null)
+                if (pair.Key != null && pair.Value != null)
                 {
-                    continue;
+                    pair.Value.style.width = Length.Percent(DeadlineRatio(pair.Key) * 100f);
                 }
-
-                pair.Value.fillAmount = pair.Key.Deadline > 0f
-                    ? Mathf.Clamp01(pair.Key.RemainingDeadline / pair.Key.Deadline)
-                    : 0f;
             }
         }
 
@@ -120,15 +140,17 @@ namespace Game.UI
             IsOpen = true;
             _isHolding = false;
             _needsRefresh = false;
-            _panel.SetActive(true);
-
-            // 상차 패널은 마우스로 고르므로 게임 중 숨겨 둔 커서를 풀어 준다
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
+            _windowRoot?.RemoveFromClassList(HiddenClass);
 
             if (_controller != null)
             {
                 _controller.LoadedParcelsChanged += OnLoadedParcelsChanged;
+                _controller.InteractionProgressChanged += OnProgressChanged;
+            }
+
+            if (_cardList != null)
+            {
+                _cardList.scrollOffset = Vector2.zero;
             }
 
             Build();
@@ -143,42 +165,49 @@ namespace Game.UI
 
             IsOpen = false;
             ClearRows();
-            _panel.SetActive(false);
+            _windowRoot?.AddToClassList(HiddenClass);
 
             if (_controller != null)
             {
                 _controller.LoadedParcelsChanged -= OnLoadedParcelsChanged;
-                _controller.EndHoldLoad();
+                _controller.InteractionProgressChanged -= OnProgressChanged;
             }
 
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
+            EndHold();
+            _controller?.EndHoldLoad();
         }
 
         private void Build()
         {
+            if (_cardList == null)
+            {
+                return;
+            }
+
+            // 다시 그려도 보던 위치를 유지한다
+            Vector2 offset = _cardList.scrollOffset;
             ClearRows();
             CollectGroups();
-            RefreshUsageLabel();
+            RefreshSummary();
 
             for (int i = 0; i < _groups.Count; i++)
             {
                 ParcelGroup group = _groups[i];
-                AddGroupRow(group);
+                VisualElement card = AddGroupCard(group);
 
                 // 현재 사용량으로 실을 수 없는 물류는 행 단위로 비활성 표시한다(기획서 8.5, 16.2-5)
                 for (int j = 0; j < group.Remaining.Count; j++)
                 {
-                    Parcel parcel = group.Remaining[j];
-                    AddParcelRow(parcel, CanLoad(parcel) == false);
+                    AddParcelRow(card, group.Remaining[j]);
                 }
             }
 
-            AddDisposalGroupRow();
+            AddDisposalCard();
+            _cardList.scrollOffset = offset;
         }
 
-        /// <summary>폐기 물류는 목적지가 처분 장소이므로 마지막에 처분 장소 그룹으로 묶어 보여 준다(기획서 11.6). 상차 대상이 아니라 누를 수 없다.</summary>
-        private void AddDisposalGroupRow()
+        /// <summary>폐기 물류는 목적지가 처분 장소이므로 마지막에 처분 장소 카드로 묶어 보여 준다(기획서 11.6). 상차 대상이 아니라 누를 수 없다.</summary>
+        private void AddDisposalCard()
         {
             if (_controller == null || DisposalSite.Instance == null)
             {
@@ -200,18 +229,10 @@ namespace Game.UI
                 return;
             }
 
-            Button button = Instantiate(_groupTemplate, _content);
-            button.gameObject.SetActive(true);
-            _spawned.Add(button.gameObject);
-            ConfigureButton(button, true);
-
-            TMP_Text label = button.GetComponentInChildren<TMP_Text>(true);
-            if (label != null)
-            {
-                float distance = CalculateXZDistance(_center.transform.position, DisposalSite.Instance.transform.position);
-                label.text = $"{DisposalSite.Instance.name}  {distance:0}m  spoiled {spoiled}";
-                label.color = _warningColor;
-            }
+            VisualElement card = AddElement(_cardList, "lc-card");
+            card.AddToClassList("lc-card--warning");
+            float distance = CalculateXZDistance(_center.transform.position, DisposalSite.Instance.transform.position);
+            AddCardHeader(card, DisposalTitle, distance, $"폐기 {spoiled}");
         }
 
         /// <summary>그룹 상차는 처리 순서 첫 물류부터 시작하므로, 그 물류가 실려야 그룹을 누를 수 있다(결정 D5).</summary>
@@ -225,18 +246,26 @@ namespace Game.UI
             return _controller != null && _controller.CanLoad(parcel);
         }
 
-        private void RefreshUsageLabel()
+        private void RefreshSummary()
         {
-            if (_usageLabel == null || _controller == null)
+            if (_totalLabel == null)
             {
                 return;
             }
 
-            _usageLabel.text = $"CARGO {_controller.UsedCapacity}/{_controller.CargoCapacity}   WEIGHT {_controller.UsedWeight}/{_controller.WeightCapacity}";
-            _usageLabel.color = _controller.IsOverweight ? _warningColor : Color.white;
+            _totalLabel.text = $"총 물류 개수: {CountAvailable(null)}";
+
+            if (_controller == null)
+            {
+                return;
+            }
+
+            _capacityBadge.text = $"적재 한도: {_controller.UsedCapacity}/{_controller.CargoCapacity}";
+            _weightBadge.text = $"무게 한도: {_controller.UsedWeight}/{_controller.WeightCapacity}";
+            _weightBadge.EnableInClassList("lc-badge--warning", _controller.IsOverweight);
         }
 
-        /// <summary>대기열 물류를 배송지별로 묶고, 그룹은 물류센터에서의 거리순·그룹 내부는 남은 시간순으로 정렬한다(기획서 8.1).</summary>
+        /// <summary>대기열 물류를 배송지별로 묶고, 그룹은 물류센터에서의 거리순·그룹 내부는 처리 순서로 정렬한다(기획서 8.1).</summary>
         private void CollectGroups()
         {
             _groups.Clear();
@@ -255,27 +284,9 @@ namespace Game.UI
             for (int i = 0; i < available.Count; i++)
             {
                 Parcel parcel = available[i];
-                if (parcel == null || parcel.Target == null)
+                if (parcel != null && parcel.Target != null)
                 {
-                    continue;
-                }
-
-                FindGroup(parcel.Target).Remaining.Add(parcel);
-            }
-
-            if (_controller != null)
-            {
-                IReadOnlyList<Parcel> loaded = _controller.LoadedParcels;
-                for (int i = 0; i < loaded.Count; i++)
-                {
-                    Parcel parcel = loaded[i];
-                    if (parcel == null || parcel.Target == null || parcel.IsSpoiled)
-                    {
-                        continue;
-                    }
-
-                    // 실린 물류가 있어도 그룹 머리글은 목록에 남긴다
-                    FindGroup(parcel.Target).LoadedCount++;
+                    FindGroup(parcel.Target).Remaining.Add(parcel);
                 }
             }
 
@@ -306,95 +317,162 @@ namespace Game.UI
             return group;
         }
 
-        private void AddGroupRow(ParcelGroup group)
+        private VisualElement AddGroupCard(ParcelGroup group)
         {
-            Button button = Instantiate(_groupTemplate, _content);
-            button.gameObject.SetActive(true);
-            _spawned.Add(button.gameObject);
-
-            TMP_Text label = button.GetComponentInChildren<TMP_Text>(true);
-            if (label != null)
-            {
-                // 미적재 수량은 차량 적재량과 분리해 표시한다(기획서 8.1)
-                label.text = BuildGroupText(group.Target, group.Distance, group.Remaining.Count);
-                label.color = CanHoldGroup(group) ? Color.white : _disabledColor;
-                _groupLabels[group.Target] = label;
-            }
-
-            _groupDistances[group.Target] = group.Distance;
+            VisualElement card = AddElement(_cardList, "lc-card");
+            VisualElement header = AddCardHeader(card, group.Target.name, group.Distance, BuildCountText(group.Target));
+            _groupCounts[group.Target] = header.Q<Label>(className: "lc-card-count");
 
             // 적재 한도에 도달해도 그룹은 숨기지 않고 비활성으로 남긴다(기획서 16.2-5)
-            bool canHold = CanHoldGroup(group);
-            ConfigureButton(button, canHold == false);
-
-            if (canHold)
+            if (CanHoldGroup(group))
             {
-                SetHold(button, group.Remaining);
+                MakeHoldable(header, group.Remaining);
+                // 헤더에 올리면 그룹 상차로 실릴 물류 행을 함께 강조한다
+                header.RegisterCallback<PointerEnterEvent>(_ => SetGroupTarget(group, true));
+                header.RegisterCallback<PointerLeaveEvent>(_ => SetGroupTarget(group, false));
             }
+            else
+            {
+                header.AddToClassList(DisabledClass);
+            }
+
+            return card;
         }
 
-        private void AddParcelRow(Parcel parcel, bool isDisabled)
+        private void SetGroupTarget(ParcelGroup group, bool isTarget)
         {
-            Button button = Instantiate(_parcelTemplate, _content);
-            button.gameObject.SetActive(true);
-            _spawned.Add(button.gameObject);
-
-            TMP_Text label = button.GetComponentInChildren<TMP_Text>(true);
-            if (label != null)
+            for (int i = 0; i < group.Remaining.Count; i++)
             {
-                bool isWeightBlocked = isDisabled && _controller != null && _controller.GetLoadBlockReason(parcel) == WeightLimitReason;
-                label.text = isWeightBlocked ? $"{BuildParcelText(parcel)} {WeightLimitReason}" : BuildParcelText(parcel);
-
-                // 상차하면 W를 넘지만 W_max 이내인 행은 경고색으로 두되 활성 상태를 유지한다
-                bool isWarning = isDisabled == false && _controller != null && _controller.WouldExceedWeightCapacity(parcel);
-                label.color = isDisabled ? _disabledColor : isWarning ? _warningColor : Color.white;
-            }
-
-            _parcelRows[parcel] = button.gameObject;
-
-            Transform fill = button.transform.Find(FillPath);
-            if (fill != null && fill.TryGetComponent(out Image fillImage))
-            {
-                // 제한 시간이 없는 물류는 바를 숨기고 매 프레임 갱신 대상에도 넣지 않는다(기획서 8.2)
-                fillImage.enabled = parcel.HasDeadline;
-                if (parcel.HasDeadline)
+                if (_parcelRows.TryGetValue(group.Remaining[i], out VisualElement row) && row.ClassListContains(DisabledClass) == false)
                 {
-                    _parcelFills[parcel] = fillImage;
-                    fillImage.fillAmount = parcel.Deadline > 0f
-                        ? Mathf.Clamp01(parcel.RemainingDeadline / parcel.Deadline)
-                        : 0f;
+                    row.EnableInClassList(TargetClass, isTarget);
                 }
             }
-
-            ConfigureButton(button, isDisabled);
-
-            SetHold(button, new List<Parcel> { parcel });
         }
 
-        /// <summary>행 생성 시 색 전환 애니메이션이 재생되면 목록이 깜빡이므로 즉시 전환으로 맞춘다.</summary>
-        private void ConfigureButton(Button button, bool isDisabled)
+        /// <summary>상차 진행도를 지금 실리는 물류 행(그룹 상차면 처리 순서 첫 행) 테두리에 그린다.</summary>
+        private void OnProgressChanged(float progress01, bool isActive)
         {
-            ColorBlock colors = button.colors;
-            colors.fadeDuration = 0f;
-            colors.disabledColor = _disabledColor;
-            button.colors = colors;
-
-            button.interactable = isDisabled == false;
-        }
-
-        /// <summary>행을 누르고 있는 동안만 상차가 진행되도록 연결한다(기획서 8.3).</summary>
-        private void SetHold(Button button, IReadOnlyList<Parcel> parcels)
-        {
-            if (button.TryGetComponent(out HoldInteractButton hold))
+            if (_isHolding == false || isActive == false || _heldParcels == null || _heldParcels.Count == 0)
             {
-                hold.Initialize(() => BeginHold(parcels, hold), EndHold);
+                HideTrace();
+                return;
+            }
+
+            VisualElement target = _parcelRows.TryGetValue(_heldParcels[0], out VisualElement row) ? row : _heldElement;
+            if (target == null || _trace == null)
+            {
+                HideTrace();
+                return;
+            }
+
+            _trace.AttachTo(target);
+            _trace.Value = progress01;
+        }
+
+        private void HideTrace()
+        {
+            if (_trace != null)
+            {
+                _trace.Value = 0f;
+                _trace.RemoveFromHierarchy();
             }
         }
 
-        private void BeginHold(IReadOnlyList<Parcel> parcels, HoldInteractButton hold)
+        private static VisualElement AddCardHeader(VisualElement card, string title, float distance, string count)
+        {
+            VisualElement header = AddElement(card, "lc-card-header");
+            AddElement(header, "lc-pin");
+            AddLabel(header, "lc-card-title", title);
+            AddLabel(header, "lc-card-distance", $"{distance:0}m");
+            // 미적재 수량은 차량 적재량과 분리해 표시한다(기획서 8.1)
+            AddLabel(header, "lc-card-count", count);
+            return header;
+        }
+
+        /// <summary>물류 행: 적재 HUD와 같은 유형 아이콘·예상 보상·해시태그, Express만 제한 시간 바와 만료 시각.</summary>
+        private void AddParcelRow(VisualElement card, Parcel parcel)
+        {
+            bool isDisabled = CanLoad(parcel) == false;
+
+            VisualElement row = AddElement(card, "lc-row");
+            VisualElement main = AddElement(row, "lc-row-main");
+            AddElement(main, "parcel-icon").EnableInClassList("parcel-icon--express", parcel.Type == DeliveryType.Express);
+
+            VisualElement info = AddElement(main, "parcel-info");
+            DeliveryReward reward = parcel.Reward;
+            // 제한 시간 안에 배송했을 때 받는 금액(적재 HUD와 같은 식)
+            Label price = AddLabel(info, "parcel-price", $"{reward.BaseFee + reward.DistanceFee + reward.TimeBonus + reward.TraitBonus:#,0}₩");
+            // 상차하면 W를 넘지만 W_max 이내인 행은 경고색으로 두되 누를 수 있게 둔다(6.4)
+            price.EnableInClassList("lc-price--warning", isDisabled == false && _controller != null && _controller.WouldExceedWeightCapacity(parcel));
+
+            VisualElement tags = AddElement(info, "parcel-tags");
+            CargoTrait traits = parcel.Cargo.Traits;
+            if ((traits & CargoTrait.Fragile) != 0)
+            {
+                AddLabel(tags, "tag-chip", "#취급주의");
+            }
+
+            if ((traits & CargoTrait.Heavy) != 0)
+            {
+                AddLabel(tags, "tag-chip", "#고중량");
+            }
+
+            if ((traits & CargoTrait.Large) != 0)
+            {
+                AddLabel(tags, "tag-chip", "#대형");
+            }
+
+            if (isDisabled)
+            {
+                bool isWeight = _controller != null && _controller.GetLoadBlockReason(parcel) == WeightLimitReason;
+                AddLabel(tags, "tag-chip", isWeight ? "#무게 초과" : "#적재 초과").AddToClassList("tag-chip--blocked");
+            }
+
+            // 제한 시간이 없는 물류는 바와 시각을 두지 않는다(기획서 8.2)
+            if (parcel.HasDeadline)
+            {
+                VisualElement deadline = AddElement(row, "lc-deadline");
+                VisualElement fill = AddElement(AddElement(deadline, "lc-bar"), "lc-bar-fill");
+                fill.style.width = Length.Percent(DeadlineRatio(parcel) * 100f);
+                _parcelFills[parcel] = fill;
+                // 남은 시간이 아니라 생성 시점에 확정된 만료 시각(게임 시계)을 보여 준다
+                AddLabel(deadline, "lc-deadline-time", FormatClock(parcel.CreationTime + parcel.Deadline));
+            }
+
+            _parcelRows[parcel] = row;
+
+            if (isDisabled)
+            {
+                row.AddToClassList(DisabledClass);
+            }
+            else
+            {
+                MakeHoldable(row, new List<Parcel> { parcel });
+            }
+        }
+
+        /// <summary>항목을 누르고 있는 동안만 상차가 진행되도록 연결한다. 떼거나 벗어나면 진행도를 잃는다(기획서 8.2, 16.2-3).</summary>
+        private void MakeHoldable(VisualElement target, IReadOnlyList<Parcel> parcels)
+        {
+            target.pickingMode = PickingMode.Position;
+            target.AddToClassList(HoldableClass);
+            target.RegisterCallback<PointerDownEvent>(evt =>
+            {
+                if (evt.button == 0 && _isHolding == false)
+                {
+                    BeginHold(parcels, target);
+                }
+            });
+            target.RegisterCallback<PointerUpEvent>(_ => EndHold());
+            target.RegisterCallback<PointerLeaveEvent>(_ => EndHold());
+        }
+
+        private void BeginHold(IReadOnlyList<Parcel> parcels, VisualElement element)
         {
             _isHolding = true;
-            _heldButton = hold;
+            _heldElement = element;
+            _heldElement.AddToClassList(HoldingClass);
             _heldParcels = new List<Parcel>(parcels);
             _controller?.BeginHoldLoad(parcels);
         }
@@ -407,11 +485,13 @@ namespace Game.UI
             }
 
             _isHolding = false;
+            HideTrace();
+            _heldElement?.RemoveFromClassList(HoldingClass);
+            _heldElement = null;
             _heldParcels = null;
-            _heldButton = null;
             _controller?.EndHoldLoad();
 
-            // 홀드 중에는 행을 다시 만들지 않았으므로 손을 뗀 시점에 한 번 갱신한다
+            // 홀드 중에는 목록을 다시 만들지 않았으므로 손을 뗀 시점에 한 번 갱신한다
             if (_needsRefresh)
             {
                 _needsRefresh = false;
@@ -429,9 +509,10 @@ namespace Game.UI
                 return;
             }
 
-            // 홀드 중에도 방금 실린 물류의 행을 하나씩 없애고 그룹 수량을 갱신해 바로 반영한다
+            // 홀드 중에도 방금 실린 물류의 행을 하나씩 없애고 수량을 갱신해 바로 반영한다
             RemoveParcelRow(parcel);
-            RefreshGroupLabel(parcel.Target);
+            RefreshGroupCount(parcel.Target);
+            RefreshSummary();
 
             if (_isHolding == false)
             {
@@ -448,76 +529,45 @@ namespace Game.UI
             }
 
             _heldParcels.Remove(parcel);
-            RefreshUsageLabel();
 
             // 처리 순서상 다음 물류가 한도를 넘으면 컨트롤러가 상차를 끝냈으므로 홀드도 끝낸다(결정 D5)
             if (_heldParcels.Count == 0 || _controller == null || _controller.CanContinueGroupLoad(_heldParcels[0]) == false)
             {
-                _heldButton?.EndHold();
+                EndHold();
             }
         }
 
-        /// <summary>실린 물류의 행을 지운다. 그룹 머리글은 남겨 그룹 단위 정보를 유지한다.</summary>
+        /// <summary>실린 물류의 행을 지운다. 카드 헤더는 남겨 그룹 단위 정보를 유지한다.</summary>
         private void RemoveParcelRow(Parcel parcel)
         {
             _parcelFills.Remove(parcel);
-
-            if (_parcelRows.TryGetValue(parcel, out GameObject row) == false)
+            if (_parcelRows.Remove(parcel, out VisualElement row))
             {
-                return;
-            }
-
-            _parcelRows.Remove(parcel);
-            _spawned.Remove(row);
-
-            if (row != null)
-            {
-                // 파괴는 프레임 끝에 처리되므로 먼저 숨겨 새 행과 겹쳐 보이지 않게 한다
-                row.SetActive(false);
-                Destroy(row);
+                row.RemoveFromHierarchy();
             }
         }
 
-        private void RefreshGroupLabel(DeliveryTarget target)
+        private void RefreshGroupCount(DeliveryTarget target)
         {
-            if (target == null || _groupLabels.TryGetValue(target, out TMP_Text label) == false)
+            if (target != null && _groupCounts.TryGetValue(target, out Label label))
             {
-                return;
+                label.text = BuildCountText(target);
             }
-
-            float distance = _groupDistances.TryGetValue(target, out float stored) ? stored : 0f;
-            label.text = BuildGroupText(target, distance, CountAvailable(target));
         }
 
-        /// <summary>물류 행 표기: 번호, 배송 유형, 특징(F/H/L 자리), 적재 용량·무게 사용량, 만료 시각(기획서 8.1).</summary>
-        private static string BuildParcelText(Parcel parcel)
+        private string BuildCountText(DeliveryTarget target)
         {
-            string type = parcel.Type == DeliveryType.Express ? "EXP" : "NRM";
-
-            CargoTrait traits = parcel.Cargo.Traits;
-            char fragile = (traits & CargoTrait.Fragile) != 0 ? 'F' : '-';
-            char heavy = (traits & CargoTrait.Heavy) != 0 ? 'H' : '-';
-            char large = (traits & CargoTrait.Large) != 0 ? 'L' : '-';
-
-            // 남은 시간이 아니라 생성 시점에 확정된 만료 시각(게임 시계)을 보여 준다. 제한 시간이 없으면 --:--
-            string expiry = parcel.HasDeadline ? FormatClock(parcel.CreationTime + parcel.Deadline) : NoDeadlineText;
-
-            // 비례폭 폰트에서도 행끼리 열이 맞도록 고정폭 태그로 감싼다
-            return $"<mspace=0.62em>#{parcel.Id,-3} {type} {fragile}{heavy}{large} C{parcel.Cargo.CapacityUsage} W{parcel.Cargo.WeightUsage}  {expiry}</mspace>";
+            return $"남은 {CountAvailable(target)} · 적재 {CountLoaded(target)}";
         }
 
-        private string BuildGroupText(DeliveryTarget target, float distance, int remaining)
-        {
-            return $"{target.name}  {distance:0}m  x{remaining}  loaded {CountLoaded(target)}";
-        }
-
+        /// <summary>물류센터에 남은 물류 수. target이 null이면 전체.</summary>
         private int CountAvailable(DeliveryTarget target)
         {
             int count = 0;
             IReadOnlyList<Parcel> parcels = _center.AvailableParcels;
             for (int i = 0; i < parcels.Count; i++)
             {
-                if (parcels[i] != null && parcels[i].Target == target)
+                if (parcels[i] != null && (target == null || parcels[i].Target == target))
                 {
                     count++;
                 }
@@ -548,21 +598,31 @@ namespace Game.UI
 
         private void ClearRows()
         {
-            for (int i = 0; i < _spawned.Count; i++)
-            {
-                if (_spawned[i] != null)
-                {
-                    // 파괴는 프레임 끝에 처리되므로 먼저 숨겨 새 행과 겹쳐 보이지 않게 한다
-                    _spawned[i].SetActive(false);
-                    Destroy(_spawned[i]);
-                }
-            }
-
-            _spawned.Clear();
+            _cardList?.Clear();
             _parcelRows.Clear();
             _parcelFills.Clear();
-            _groupLabels.Clear();
-            _groupDistances.Clear();
+            _groupCounts.Clear();
+        }
+
+        private static float DeadlineRatio(Parcel parcel)
+        {
+            return parcel.Deadline > 0f ? Mathf.Clamp01(parcel.RemainingDeadline / parcel.Deadline) : 0f;
+        }
+
+        private static VisualElement AddElement(VisualElement parent, string className)
+        {
+            var element = new VisualElement { pickingMode = PickingMode.Ignore };
+            element.AddToClassList(className);
+            parent.Add(element);
+            return element;
+        }
+
+        private static Label AddLabel(VisualElement parent, string className, string text)
+        {
+            var label = new Label(text) { pickingMode = PickingMode.Ignore };
+            label.AddToClassList(className);
+            parent.Add(label);
+            return label;
         }
 
         private static float CalculateXZDistance(Vector3 a, Vector3 b)

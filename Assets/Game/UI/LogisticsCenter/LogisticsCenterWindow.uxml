@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="../Hud/DurabilityHud.uss" />
+    <ui:Style src="LogisticsCenterWindow.uss" />
+    <ui:VisualElement name="windowRoot" class="lc-root lc-root--hidden" picking-mode="Ignore">
+        <ui:VisualElement class="lc-window">
+            <ui:VisualElement class="lc-head">
+                <ui:VisualElement class="lc-head-text">
+                    <ui:Label class="lc-title" text="물류센터" />
+                    <ui:Label class="lc-subtitle" text="배송할 물류를 확인하고 차량에 상차할 수 있습니다." />
+                </ui:VisualElement>
+                <ui:Button name="closeButton" class="lc-close" text="×" />
+            </ui:VisualElement>
+            <ui:VisualElement class="lc-divider" />
+            <ui:VisualElement class="lc-summary">
+                <ui:Label name="totalLabel" class="lc-total" />
+                <ui:Label name="capacityBadge" class="lc-badge" />
+                <ui:Label name="weightBadge" class="lc-badge" />
+            </ui:VisualElement>
+            <ui:ScrollView name="cardList" class="lc-list" mode="Vertical" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,259 @@
+/* 임시 GUI(Story 021). 행·아이콘·칩은 DurabilityHud.uss 클래스를 함께 쓴다 */
+.lc-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    color: rgb(255, 255, 255);
+    -unity-font-definition: url("../Hud/MalgunGothicDynamic.asset");
+}
+
+.lc-root--hidden {
+    display: none;
+}
+
+.lc-window {
+    width: 820px;
+    height: 600px;
+    padding: 20px 24px 16px 24px;
+    background-color: rgba(38, 44, 54, 0.96);
+    border-width: 3px;
+    border-color: rgb(78, 88, 104);
+    border-radius: 18px;
+}
+
+.lc-head {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.lc-head-text {
+    flex-grow: 1;
+}
+
+.lc-title {
+    font-size: 26px;
+    -unity-font-style: bold;
+}
+
+.lc-subtitle {
+    margin-top: 4px;
+    font-size: 16px;
+    color: rgb(215, 222, 232);
+}
+
+.lc-close {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    font-size: 30px;
+    color: rgb(255, 255, 255);
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+.lc-close:hover {
+    color: rgb(255, 120, 120);
+}
+
+.lc-divider {
+    height: 3px;
+    margin: 14px 0 12px 0;
+    background-color: rgb(78, 88, 104);
+}
+
+.lc-summary {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.lc-total {
+    flex-grow: 1;
+    font-size: 18px;
+    -unity-font-style: bold;
+}
+
+.lc-badge {
+    margin-left: 8px;
+    padding: 4px 14px;
+    font-size: 15px;
+    background-color: rgb(78, 88, 104);
+    border-radius: 14px;
+}
+
+.lc-badge--warning {
+    background-color: rgb(200, 120, 20);
+}
+
+.lc-list {
+    flex-grow: 1;
+}
+
+/* 기본 스크롤바는 밝아 창과 어긋나므로 얇고 어둡게, 화살표 버튼은 숨긴다 */
+.lc-list .unity-scroller--vertical {
+    width: 8px;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.lc-list .unity-scroller__low-button,
+.lc-list .unity-scroller__high-button {
+    display: none;
+}
+
+/* 기본 테마의 슬라이더 최소 폭(24px)이 스크롤러 밖으로 넘쳐 트랙만 넓게 보이므로 손잡이 폭에 맞춘다 */
+.lc-list .unity-scroller--vertical .unity-scroller__slider {
+    width: 8px;
+    min-width: 8px;
+    margin: 0;
+}
+
+.lc-list .unity-scroller--vertical .unity-base-slider__input,
+.lc-list .unity-scroller--vertical .unity-base-slider__drag-container {
+    margin: 0;
+}
+
+.lc-list .unity-scroller--vertical .unity-base-slider__tracker {
+    left: 0;
+    right: 0;
+    border-width: 0;
+    border-radius: 4px;
+    background-color: rgb(30, 35, 44);
+}
+
+.lc-list .unity-scroller--vertical .unity-base-slider__dragger {
+    left: 0;
+    width: 8px;
+    border-width: 0;
+    border-radius: 4px;
+    background-color: rgb(120, 130, 148);
+}
+
+.lc-card {
+    margin: 0 8px 12px 0;
+    padding: 10px;
+    background-color: rgb(44, 51, 62);
+    border-width: 2px;
+    border-color: rgb(78, 88, 104);
+    border-radius: 14px;
+}
+
+.lc-card--warning {
+    border-color: rgb(255, 153, 26);
+}
+
+.lc-card-header {
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 6px 8px 6px;
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgb(66, 75, 89);
+    border-radius: 8px;
+}
+
+.lc-pin {
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 6px;
+}
+
+.lc-card-title {
+    font-size: 19px;
+    -unity-font-style: bold;
+}
+
+.lc-card-distance {
+    margin-left: 8px;
+    font-size: 14px;
+    color: rgb(160, 170, 185);
+}
+
+.lc-card-count {
+    margin-left: auto;
+    font-size: 14px;
+    color: rgb(215, 222, 232);
+}
+
+.lc-row {
+    margin-top: 8px;
+    padding: 8px;
+    background-color: rgb(58, 66, 79);
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0);
+    border-radius: 10px;
+}
+
+.lc-row-main {
+    flex-direction: row;
+    align-items: center;
+}
+
+.lc-price--warning {
+    color: rgb(255, 153, 26);
+}
+
+.tag-chip--blocked {
+    background-color: rgb(150, 60, 60);
+}
+
+.lc-deadline {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.lc-bar {
+    flex-grow: 1;
+    height: 8px;
+    background-color: rgb(30, 35, 44);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.lc-bar-fill {
+    height: 100%;
+    background-color: rgb(84, 217, 140);
+    border-radius: 4px;
+}
+
+.lc-deadline-time {
+    margin-left: 8px;
+    font-size: 13px;
+    color: rgb(215, 222, 232);
+}
+
+/* 누르고 있으면 상차하는 행·헤더. 올리면 밝은 배경과 테두리로 강조, 헤더에 올리면 그룹 행도 함께(lc-row--target) */
+.lc-row,
+.lc-card-header {
+    transition-property: background-color, border-color, scale;
+    transition-duration: 0.12s;
+}
+
+.lc-holdable:hover,
+.lc-row--target {
+    background-color: rgb(74, 86, 104);
+    border-color: rgb(170, 182, 200);
+}
+
+.lc-row.lc-holdable:hover {
+    scale: 1.01 1.01;
+}
+
+/* 상차 중: 테두리를 어두운 트랙으로 두고, 진행은 BorderProgress가 초록으로 테두리를 따라 그린다 */
+/* 누르는 동안에도 커서가 올라가 있으므로 hover보다 우선하게 선택자를 겹친다 */
+.lc-holdable.lc-holding,
+.lc-holdable.lc-holding:hover {
+    border-color: rgb(30, 35, 44);
+}
+
+.lc-disabled {
+    opacity: 0.45;
+}
