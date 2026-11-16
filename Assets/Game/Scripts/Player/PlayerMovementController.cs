@@ -4,12 +4,13 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 using Game.Player.Interaction;
+using Game.WorldObjects;
 
 namespace Game.Player.Movement
 {
     [RequireComponent(typeof(Rigidbody))]
     // 파일명과 클래스명이 다르면 Unity가 스크립트를 바인딩하지 못해 컴포넌트가 로드되지 않는다
-    public class PlayerMovementController : MonoBehaviour
+    public class PlayerMovementController : MonoBehaviour, IVehicleEffectTarget
     {
         [Header("Required Components")]
         [SerializeField] private Rigidbody _rigidbody;
@@ -42,10 +43,23 @@ namespace Game.Player.Movement
         private float _lastGroundedTime = float.NegativeInfinity;
 
         private PlayerInteractionController _interactionController;
+        private FastModeGauge _fastGauge;
+
+        // 방해물 효과 요청(Story 010). 속도 배율은 중첩 판정을 맡기고, 방향 회전은 다음 FixedUpdate에 합산해 적용한다
+        private readonly SpeedEffectState _obstacleSpeedEffect = new();
+        private float _pendingYawDegrees;
 
         public event Action<VehicleDrivingMode> DrivingModeChanged;
 
         public VehicleDrivingMode DrivingMode => _drivingMode;
+
+        /// <summary>지면 기준 전진 속도(m/s). 후진이면 음수.</summary>
+        public float ForwardSpeed => _forwardSpeed;
+
+        /// <summary>고속 모드 게이지 상태(HUD 표시용).</summary>
+        public FastModeGauge FastGauge => _fastGauge;
+
+        public VehicleConfig Config => _vehicleConfig;
 
         private void Reset()
         {
@@ -81,6 +95,7 @@ namespace Game.Player.Movement
             DisableGroundCollision();
 
             _interactionController = GetComponent<PlayerInteractionController>();
+            _fastGauge = new FastModeGauge(_vehicleConfig);
 
             UpdateModeParameters();
         }
@@ -108,6 +123,10 @@ namespace Game.Player.Movement
                 return;
             }
 
+            // 하루 종료 시 지속 중인 방해물 효과를 해제한다
+            _obstacleSpeedEffect.Clear();
+            _pendingYawDegrees = 0f;
+
             _input = Vector2.zero;
             _isDriftHeld = false;
 
@@ -116,6 +135,35 @@ namespace Game.Player.Movement
                 _rigidbody.linearVelocity = Vector3.zero;
                 _rigidbody.angularVelocity = Vector3.zero;
             }
+        }
+
+        /// <summary>방해물의 최고 속도 배율 요청. 조작 잠금 중에는 받지 않는다.</summary>
+        public void ApplySpeedMultiplier(float multiplier, float durationSeconds)
+        {
+            if (_isControlEnabled)
+            {
+                _obstacleSpeedEffect.Apply(multiplier, durationSeconds);
+            }
+        }
+
+        /// <summary>방해물의 진행 방향 회전 요청. 조작 잠금 중에는 받지 않는다.</summary>
+        public void RequestHeadingRotation(float yawDegrees)
+        {
+            if (_isControlEnabled)
+            {
+                _pendingYawDegrees += yawDegrees;
+            }
+        }
+
+        private void ApplyPendingHeading()
+        {
+            if (_pendingYawDegrees == 0f)
+            {
+                return;
+            }
+
+            _rigidbody.rotation = Quaternion.AngleAxis(_pendingYawDegrees, _groundNormal) * _rigidbody.rotation;
+            _pendingYawDegrees = 0f;
         }
 
         private void Update()
@@ -132,11 +180,19 @@ namespace Game.Player.Movement
             {
                 TryToggleDrivingMode();
             }
+
+            // 게이지가 바닥나면 접지·상호작용·쿨다운과 무관하게 일반 모드로 돌린다
+            if (_fastGauge.Tick(Time.deltaTime, _drivingMode == VehicleDrivingMode.Fast))
+            {
+                SetDrivingMode(VehicleDrivingMode.Normal);
+            }
         }
 
         private void FixedUpdate()
         {
+            _obstacleSpeedEffect.Tick(Time.fixedDeltaTime);
             UpdateModeParameters();
+            ApplyPendingHeading();
             ApplySuspension();
             UpdateDriftState();
 
@@ -173,10 +229,20 @@ namespace Game.Player.Movement
                 return;
             }
 
-            _drivingMode = _drivingMode == VehicleDrivingMode.Normal
-                ? VehicleDrivingMode.Fast
-                : VehicleDrivingMode.Normal;
+            if (_fastGauge.CanToggle(_drivingMode == VehicleDrivingMode.Fast) == false)
+            {
+                return;
+            }
 
+            SetDrivingMode(_drivingMode == VehicleDrivingMode.Normal
+                ? VehicleDrivingMode.Fast
+                : VehicleDrivingMode.Normal);
+        }
+
+        private void SetDrivingMode(VehicleDrivingMode mode)
+        {
+            _drivingMode = mode;
+            _fastGauge.NotifyModeChanged();
             DrivingModeChanged?.Invoke(_drivingMode);
         }
 
@@ -196,7 +262,9 @@ namespace Game.Player.Movement
             // 과적 속도 배율(기획서 8.6)은 모드 보간 후 전진 최고 속도에 곱한다. 가속도 쪽은 GetSpeedChangeRate에서 곱한다
             _speedMultiplier = _interactionController != null ? _interactionController.SpeedMultiplier : 1f;
 
-            _maxForwardSpeed = Mathf.Lerp(normal.MaxForwardSpeed, fast.MaxForwardSpeed, _modeBlend) * _speedMultiplier;
+            // 방해물 배율(Story 010)도 같은 자리에서 과적 배율과 함께 곱한다. 가속도에는 곱하지 않는다
+            _maxForwardSpeed = Mathf.Lerp(normal.MaxForwardSpeed, fast.MaxForwardSpeed, _modeBlend)
+                             * _speedMultiplier * _obstacleSpeedEffect.Multiplier;
             _acceleration = Mathf.Lerp(normal.Acceleration, fast.Acceleration, _modeBlend);
             _maxTurnRate = Mathf.Lerp(normal.MaxTurnRate, fast.MaxTurnRate, _modeBlend);
             _lateralGrip = Mathf.Lerp(normal.LateralGrip, fast.LateralGrip, _modeBlend);
@@ -324,7 +392,7 @@ namespace Game.Player.Movement
 
             if (Mathf.Approximately(throttle, 0f))
             {
-                return _vehicleConfig.CoastDeceleration;
+                return _isDrifting ? _vehicleConfig.DriftCoastDeceleration : _vehicleConfig.CoastDeceleration;
             }
 
             if (Mathf.Abs(forwardSpeed) > _vehicleConfig.BrakeSpeedThreshold

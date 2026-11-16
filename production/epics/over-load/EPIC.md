@@ -14,10 +14,19 @@
 | 003 | 밸런싱 수치 확정과 마무리 | Config/Data | Deferred | N/A (minimal) |
 | 004 | 충돌 내구도 감소 | Logic | Complete | N/A (minimal) |
 | 005 | 폐기 물류 전환과 처분 장소 | Integration | Complete | N/A (minimal) |
-| 006 | 내구도 피드백 UI 3종 | UI | Ready | N/A (minimal) |
+| 006 | 내구도 피드백 UI 3종 | UI | Complete | N/A (minimal) |
 | 007 | 차량 리셋·복구 | Logic | Ready | N/A (minimal) |
 | 008 | Fresh 배송 유형 | Integration | Ready | N/A (minimal) |
 | 009 | 무게 한도 초과 적재와 속도 감소 | Logic | Complete | N/A (minimal) |
-| 010 | 정적 방해물 모듈 컴포넌트 | Logic | Ready | N/A (minimal) |
+| 010 | 정적 방해물 모듈 컴포넌트 | Logic | Complete | N/A (minimal) |
 | 011 | 카탈로그 정적 오브젝트 프리팹화 | Integration | Ready | N/A (minimal) |
 | 012 | NPC 차량 골격 | Integration | Ready | N/A (minimal) |
+| 013 | 고속 모드 게이지와 속도계 HUD | Logic | In Review | N/A (minimal) |
+| 014 | 적재 물류 패널 접기/펼치기와 스크롤 | UI | In Review | N/A (minimal) |
+| 015 | 일차·시각 HUD 좌상단 | UI | Ready | N/A (minimal) |
+| 016 | 오늘 수익 HUD | UI | Ready | N/A (minimal) |
+| 017 | 방향 안내를 적재 물류 패널로 이전 | UI | Ready | N/A (minimal) |
+| 018 | 하단 중앙 HUD 정리 | UI | Ready | N/A (minimal) |
+| 019 | 적재 패널 물류 행 제한 시간 바 | UI | Ready | N/A (minimal) |
+| 020 | 표시 문구 한글 통일 | UI | Ready | N/A (minimal) |
+| 021 | 토스트 알림 | UI | Ready | N/A (minimal) |

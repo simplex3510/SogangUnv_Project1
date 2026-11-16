@@ -56,6 +56,9 @@ namespace Game.Player.Interaction
 
         public event Action<Parcel> LoadedParcelsChanged;
 
+        /// <summary>적재 물류가 폐기로 전환될 때 발생한다(원인 무관, 기획서 11.6). 폐기 알림 표시에 사용한다.</summary>
+        public event Action<Parcel> ParcelSpoiled;
+
         /// <summary>상호작용이 막힌 이유. 안내 문구 표시에 사용한다.</summary>
         public event Action<string> InteractionBlocked;
 
@@ -222,6 +225,7 @@ namespace Game.Player.Interaction
             // 원래 배송지의 아이콘에서 빠지고 적재·처분 UI가 갱신되도록 알린다. 적재·무게 사용량은 그대로다(규칙 4)
             parcel.Target.NotifyParcelChanged(parcel);
             LoadedParcelsChanged?.Invoke(parcel);
+            ParcelSpoiled?.Invoke(parcel);
             Debug.Log($"[폐기] 물류 #{parcel.Id} 폐기 전환, 배송 실패 확정 {FormatUsage()}");
         }
 
@@ -349,6 +353,13 @@ namespace Game.Player.Interaction
                 return;
             }
 
+            // 방해물은 물류 없이 InteractionDuration만큼 유지하면 실행한다(Story 010)
+            if (_currentInteractable.InteractionType == InteractionTypes.Obstacle)
+            {
+                TickObstacle(_currentInteractable, deltaSeconds);
+                return;
+            }
+
             if (_activeParcel == null && TryBeginNextParcel() == false)
             {
                 return;
@@ -377,6 +388,19 @@ namespace Game.Player.Interaction
 
             StopInteraction();
             Interact(center);
+        }
+
+        private void TickObstacle(IInteractable obstacle, float deltaSeconds)
+        {
+            _progressSeconds += deltaSeconds;
+            if (_progressSeconds < obstacle.InteractionDuration)
+            {
+                InteractionProgressChanged?.Invoke(GetProgress01(), true);
+                return;
+            }
+
+            StopInteraction();
+            Interact(obstacle);
         }
 
         /// <summary>물류센터 UI가 고른 상차 대상을 넘긴다. 빈 목록이면 대기열 선두를 사용한다.</summary>
@@ -462,7 +486,8 @@ namespace Game.Player.Interaction
                     && _loadedParcels.Exists(parcel => parcel.IsDeliverableTo(target));
             }
 
-            return false;
+            // 방해물은 실행 가능 여부(1회·잠금·대상)를 자신이 판정한다
+            return interactable.InteractionType == InteractionTypes.Obstacle;
         }
 
         /// <summary>구역 진입·이탈과 상태 변화를 매 프레임 반영해 프롬프트를 갱신한다. 상태가 바뀔 때만 이벤트를 발생시킨다.</summary>
