@@ -1,0 +1,6 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/VehicleCargoConfig.cs 270c6d79143244f9d74a22d6f281d521f60d19f6
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/PlayerInteractionController.cs 2cd16f14e3831e96a7f28a8d205a4455517cb0d4
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/PlayerMovementController.cs d4c2bbc0f4edc1690d4a46acf5a6187e1eca6566
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/LogisticsCenterUI.cs 8202c54455b75960ccb4840742a1039f5d8a2624
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/OverweightHUD.cs 918afdb7fd8ae43e03234efaec0b62b575870f07
+Reviewed-Content-Hash: Assets/Game/Scenes/_DevOnly/SampleMapDesign.unity 7b585b295f0c2c899710afac03c50fc83d50a757

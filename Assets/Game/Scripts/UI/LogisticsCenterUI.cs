@@ -27,6 +27,11 @@ namespace Game.UI
         [Tooltip("적재 한도에 도달했거나 이미 실은 항목의 색")]
         [SerializeField] private Color _disabledColor = new(0.5f, 0.5f, 0.5f, 1f);
 
+        [Tooltip("무게 한도 W를 넘는 사용량·상차 시 W를 넘게 되는 행의 경고색")]
+        [SerializeField] private Color _warningColor = new(1f, 0.6f, 0.1f, 1f);
+
+        private const string WeightLimitReason = "WEIGHT LIMIT";
+
         private PlayerInteractionController _controller;
         private readonly List<GameObject> _spawned = new();
         private readonly List<ParcelGroup> _groups = new();
@@ -189,6 +194,7 @@ namespace Game.UI
             }
 
             _usageLabel.text = $"CARGO {_controller.UsedCapacity}/{_controller.CargoCapacity}   WEIGHT {_controller.UsedWeight}/{_controller.WeightCapacity}";
+            _usageLabel.color = _controller.IsOverweight ? _warningColor : Color.white;
         }
 
         /// <summary>대기열 물류를 배송지별로 묶고, 그룹은 물류센터에서의 거리순·그룹 내부는 남은 시간순으로 정렬한다(기획서 8.1).</summary>
@@ -297,8 +303,12 @@ namespace Game.UI
             TMP_Text label = button.GetComponentInChildren<TMP_Text>(true);
             if (label != null)
             {
-                label.text = BuildParcelText(parcel);
-                label.color = isDisabled ? _disabledColor : Color.white;
+                bool isWeightBlocked = isDisabled && _controller != null && _controller.GetLoadBlockReason(parcel) == WeightLimitReason;
+                label.text = isWeightBlocked ? $"{BuildParcelText(parcel)} {WeightLimitReason}" : BuildParcelText(parcel);
+
+                // 상차하면 W를 넘지만 W_max 이내인 행은 경고색으로 두되 활성 상태를 유지한다
+                bool isWarning = isDisabled == false && _controller != null && _controller.WouldExceedWeightCapacity(parcel);
+                label.color = isDisabled ? _disabledColor : isWarning ? _warningColor : Color.white;
             }
 
             _parcelRows[parcel] = button.gameObject;
@@ -402,7 +412,7 @@ namespace Game.UI
             RefreshUsageLabel();
 
             // 처리 순서상 다음 물류가 한도를 넘으면 컨트롤러가 상차를 끝냈으므로 홀드도 끝낸다(결정 D5)
-            if (_heldParcels.Count == 0 || CanLoad(_heldParcels[0]) == false)
+            if (_heldParcels.Count == 0 || _controller == null || _controller.CanContinueGroupLoad(_heldParcels[0]) == false)
             {
                 _heldButton?.EndHold();
             }

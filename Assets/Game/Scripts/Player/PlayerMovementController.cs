@@ -23,6 +23,7 @@ namespace Game.Player.Movement
         // 아래 값들은 VehicleConfig의 모드 값에 블렌딩을 적용한 현재 프레임의 실효값이다
         private float _maxForwardSpeed;
         private float _acceleration;
+        private float _speedMultiplier = 1f;
         private float _maxTurnRate;
         private float _lateralGrip;
         private float _steerSmoothing;
@@ -192,7 +193,10 @@ namespace Game.Player.Movement
             VehicleConfig.DrivingModeSettings normal = _vehicleConfig.GetModeSettings(VehicleDrivingMode.Normal);
             VehicleConfig.DrivingModeSettings fast = _vehicleConfig.GetModeSettings(VehicleDrivingMode.Fast);
 
-            _maxForwardSpeed = Mathf.Lerp(normal.MaxForwardSpeed, fast.MaxForwardSpeed, _modeBlend);
+            // 과적 속도 배율(기획서 8.6)은 모드 보간 후 전진 최고 속도에 곱한다. 가속도 쪽은 GetSpeedChangeRate에서 곱한다
+            _speedMultiplier = _interactionController != null ? _interactionController.SpeedMultiplier : 1f;
+
+            _maxForwardSpeed = Mathf.Lerp(normal.MaxForwardSpeed, fast.MaxForwardSpeed, _modeBlend) * _speedMultiplier;
             _acceleration = Mathf.Lerp(normal.Acceleration, fast.Acceleration, _modeBlend);
             _maxTurnRate = Mathf.Lerp(normal.MaxTurnRate, fast.MaxTurnRate, _modeBlend);
             _lateralGrip = Mathf.Lerp(normal.LateralGrip, fast.LateralGrip, _modeBlend);
@@ -329,7 +333,8 @@ namespace Game.Player.Movement
                 return _vehicleConfig.BrakeDeceleration;
             }
 
-            return _acceleration;
+            // 후진 가속은 과적 배율을 받지 않는다
+            return throttle > 0f ? _acceleration * _speedMultiplier : _acceleration;
         }
 
         private void ApplySteering()

@@ -10,6 +10,8 @@ using Game.Logistics;
 namespace Game.Player.Interaction
 {
     /// <summary>물류 하나 단위로 상차·하차를 진행한다. 상호작용 키를 유지하는 동안 현재 물류의 진행도가 쌓이고, 완료되면 다음 물류로 넘어간다.</summary>
+    // 같은 프레임의 시간 판정(영업 종료·제한 시간)이 끝난 뒤 완료를 판정한다(기획서 3.7)
+    [DefaultExecutionOrder(300)]
     public class PlayerInteractionController : MonoBehaviour, IInteractor
     {
         [Header("Interact Input")]
@@ -59,6 +61,37 @@ namespace Game.Player.Interaction
         public IReadOnlyList<Parcel> LoadedParcels => _loadedParcels;
         public int CargoCapacity => _cargoConfig != null ? _cargoConfig.CargoCapacity : 0;
         public int WeightCapacity => _cargoConfig != null ? _cargoConfig.WeightCapacity : 0;
+        public float MaxWeight => _cargoConfig != null ? _cargoConfig.MaxWeight : 0f;
+
+        /// <summary>적재 무게가 무게 한도 W를 넘었는지. 폐기 물류도 처분 전까지 무게에 포함된다.</summary>
+        public bool IsOverweight => UsedWeight > WeightCapacity;
+
+        /// <summary>현재 무게의 속도 배율 m. 이동 컨트롤러는 적재 무게를 모르고 이 값만 받는다.</summary>
+        public float SpeedMultiplier { get; private set; } = 1f;
+
+        /// <summary>속도 배율을 다시 계산할 때마다 발생한다(상차·하차·처분 완료).</summary>
+        public event Action<float> SpeedMultiplierChanged;
+
+        // 그룹·선택 상차에서 이번 홀드에 이미 실은 물류 수. 첫 물류만 W 초과를 허용한다
+        private int _loadedInHold;
+
+        /// <summary>적재 무게가 바뀐 뒤 속도 배율을 다시 계산한다. 폐기 물류 처분 완료(Story 005) 시에도 호출한다.</summary>
+        public void RecomputeSpeedMultiplier()
+        {
+            SpeedMultiplier = _cargoConfig != null ? _cargoConfig.GetSpeedMultiplier(UsedWeight) : 1f;
+            SpeedMultiplierChanged?.Invoke(SpeedMultiplier);
+        }
+
+        /// <summary>그룹·선택 상차를 이어갈 수 있는지. 개별 한도에 더해, 이번 홀드에서 이미 실었다면 상차 후 무게가 W 이하여야 한다.</summary>
+        public bool CanContinueGroupLoad(Parcel next)
+        {
+            if (CanLoad(next) == false)
+            {
+                return false;
+            }
+
+            return _loadedInHold == 0 || UsedWeight + next.Cargo.WeightUsage <= WeightCapacity;
+        }
 
         // 적재 목록이 작아 매번 합산한다. 별도 누적값을 두면 상차·하차·실패 경로마다 동기화가 필요하다
         public int UsedCapacity
@@ -103,12 +136,18 @@ namespace Game.Player.Interaction
                 return "CARGO FULL";
             }
 
-            if (UsedWeight + parcel.Cargo.WeightUsage > WeightCapacity)
+            if (UsedWeight + parcel.Cargo.WeightUsage > MaxWeight)
             {
                 return "WEIGHT LIMIT";
             }
 
             return null;
+        }
+
+        /// <summary>상차하면 무게 한도 W를 넘지만 W_max 이내라 실을 수 있는 물류인지(상차 UI 경고 행).</summary>
+        public bool WouldExceedWeightCapacity(Parcel parcel)
+        {
+            return UsedWeight + parcel.Cargo.WeightUsage > WeightCapacity;
         }
 
         /// <summary>물류 하나를 처리하는 중인지. 주행 모드 전환·드리프트 차단에 사용한다.</summary>
@@ -289,6 +328,7 @@ namespace Game.Player.Interaction
         /// <summary>물류센터 UI가 고른 상차 대상을 넘긴다. 빈 목록이면 대기열 선두를 사용한다.</summary>
         public void SetLoadSelection(IReadOnlyList<Parcel> parcels)
         {
+            _loadedInHold = 0;
             _loadSelection.Clear();
             _hasExplicitSelection = parcels != null && parcels.Count > 0;
 
@@ -402,6 +442,8 @@ namespace Game.Player.Interaction
 
         private void OnInteractionPressed()
         {
+            _loadedInHold = 0;
+
             if (_currentInteractable == null)
             {
                 return;
@@ -443,6 +485,12 @@ namespace Game.Player.Interaction
             {
                 // 대기열이 남아 있는데 실을 수 없으면 선두 물류 기준으로 어느 한도인지 알린다
                 Parcel head = center.PeekNextParcel();
+                if (head != null && head.Cargo.WeightUsage > MaxWeight)
+                {
+                    // 단일 물류가 W_max를 넘으면 영원히 실을 수 없으므로 설정 오류로 알린다
+                    Debug.LogWarning($"Parcel #{head.Id} weight {head.Cargo.WeightUsage} exceeds W_max {MaxWeight}; it can never be loaded");
+                }
+
                 return head != null ? GetLoadBlockReason(head) ?? "NO PARCELS TO LOAD" : "NO PARCELS TO LOAD";
             }
 
@@ -487,7 +535,7 @@ namespace Game.Player.Interaction
         private bool StopLoadingIfBlocked(LogisticsCenter center)
         {
             Parcel next = FindNextLoadParcel(center);
-            if (next == null || CanLoad(next))
+            if (next == null || CanContinueGroupLoad(next))
             {
                 return false;
             }
@@ -495,7 +543,8 @@ namespace Game.Player.Interaction
             _loadSelection.Clear();
             _hasExplicitSelection = false;
             _isLoadRequested = false;
-            InteractionBlocked?.Invoke(GetLoadBlockReason(next));
+            // 개별 한도는 아니고 그룹 상차의 W 초과로 멈춘 경우도 WEIGHT LIMIT로 알린다
+            InteractionBlocked?.Invoke(GetLoadBlockReason(next) ?? "WEIGHT LIMIT");
             return true;
         }
 
@@ -579,6 +628,8 @@ namespace Game.Player.Interaction
                 parcel.Status = ParcelStatus.Loaded;
                 _loadedParcels.Add(parcel);
                 _loadSelection.Remove(parcel);
+                _loadedInHold++;
+                RecomputeSpeedMultiplier();
 
                 // UI가 이벤트를 받을 때 선택이 이미 정리되어 있도록 알림보다 먼저 판정한다
                 if (_hasExplicitSelection)
@@ -601,6 +652,7 @@ namespace Game.Player.Interaction
         private void DeliverParcel(Parcel parcel, DeliveryTarget target)
         {
             parcel.Status = ParcelStatus.Delivered;
+            RecomputeSpeedMultiplier();
             target.NotifyParcelChanged(parcel);
             LoadedParcelsChanged?.Invoke(parcel);
 
