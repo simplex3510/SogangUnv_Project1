@@ -1,0 +1,6 @@
+<!-- Bootstrap Icons cursor-fill (MIT). 회전 축이 도형 중심이 되도록 무게중심을 (8,8)에 두고 위쪽을 가리키게 -45도 돌렸다 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#ffffff" viewBox="-1 -1 18 18">
+  <g transform="translate(8 8) rotate(-45) translate(-8.093 -8.447)">
+    <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"/>
+  </g>
+</svg>

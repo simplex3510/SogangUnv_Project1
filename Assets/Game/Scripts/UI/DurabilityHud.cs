@@ -18,6 +18,7 @@ namespace Game.UI
     public class DurabilityHud : MonoBehaviour
     {
         private const string SpoiledGroupTitle = "처분 장소";
+        private const string LogisticsCenterTitle = "물류센터";
         private const string DiscardNoticeText = "물류가 폐기되었습니다 — 처분 장소로 이동";
 
         // 유지 시간 비율 중 이 지점부터 선형으로 사라진다
@@ -62,9 +63,18 @@ namespace Game.UI
         private readonly HashSet<string> _expandedGroups = new();
         // 패널 위에서부터의 그룹 순서. 숫자키 번호와 같다
         private readonly List<string> _groupOrder = new();
+        // 펼친 그룹에 그려진 Fresh 물류의 신선도 바
+        private readonly Dictionary<Parcel, VisualElement> _freshnessFills = new();
+        // 그룹 헤더의 방향 표시(화살표·거리)와 그 목적지. 패널을 다시 그릴 때 채우고 회전·거리만 매 프레임 바꾼다
+        private readonly List<(VisualElement arrow, Label distance, Transform destination)> _groupNavs = new();
+        private LogisticsCenter _logisticsCenter;
+        private (VisualElement arrow, Label distance, Transform destination) _centerNav;
         private VisualElement _root;
         private VisualElement _hudRoot;
+        // 우상단 세로 열의 세 패널: 물류센터(항상), 배송 현황(배송지 그룹), 폐기(처분 장소 그룹)
+        private VisualElement _centerPanel;
         private VisualElement _cargoPanel;
+        private VisualElement _disposalPanel;
         private ScrollView _cargoList;
         private Label _notice;
         private float _noticeHideTime;
@@ -107,10 +117,12 @@ namespace Game.UI
             ClearPopups();
             _root = root;
             _hudRoot = _root.Q("hudRoot");
+            _centerPanel = _root.Q("centerPanel");
             _cargoPanel = _root.Q("cargoPanel");
+            _disposalPanel = _root.Q("disposalPanel");
             _cargoList = _root.Q<ScrollView>("cargoList");
             _notice = _root.Q<Label>("discardNotice");
-            if (_hudRoot == null || _cargoPanel == null || _cargoList == null || _notice == null)
+            if (_hudRoot == null || _centerPanel == null || _cargoPanel == null || _disposalPanel == null || _cargoList == null || _notice == null)
             {
                 Debug.LogError($"DurabilityHud.uxml is not assigned to the PanelRenderer in {gameObject.name}");
                 enabled = false;
@@ -121,6 +133,7 @@ namespace Game.UI
             _cargoList.contentViewport.pickingMode = PickingMode.Ignore;
             _cargoList.style.maxHeight = _listMaxHeight;
             _notice.text = DiscardNoticeText;
+            BuildLogisticsCenterRow();
             RefreshCargoPanel();
         }
 
@@ -207,6 +220,8 @@ namespace Game.UI
                 return;
             }
 
+            UpdateArrows();
+
             for (int i = _popups.Count - 1; i >= 0; i--)
             {
                 float t = (Time.time - _popups[i].startTime) / _popupDuration;
@@ -220,11 +235,70 @@ namespace Game.UI
                 PlacePopup(_popups[i].label, t);
             }
 
+            // 행은 적재 변화 때만 다시 그리므로 신선도 바만 매 프레임 줄인다
+            foreach (KeyValuePair<Parcel, VisualElement> pair in _freshnessFills)
+            {
+                pair.Value.style.width = Length.Percent(FreshnessRatio(pair.Key) * 100f);
+            }
+
             if (_noticeHideTime > 0f && Time.time >= _noticeHideTime)
             {
                 _notice.RemoveFromClassList("discard-notice--visible");
                 _noticeHideTime = 0f;
             }
+        }
+
+        // 물류센터 패널은 적재와 무관하게 항상 보이므로 트리를 받을 때 한 번만 만든다. 번호 키는 붙이지 않는다
+        private void BuildLogisticsCenterRow()
+        {
+            _centerPanel.Clear();
+            VisualElement row = AddElement(_centerPanel, "logistics-center-row");
+            if (_logisticsCenter == null)
+            {
+                _logisticsCenter = FindAnyObjectByType<LogisticsCenter>();
+            }
+
+            VisualElement arrow = AddNavBadge(row);
+            arrow.AddToClassList("nav-arrow--center");
+            AddLabel(row, "cargo-group-title", LogisticsCenterTitle);
+            _centerNav = (arrow, AddLabel(row, "nav-distance", string.Empty), _logisticsCenter != null ? _logisticsCenter.transform : null);
+        }
+
+        // 행 맨 왼쪽의 원형 나침반 배지. 테두리는 고정이고 안의 화살표만 돈다. 거리는 행 오른쪽 끝 열에 따로 둔다
+        private static VisualElement AddNavBadge(VisualElement parent)
+        {
+            return AddElement(AddElement(parent, "nav-indicator"), "nav-arrow");
+        }
+
+        // 화살표 위쪽 = 차량 전방. 수평면에서 전방과 목적지 방향의 부호 있는 각도(시계 방향 +)로 돌린다
+        private void UpdateArrows()
+        {
+            PointArrow(_centerNav);
+            for (int i = 0; i < _groupNavs.Count; i++)
+            {
+                PointArrow(_groupNavs[i]);
+            }
+        }
+
+        private void PointArrow((VisualElement arrow, Label distance, Transform destination) nav)
+        {
+            (VisualElement arrow, Label distance, Transform destination) = nav;
+            if (destination == null)
+            {
+                return;
+            }
+
+            Vector3 forward = Vector3.ProjectOnPlane(_vehicle.forward, Vector3.up);
+            Vector3 toDestination = Vector3.ProjectOnPlane(destination.position - _vehicle.position, Vector3.up);
+            // 월드 1유닛 = 1m
+            distance.text = $"{toDestination.magnitude:0}m";
+            // 목적지와 수평으로 겹치면 방향이 정의되지 않으므로 직전 각도를 유지한다
+            if (forward.sqrMagnitude < 0.0001f || toDestination.sqrMagnitude < 0.0001f)
+            {
+                return;
+            }
+
+            arrow.style.rotate = new Rotate(Vector3.SignedAngle(forward, toDestination, Vector3.up));
         }
 
         // 하루 종료(조작 잠금) 뒤에는 새 표시를 만들지 않는다(AC5). 운영 시스템이 없는 테스트 씬에서는 표시한다
@@ -285,13 +359,16 @@ namespace Game.UI
         }
 
         /// <summary>
-        /// 적재 물류를 배송지별로 묶어 다시 그린다. 폐기 물류는 목적지가 처분 장소라 따로 묶는다.
-        /// 접힌 그룹은 헤더(번호·이름·개수)만, 펼친 그룹은 물류 행까지 그린다.
+        /// 적재 물류를 배송지별로 묶어 배송 현황 패널에 다시 그린다. 폐기 물류는 목적지가 처분 장소라 따로 묶어 폐기 패널에 그린다.
+        /// 접힌 그룹은 헤더(번호·이름·개수)만, 펼친 그룹은 물류 행까지 그린다. 빈 패널은 숨긴다.
         /// </summary>
         private void RefreshCargoPanel()
         {
             _cargoList.Clear();
+            _disposalPanel.Clear();
             _groupOrder.Clear();
+            _freshnessFills.Clear();
+            _groupNavs.Clear();
 
             var groups = new Dictionary<string, List<Parcel>>();
             IReadOnlyList<Parcel> parcels = _interactionController.LoadedParcels;
@@ -309,6 +386,12 @@ namespace Game.UI
                 members.Add(parcel);
             }
 
+            // 폐기 그룹은 화면에서 맨 아래 패널이므로 숫자키 번호도 마지막으로 둔다
+            if (_groupOrder.Remove(SpoiledGroupTitle))
+            {
+                _groupOrder.Add(SpoiledGroupTitle);
+            }
+
             // 사라진 그룹의 펼침 상태는 버린다. 같은 이름으로 다시 생기면 접힘부터 시작한다
             _expandedGroups.RemoveWhere(title => groups.ContainsKey(title) == false);
 
@@ -318,13 +401,21 @@ namespace Game.UI
                 List<Parcel> members = groups[title];
                 bool expanded = _expandedGroups.Contains(title);
 
-                VisualElement group = AddElement(_cargoList, "cargo-group");
-                // 숫자키가 닿는 1~9번째 그룹만 번호를 붙인다
-                string badge = i < GroupToggleKeys.Length ? $"[{i + 1}] " : string.Empty;
+                VisualElement group = AddElement(title == SpoiledGroupTitle ? _disposalPanel : _cargoList, "cargo-group");
                 // 긴 배송지 이름은 말줄임하고 개수는 항상 보이게 따로 둔다
                 VisualElement header = AddElement(group, "cargo-group-header");
-                AddLabel(header, "cargo-group-title", $"{(expanded ? "▼" : "▶")} {badge}{title}");
+                // 폐기 그룹은 처분 장소, 그 외는 배송지를 가리킨다
+                Transform destination = members[0].IsSpoiled ? DisposalSite.Instance?.transform : members[0].Target.transform;
+                VisualElement arrow = AddNavBadge(header);
+                // 숫자키가 닿는 1~9번째 그룹만 키 번호를 붙인다
+                if (i < GroupToggleKeys.Length)
+                {
+                    AddLabel(header, "group-key", $"{i + 1}");
+                }
+
+                AddLabel(header, "cargo-group-title", title);
                 AddLabel(header, "cargo-group-count", $"×{members.Count}");
+                _groupNavs.Add((arrow, AddLabel(header, "nav-distance", string.Empty), destination));
                 if (expanded)
                 {
                     for (int j = 0; j < members.Count; j++)
@@ -334,21 +425,34 @@ namespace Game.UI
                 }
             }
 
-            _cargoPanel.EnableInClassList("cargo-panel--empty", parcels.Count == 0);
+            bool hasSpoiled = groups.ContainsKey(SpoiledGroupTitle);
+            _cargoPanel.EnableInClassList("hud-panel--hidden", _groupOrder.Count == (hasSpoiled ? 1 : 0));
+            _disposalPanel.EnableInClassList("hud-panel--hidden", hasSpoiled == false);
         }
 
-        private static void AddParcelRow(VisualElement group, Parcel parcel)
+        private void AddParcelRow(VisualElement group, Parcel parcel)
         {
             VisualElement row = AddElement(group, "parcel-row");
             row.EnableInClassList("parcel-row--spoiled", parcel.IsSpoiled);
 
-            // 상자 그림 대신 배송 유형 색 블록(Normal 파랑, Express 빨강)
-            AddElement(row, "parcel-icon").EnableInClassList("parcel-icon--express", parcel.Type == DeliveryType.Express);
+            // 상자 그림 대신 배송 유형 색 블록(Normal 파랑, Express 빨강, Fresh 초록)
+            VisualElement icon = AddElement(row, "parcel-icon");
+            icon.EnableInClassList("parcel-icon--express", parcel.Type == DeliveryType.Express);
+            icon.EnableInClassList("parcel-icon--fresh", parcel.IsFresh);
+            // 폐기 물류는 원래 유형과 관계없이 폐기 색으로 덮는다(USS에서 뒤에 선언)
+            icon.EnableInClassList("parcel-icon--spoiled", parcel.IsSpoiled);
 
             VisualElement info = AddElement(row, "parcel-info");
             DeliveryReward reward = parcel.Reward;
-            // 제한 시간 안에 배송했을 때 받는 금액
-            AddLabel(info, "parcel-price", $"{reward.BaseFee + reward.DistanceFee + reward.TimeBonus + reward.TraitBonus:#,0}₩");
+            // 제한 시간 안에(Fresh는 신선도가 가득일 때) 배송했을 때 받는 금액
+            AddLabel(info, "parcel-price", $"{reward.BaseFee + reward.DistanceFee + reward.TimeBonus + reward.TraitBonus + reward.FreshBonusMax:#,0}₩");
+
+            if (parcel.IsFresh && parcel.IsSpoiled == false)
+            {
+                VisualElement fill = AddElement(AddElement(info, "parcel-freshness"), "parcel-freshness-fill");
+                fill.style.width = Length.Percent(FreshnessRatio(parcel) * 100f);
+                _freshnessFills[parcel] = fill;
+            }
 
             VisualElement tags = AddElement(info, "parcel-tags");
             if (parcel.IsSpoiled)
@@ -373,7 +477,12 @@ namespace Game.UI
             }
 
             // 0이 아닌 내구도가 0으로 보이지 않게 올림한다
-            AddLabel(row, "parcel-durability", $"내구도\n{Mathf.CeilToInt(parcel.CurrentDurability)}/{parcel.Cargo.Durability}");
+            AddLabel(row, "parcel-durability", $"내구도 {Mathf.CeilToInt(parcel.CurrentDurability)}/{parcel.Cargo.Durability}");
+        }
+
+        private static float FreshnessRatio(Parcel parcel)
+        {
+            return parcel.Deadline > 0f ? Mathf.Clamp01(parcel.RemainingDeadline / parcel.Deadline) : 0f;
         }
 
         private static VisualElement AddElement(VisualElement parent, string className)

@@ -25,7 +25,7 @@
 | 014 | 적재 물류 패널 접기/펼치기와 스크롤 | UI | Complete | N/A (minimal) |
 | 015 | 일차·시각 HUD 좌상단 | UI | Complete | N/A (minimal) |
 | 016 | 오늘 수익 HUD | UI | Complete | N/A (minimal) |
-| 017 | 방향 안내를 적재 물류 패널로 이전 | UI | Ready | N/A (minimal) |
+| 017 | 방향 안내를 적재 물류 패널로 이전 | UI | Complete | N/A (minimal) |
 | 018 | 하단 중앙 HUD 정리 | UI | Ready | N/A (minimal) |
 | 019 | 적재 패널 물류 행 제한 시간 바 | UI | Ready | N/A (minimal) |
 | 020 | 표시 문구 한글 통일 | UI | Ready | N/A (minimal) |

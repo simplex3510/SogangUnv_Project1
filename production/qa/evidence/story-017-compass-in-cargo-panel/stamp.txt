@@ -1,0 +1,6 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DurabilityHud.cs 2b33d7cfa01e287c90a44ef5266468b5c13ca14f
+Reviewed-Content-Hash: Assets/Game/UI/Hud/DurabilityHud.uss 829d178c6faa8e0bbcaf95d97c3bf9a8b184dcb9
+Reviewed-Content-Hash: Assets/Game/UI/Hud/DurabilityHud.uxml 97542c925c631b92f28e142a1ea73080abbb46a9
+Reviewed-Content-Hash: Assets/Game/UI/Icons/cursor-fill.svg 14cf9fdc24444d8da7df10ba20793decba6b1746
+Reviewed-Content-Hash: Assets/Game/UI/Icons/cursor-fill.svg.meta f6dd4947fd2560bbda0103aa691ad3da6d94b4c9
+Reviewed-Content-Hash: Assets/Game/UI/Icons/box-seam-fill.svg 9c1ee86cedfc34c4edb2fb55d420a6acdfdc8e08

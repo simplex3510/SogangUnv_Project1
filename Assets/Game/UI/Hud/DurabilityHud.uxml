@@ -1,8 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:Style src="DurabilityHud.uss" />
     <ui:VisualElement name="hudRoot" class="hud-root" picking-mode="Ignore">
-        <ui:VisualElement name="cargoPanel" class="cargo-panel cargo-panel--empty" picking-mode="Ignore">
-            <ui:ScrollView name="cargoList" mode="Vertical" vertical-scroller-visibility="Hidden" horizontal-scroller-visibility="Hidden" picking-mode="Ignore" />
+        <ui:VisualElement name="cargoColumn" class="cargo-column" picking-mode="Ignore">
+            <ui:VisualElement name="centerPanel" class="hud-panel hud-panel--center" picking-mode="Ignore" />
+            <ui:VisualElement name="cargoPanel" class="hud-panel cargo-panel" picking-mode="Ignore">
+                <ui:ScrollView name="cargoList" mode="Vertical" vertical-scroller-visibility="Hidden" horizontal-scroller-visibility="Hidden" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement name="disposalPanel" class="hud-panel hud-panel--disposal" picking-mode="Ignore" />
         </ui:VisualElement>
         <ui:Label name="discardNotice" class="discard-notice" picking-mode="Ignore" />
     </ui:VisualElement>

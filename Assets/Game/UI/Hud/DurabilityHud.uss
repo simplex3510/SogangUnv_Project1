@@ -6,25 +6,107 @@
     -unity-font-definition: url("MalgunGothicDynamic.asset");
 }
 
-.cargo-panel {
+/* 우상단 세로 열: 물류센터 · 배송 현황 · 폐기 패널을 위에서 아래로 쌓는다 */
+.cargo-column {
     position: absolute;
     top: 24px;
     right: 24px;
-    width: 340px;
-    padding: 12px 12px 2px 12px;
+    width: 420px;
+}
+
+.hud-panel {
+    margin-bottom: 10px;
+    padding: 10px;
     background-color: rgba(38, 44, 54, 0.92);
     border-width: 3px;
     border-color: rgb(78, 88, 104);
     border-radius: 18px;
 }
 
-.cargo-panel--empty {
+.hud-panel--hidden {
     display: none;
 }
 
+/* 배송 현황: 그룹 카드가 margin-bottom을 가지므로 아래 여백을 줄인다 */
+.cargo-panel {
+    padding-bottom: 2px;
+}
+
+/* 물류센터 패널은 파란 테두리, 폐기 패널은 어두운 회색 테두리로 구분한다(임시) */
+.hud-panel--center {
+    border-color: rgb(90, 140, 190);
+}
+
+.hud-panel--disposal {
+    border-color: rgb(85, 88, 95);
+}
+
+/* 배송 현황 행은 그룹 카드(테두리 2 + 여백 10) 안에 있으므로 좌우 여백을 그만큼 늘려 배지·거리 열을 맞춘다 */
+.hud-panel--center,
+.hud-panel--disposal {
+    padding-left: 22px;
+    padding-right: 22px;
+}
+
+/* 패널 하나에 한 행·한 그룹뿐이라 안쪽 카드 테두리는 겹치지 않게 뺀다 */
+.hud-panel--disposal .cargo-group {
+    margin: 0;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+.logistics-center-row {
+    flex-direction: row;
+    align-items: center;
+    font-size: 22px;
+    -unity-font-style: bold;
+}
+
+/* 원형 나침반 배지: 행 맨 왼쪽, 테두리 고정·안의 화살표만 회전. 화살표는 Bootstrap Icons cursor-fill(MIT, 위쪽·무게중심 정렬로 보정) */
+.nav-indicator {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    margin-right: 10px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(30, 35, 44);
+    border-width: 2px;
+    border-color: rgb(110, 122, 140);
+    border-radius: 17px;
+}
+
+.nav-arrow {
+    width: 20px;
+    height: 20px;
+    background-image: url("../Icons/cursor-fill.svg");
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+}
+
+/* 거리: 행 오른쪽 끝 고정 폭 열(오른쪽 정렬). 남는 폭을 차지해 이름·개수를 왼쪽으로 민다. 값은 C#이 매 프레임 정한다 */
+.nav-distance {
+    flex-grow: 1;
+    flex-shrink: 0;
+    min-width: 64px;
+    margin: 0 0 0 8px;
+    padding: 0;
+    font-size: 18px;
+    -unity-font-style: normal;
+    -unity-text-align: middle-right;
+}
+
+.nav-arrow--center {
+    -unity-background-image-tint-color: rgb(140, 198, 245);
+}
+
+.logistics-center-row .nav-indicator {
+    border-color: rgb(140, 198, 245);
+}
+
 .cargo-group {
-    margin-bottom: 10px;
-    padding: 10px;
+    margin-bottom: 8px;
+    padding: 8px 10px;
     background-color: rgb(44, 51, 62);
     border-width: 2px;
     border-color: rgb(78, 88, 104);
@@ -34,13 +116,28 @@
 .cargo-group-header {
     flex-direction: row;
     align-items: center;
-    padding-left: 4px;
-    font-size: 20px;
+    font-size: 22px;
     -unity-font-style: bold;
+}
+
+/* 그룹 접기/펼치기 숫자키(Story 014). 키캡 모양으로 이름과 구분한다 */
+.group-key {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    margin: 0 8px 0 0;
+    padding: 0;
+    font-size: 13px;
+    -unity-text-align: middle-center;
+    color: rgb(220, 226, 235);
+    background-color: rgb(78, 88, 104);
+    border-radius: 5px;
 }
 
 .cargo-group-title {
     flex-shrink: 1;
+    margin: 0;
+    padding: 0;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -48,8 +145,10 @@
 
 .cargo-group-count {
     flex-shrink: 0;
-    margin-left: 6px;
+    margin: 0 0 0 8px;
     font-size: 18px;
+    -unity-font-style: normal;
+    color: rgb(170, 180, 195);
 }
 
 .parcel-row {
@@ -65,16 +164,42 @@
     opacity: 0.55;
 }
 
+/* 배송 유형 아이콘: Bootstrap Icons box-seam-fill(MIT), 색으로 유형 구분(임시 2026-11-17: Normal 상자 노랑, Express 빨강, Fresh 초록, 폐기 어두운 회색) */
 .parcel-icon {
-    width: 32px;
-    height: 32px;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
     margin-right: 10px;
-    background-color: rgb(40, 120, 230);
-    border-radius: 6px;
+    background-image: url("../Icons/box-seam-fill.svg");
+    -unity-background-image-tint-color: rgb(222, 175, 95);
 }
 
 .parcel-icon--express {
-    background-color: rgb(225, 50, 60);
+    -unity-background-image-tint-color: rgb(240, 90, 95);
+}
+
+.parcel-icon--fresh {
+    -unity-background-image-tint-color: rgb(84, 217, 140);
+}
+
+/* 폐기 행은 반투명이라 너무 어두우면 사라지므로 회검정보다 약간 밝게 */
+.parcel-icon--spoiled {
+    -unity-background-image-tint-color: rgb(85, 88, 95);
+}
+
+/* 상차한 Fresh의 남은 신선도. 폭은 C#이 매 프레임 정한다 */
+.parcel-freshness {
+    height: 6px;
+    margin-top: 4px;
+    background-color: rgb(30, 35, 44);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.parcel-freshness-fill {
+    height: 100%;
+    background-color: rgb(84, 217, 140);
+    border-radius: 3px;
 }
 
 .parcel-info {
@@ -83,6 +208,7 @@
 
 .parcel-price {
     font-size: 18px;
+    -unity-font-style: bold;
 }
 
 .parcel-tags {
@@ -94,7 +220,7 @@
     margin-top: 2px;
     margin-right: 4px;
     padding: 1px 8px;
-    font-size: 12px;
+    font-size: 13px;
     background-color: rgb(96, 106, 122);
     border-radius: 8px;
 }
@@ -104,7 +230,10 @@
 }
 
 .parcel-durability {
-    font-size: 13px;
+    flex-shrink: 0;
+    margin-left: 8px;
+    font-size: 14px;
+    color: rgb(200, 208, 220);
     -unity-text-align: middle-right;
 }
 
