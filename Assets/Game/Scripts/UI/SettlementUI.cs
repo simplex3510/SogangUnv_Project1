@@ -67,6 +67,7 @@ namespace Game.UI
             AppendLine("DISTANCE FEE", result.DistanceFeeTotal);
             AppendLine("TIME BONUS", result.TimeBonusEarned);
             AppendLine("TIME BONUS MISSED", -result.TimeBonusMissed);
+            AppendLine("TRAIT BONUS", result.TraitBonusTotal);
             AppendLine("LATE LOSS", -result.LateLoss);
             AppendLine("FAILURE PENALTY", -result.FailurePenalty);
             _builder.Append("</mspace>");

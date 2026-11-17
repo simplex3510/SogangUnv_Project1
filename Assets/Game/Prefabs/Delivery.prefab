@@ -1111,7 +1111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.Delivery.PlayerDeliveryController
   _interactionInput: {fileID: -5374473091262486240, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  _maxLoadedParcels: 6
+  _cargoConfig: {fileID: 11400000, guid: 317d2ea408e695e438e5466a855533bd, type: 2}
 --- !u!114 &3321739127970385887
 MonoBehaviour:
   m_ObjectHideFlags: 0

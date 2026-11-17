@@ -68,6 +68,7 @@ namespace Game.Logistics
             float distanceFeeTotal = 0f;
             float timeBonusEarned = 0f;
             float timeBonusMissed = 0f;
+            float traitBonusTotal = 0f;
             float lateLossTotal = 0f;
 
             for (int i = 0; i < _deliveredParcels.Count; i++)
@@ -77,6 +78,9 @@ namespace Game.Logistics
 
                 baseFeeTotal += reward.BaseFee;
                 distanceFeeTotal += reward.DistanceFee;
+
+                // 특징 보상은 시간 조건과 무관하게 배송 완료 시 지급한다(기획서 11.1)
+                traitBonusTotal += reward.TraitBonus;
 
                 // 초과 배송은 시간 추가 보상을 받지 못하고 손실만 부과한다(기획서 11.3)
                 if (parcel.IsOverdue)
@@ -112,6 +116,7 @@ namespace Game.Logistics
                 distanceFeeTotal,
                 timeBonusEarned,
                 timeBonusMissed,
+                traitBonusTotal,
                 lateLossTotal,
                 failurePenaltyTotal,
                 _deliveredParcels.Count,
@@ -129,6 +134,7 @@ namespace Game.Logistics
             public readonly float DistanceFeeTotal;
             public readonly float TimeBonusEarned;
             public readonly float TimeBonusMissed;
+            public readonly float TraitBonusTotal;
             public readonly float LateLoss;
             public readonly float FailurePenalty;
             public readonly int DeliveredCount;
@@ -139,6 +145,7 @@ namespace Game.Logistics
                 float distanceFeeTotal,
                 float timeBonusEarned,
                 float timeBonusMissed,
+                float traitBonusTotal,
                 float lateLoss,
                 float failurePenalty,
                 int deliveredCount,
@@ -148,13 +155,14 @@ namespace Game.Logistics
                 DistanceFeeTotal = distanceFeeTotal;
                 TimeBonusEarned = timeBonusEarned;
                 TimeBonusMissed = timeBonusMissed;
+                TraitBonusTotal = traitBonusTotal;
                 LateLoss = lateLoss;
                 FailurePenalty = failurePenalty;
                 DeliveredCount = deliveredCount;
                 FailedCount = failedCount;
             }
 
-            public float Income => BaseFeeTotal + DistanceFeeTotal + TimeBonusEarned;
+            public float Income => BaseFeeTotal + DistanceFeeTotal + TimeBonusEarned + TraitBonusTotal;
             public float Loss => LateLoss + FailurePenalty;
 
             // 하한을 두지 않고 음수를 그대로 표시한다(기획서 16.1-6)

@@ -11,6 +11,8 @@ namespace Game.Logistics
         [SerializeField] private DeliveryType _type;
         [Tooltip("생성 확률(0~1, 상대 가중치로 정규화해 사용)")]
         [SerializeField, Range(0f, 1f)] private float _spawnProbability = 0.5f; // TODO(tuning)
+        [Tooltip("배송 제한 시간 적용 여부. 끄면 제한 시간·시간 추가 보상·시간 초과 손실이 없다(기획서 6.2)")]
+        [SerializeField] private bool _hasDeadline = true;
         [Tooltip("배송 제한 시간 계수")]
         [SerializeField, Min(0f)] private float _deadlineMultiplier = 1f; // TODO(tuning)
         [Tooltip("시간 초과 손실 계수")]
@@ -20,6 +22,7 @@ namespace Game.Logistics
 
         public DeliveryType Type => _type;
         public float SpawnProbability => _spawnProbability;
+        public bool HasDeadline => _hasDeadline;
         public float DeadlineMultiplier => _deadlineMultiplier;
         public float LateLossMultiplier => _lateLossMultiplier;
         public float FailurePenaltyMultiplier => _failurePenaltyMultiplier;
@@ -60,6 +63,20 @@ namespace Game.Logistics
             }
 
             return _entries[_entries.Length - 1].Type;
+        }
+
+        /// <summary>배송 유형별 제한 시간 적용 여부. 설정에 없는 유형은 기존 동작대로 제한 시간을 둔다.</summary>
+        public bool HasDeadline(DeliveryType type)
+        {
+            for (int i = 0; i < _entries.Length; i++)
+            {
+                if (_entries[i].Type == type)
+                {
+                    return _entries[i].HasDeadline;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>배송 타입별 제한 시간 계수. 설정에 없는 타입은 1로 처리한다.</summary>

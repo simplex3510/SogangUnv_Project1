@@ -16,6 +16,7 @@ namespace Game.Logistics
 
         [SerializeField] private DeliveryGenerationConfig _config;
         [SerializeField] private DeliveryTypeConfig _typeConfig;
+        [SerializeField] private CargoTraitConfig _traitConfig;
         [SerializeField] private LogisticsCenter _logisticsCenter;
 
         private int _remainingDynamicCount;
@@ -35,7 +36,7 @@ namespace Game.Logistics
 
         private void Start()
         {
-            if (_config == null || _typeConfig == null || _logisticsCenter == null)
+            if (_config == null || _typeConfig == null || _traitConfig == null || _logisticsCenter == null)
             {
                 Debug.LogError($"DeliveryGenerationSystem references are missing in {gameObject.name}");
                 enabled = false;
@@ -96,7 +97,7 @@ namespace Game.Logistics
             }
 
             // 할당 가능한 배송지가 없으면 재시도 없이 동적 생성을 종료한다(기획서 4.2)
-            if (TryGenerateParcel() == false)
+            if (TryGenerateParcel(DeliveryGenerationType.Dynamic) == false)
             {
                 StopDynamicGeneration("할당 가능한 배송지 없음");
                 return;
@@ -123,7 +124,7 @@ namespace Game.Logistics
 
             for (int i = 0; i < generateCount; i++)
             {
-                if (TryGenerateParcel() == false)
+                if (TryGenerateParcel(DeliveryGenerationType.Static) == false)
                 {
                     Debug.LogWarning($"[물류 생성] 정적 물류 생성 중단: 할당 가능한 배송지 없음 ({i}/{generateCount} 생성)");
                     return;
@@ -156,7 +157,7 @@ namespace Game.Logistics
         }
 
         /// <summary>물류 하나를 생성해 배송지에 할당하고 물류센터 대기열에 넣는다. 할당 가능한 배송지가 없으면 false.</summary>
-        private bool TryGenerateParcel()
+        private bool TryGenerateParcel(DeliveryGenerationType generationType)
         {
             if (DeliveryAssignmentSystem.TryAssignRandom(out DeliveryTarget target) == false)
             {
@@ -164,15 +165,20 @@ namespace Game.Logistics
             }
 
             DeliveryType type = _typeConfig.RollType();
+            CargoSpec cargo = _traitConfig.CreateSpec();
             DeliveryReward reward = RewardSystem.Instance.CreateReward(
                 _logisticsCenter.transform.position,
                 target.transform.position,
-                type);
+                type,
+                _traitConfig.GetRewardBonus(cargo.Traits));
 
             Parcel parcel = DeliveryDeadlineSystem.Instance.CreateParcel(
                 _logisticsCenter.transform.position,
                 target,
                 type,
+                generationType,
+                cargo,
+                _typeConfig.HasDeadline(type),
                 _typeConfig.GetDeadlineMultiplier(type),
                 reward);
 
