@@ -165,9 +165,35 @@
 }
 
 /* 제한 시간 물류의 남은 시간(Fresh는 신선도). 폭은 C#이 매 프레임 정한다. Express 빨강, Fresh 초록(임시 2026-11-17) */
-.parcel-deadline {
-    height: 6px;
+.parcel-deadline-row {
+    flex-direction: row;
+    align-items: center;
     margin-top: 4px;
+}
+
+/* 바 오른쪽 시간 표기(아이콘 + 문구). 크기는 글자(13px)에 맞춘다. TODO(tuning) */
+.parcel-deadline-icon {
+    width: 13px;
+    height: 13px;
+    margin-left: 8px;
+    background-image: url("../Icons/clock.svg");
+    -unity-background-image-tint-color: rgb(215, 222, 232);
+}
+
+.parcel-deadline-icon--fresh {
+    background-image: url("../Icons/hourglass-split.svg");
+}
+
+.parcel-deadline-time {
+    margin: 0 0 0 3px;
+    padding: 0;
+    font-size: 13px;
+    color: rgb(215, 222, 232);
+}
+
+.parcel-deadline {
+    flex-grow: 1;
+    height: 6px;
     background-color: rgb(30, 35, 44);
     border-radius: 3px;
     overflow: hidden;

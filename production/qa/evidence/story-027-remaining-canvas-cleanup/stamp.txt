@@ -1,0 +1,11 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DurabilityHud.cs d129a21401044e449652df82cc2235918802724e
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/LogisticsCenterUI.cs 218f4fbc17590f4b6e0c962379e0e3de485f7117
+Reviewed-Content-Hash: Assets/Game/UI/Hud/CargoGroupHeader.uxml 54bc40e48f5a14dbc72f8ff484116abcbc53ffd2
+Reviewed-Content-Hash: Assets/Game/UI/Hud/ParcelRow.uxml aa8cc914e914fa79959d07160bc70895e05b3769
+Reviewed-Content-Hash: Assets/Game/UI/Hud/DurabilityHud.uss aa53afb96595d35b20a0f884b6d322be9ed616d3
+Reviewed-Content-Hash: Assets/Game/UI/LogisticsCenter/CenterRow.uxml 3d47219efdff259c99c3f6d4a7d065b699e60a3d
+Reviewed-Content-Hash: Assets/Game/UI/LogisticsCenter/LogisticsCenterWindow.uss a3dee2016a938d47e579f20f4c1fa32955956891
+Reviewed-Content-Hash: Assets/Game/UI/LogisticsCenter/LogisticsCenterWindow.uxml 302baa9ecee4543cdc8341dfa0d68de96c0bac07
+Reviewed-Content-Hash: Assets/Game/UI/Icons/clock.svg 86b3e79ec7fa5006077e64ab1dfa795f6da4223a
+Reviewed-Content-Hash: Assets/Game/UI/Icons/hourglass-split.svg 050924ecd49b55d32ff6536a9ebe2b0fc0039a5b
+Reviewed-Content-Hash: Assets/Game/UI/Icons/x-lg.svg 85661e875003b10712976155aa83173355eab4b8

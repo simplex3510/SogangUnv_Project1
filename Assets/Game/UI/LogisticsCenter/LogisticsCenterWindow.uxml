@@ -11,7 +11,7 @@
                     <ui:Label class="lc-title" text="물류센터" />
                     <ui:Label class="lc-subtitle" text="배송할 물류를 확인하고 차량에 상차할 수 있습니다." />
                 </ui:VisualElement>
-                <ui:Button name="closeButton" class="lc-close" text="×" />
+                <ui:Button name="closeButton" class="lc-close" text="" />
             </ui:VisualElement>
             <ui:VisualElement class="lc-divider" />
             <ui:VisualElement class="lc-summary">

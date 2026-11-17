@@ -50,14 +50,17 @@
     height: 36px;
     margin: 0;
     padding: 0;
-    font-size: 30px;
-    color: rgb(255, 255, 255);
     background-color: rgba(0, 0, 0, 0);
     border-width: 0;
+    background-image: url("../Icons/x-lg.svg");
+    background-size: 22px 22px;
+    background-repeat: no-repeat;
+    background-position: center;
+    -unity-background-image-tint-color: rgb(255, 255, 255);
 }
 
 .lc-close:hover {
-    color: rgb(255, 120, 120);
+    -unity-background-image-tint-color: rgb(255, 120, 120);
 }
 
 .lc-divider {
@@ -230,22 +233,22 @@
 }
 
 .lc-deadline-time {
-    margin-left: 8px;
+    margin-left: 3px;
     font-size: 13px;
     color: rgb(215, 222, 232);
 }
 
-/* Fresh 신선도 총량 앞의 새로고침 아이콘. 크기는 글자(13px)에 맞춘다. TODO(tuning) */
+/* 제한 시간 앞 아이콘: Express는 시계(만료 시각), Fresh는 모래시계(신선도 총량). 크기는 글자(13px)에 맞춘다. TODO(tuning) */
 .lc-deadline-icon {
     width: 13px;
     height: 13px;
     margin-left: 8px;
-    background-image: url("../Icons/arrow-clockwise.svg");
+    background-image: url("../Icons/clock.svg");
     -unity-background-image-tint-color: rgb(215, 222, 232);
 }
 
-.lc-deadline-time--icon {
-    margin-left: 3px;
+.lc-deadline-icon--fresh {
+    background-image: url("../Icons/hourglass-split.svg");
 }
 
 /* 누르고 있으면 상차하는 행·헤더. 올리면 밝은 배경과 테두리로 강조, 헤더에 올리면 그룹 행도 함께(lc-row--target) */

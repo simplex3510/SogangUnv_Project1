@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:Style src="DurabilityHud.uss" />
     <ui:VisualElement name="group" class="cargo-group" picking-mode="Ignore">
-        <ui:VisualElement name="header" class="cargo-group-header" picking-mode="Ignore">
+        <ui:VisualElement name="header" class="cargo-group-header" picking-mode="Position">
             <ui:VisualElement name="navIndicator" class="nav-indicator" picking-mode="Ignore">
                 <ui:VisualElement name="navArrow" class="nav-arrow" picking-mode="Ignore" />
             </ui:VisualElement>

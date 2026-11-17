@@ -437,14 +437,9 @@ namespace Game.UI
                 fill.style.width = Length.Percent(DeadlineRatio(parcel) * 100f);
                 fill.EnableInClassList("lc-bar-fill--fresh", parcel.IsFresh);
                 _parcelFills[parcel] = fill;
-                // 남은 시간이 아니라 생성 시점에 확정된 만료 시각(게임 시계)을 보여 준다. Fresh는 대기 중 줄지 않으므로 신선도 총량(m:ss)을 보여 준다
-                Keep(row, "deadlineIcon", parcel.IsFresh);
-                string deadlineText = parcel.IsFresh
-                    ? $"{Mathf.FloorToInt(parcel.Deadline) / 60}:{Mathf.FloorToInt(parcel.Deadline) % 60:00}"
-                    : FormatClock(parcel.CreationTime + parcel.Deadline);
-                Label time = row.Q<Label>("deadlineTime");
-                time.text = deadlineText;
-                time.EnableInClassList("lc-deadline-time--icon", parcel.IsFresh);
+                // 남은 시간이 아니라 생성 시점에 확정된 만료 시각(게임 시계)을 보여 준다. Fresh는 대기 중 줄지 않으므로 신선도 총량을 보여 준다
+                row.Q("deadlineIcon").EnableInClassList("lc-deadline-icon--fresh", parcel.IsFresh);
+                row.Q<Label>("deadlineTime").text = FormatDeadline(parcel, parcel.Deadline);
             }
             else
             {
@@ -640,6 +635,19 @@ namespace Game.UI
             float dx = a.x - b.x;
             float dz = a.z - b.z;
             return Mathf.Sqrt(dx * dx + dz * dz);
+        }
+
+        /// <summary>제한 시간 표기. Express는 만료 시각 `hh:mm까지`, Fresh는 신선도 `freshSeconds`를 분 단위로 올림한 `hh:mm 남음`.</summary>
+        internal static string FormatDeadline(Parcel parcel, float freshSeconds)
+        {
+            if (parcel.IsFresh)
+            {
+                // 올림해서 0이 아닌 값이 00:00으로 보이지 않게 한다
+                int minutes = Mathf.CeilToInt(Mathf.Max(0f, freshSeconds) / 60f);
+                return $"{minutes / 60:00}:{minutes % 60:00} 남음";
+            }
+
+            return $"{FormatClock(parcel.CreationTime + parcel.Deadline)}까지";
         }
 
         /// <summary>게임 시간(자정 기준 초)을 시계 표기로 바꾼다.</summary>

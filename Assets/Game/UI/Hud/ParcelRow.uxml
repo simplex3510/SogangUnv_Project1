@@ -5,8 +5,12 @@
         <ui:VisualElement name="parcelIcon" class="parcel-icon" picking-mode="Ignore" />
         <ui:VisualElement name="info" class="parcel-info" picking-mode="Ignore">
             <ui:Label name="priceLabel" class="parcel-price" picking-mode="Ignore" text="1,000₩" />
-            <ui:VisualElement name="deadline" class="parcel-deadline" picking-mode="Ignore">
-                <ui:VisualElement name="deadlineFill" class="parcel-deadline-fill" picking-mode="Ignore" style="width: 60%;" />
+            <ui:VisualElement name="deadlineRow" class="parcel-deadline-row" picking-mode="Ignore">
+                <ui:VisualElement name="deadline" class="parcel-deadline" picking-mode="Ignore">
+                    <ui:VisualElement name="deadlineFill" class="parcel-deadline-fill" picking-mode="Ignore" style="width: 60%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="deadlineIcon" class="parcel-deadline-icon" picking-mode="Ignore" />
+                <ui:Label name="deadlineTime" class="parcel-deadline-time" picking-mode="Ignore" text="12:30까지" />
             </ui:VisualElement>
             <ui:VisualElement name="tags" class="parcel-tags" picking-mode="Ignore">
                 <ui:Label name="tagSpoiled" class="tag-chip tag-chip--spoiled" picking-mode="Ignore" text="#폐기" />

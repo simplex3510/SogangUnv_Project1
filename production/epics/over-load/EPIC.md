@@ -35,4 +35,4 @@
 | 024 | 동적으로 만드는 UI 요소를 UXML 템플릿으로 분리 | UI | Complete | N/A (minimal) |
 | 025 | 정산 화면 UI Toolkit 전환 + 최상단 노출 | UI | Complete | N/A (minimal) |
 | 026 | 배송지·처분장 월드 아이콘 UI Toolkit 전환 + Fresh 색 | UI | Ready | N/A (minimal) |
-| 027 | 남은 Canvas UI 정리 (HoldInteractButton, GameTimeHUD) | UI | Ready | N/A (minimal) |
+| 027 | 남은 Canvas UI 정리 (HoldInteractButton, GameTimeHUD) | UI | Complete | N/A (minimal) |

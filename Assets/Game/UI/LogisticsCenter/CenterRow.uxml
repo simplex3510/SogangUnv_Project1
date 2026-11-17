@@ -19,7 +19,7 @@
                 <ui:VisualElement name="deadlineFill" class="lc-bar-fill" picking-mode="Ignore" style="width: 60%;" />
             </ui:VisualElement>
             <ui:VisualElement name="deadlineIcon" class="lc-deadline-icon" picking-mode="Ignore" />
-            <ui:Label name="deadlineTime" class="lc-deadline-time lc-deadline-time--icon" picking-mode="Ignore" text="3:00" />
+            <ui:Label name="deadlineTime" class="lc-deadline-time" picking-mode="Ignore" text="12:30까지" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

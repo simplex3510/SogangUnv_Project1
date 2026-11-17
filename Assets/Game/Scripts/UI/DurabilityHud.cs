@@ -70,7 +70,7 @@ namespace Game.UI
         // 패널 위에서부터의 그룹 순서. 숫자키 번호와 같다
         private readonly List<string> _groupOrder = new();
         // 펼친 그룹에 그려진 제한 시간 물류(Express·Fresh)의 남은 시간 바와, 행을 그릴 때의 시간 초과 여부
-        private readonly Dictionary<Parcel, (VisualElement fill, bool overdue)> _deadlineFills = new();
+        private readonly Dictionary<Parcel, (VisualElement fill, bool overdue, Label time)> _deadlineFills = new();
         // 그룹 헤더의 방향 표시(화살표·거리)와 그 목적지. 패널을 다시 그릴 때 채우고 회전·거리만 매 프레임 바꾼다
         private readonly List<(VisualElement arrow, Label distance, Transform destination)> _groupNavs = new();
         private LogisticsCenter _logisticsCenter;
@@ -193,12 +193,7 @@ namespace Game.UI
             {
                 if (keyboard[GroupToggleKeys[i]].wasPressedThisFrame)
                 {
-                    string group = _groupOrder[i];
-                    if (_expandedGroups.Remove(group) == false)
-                    {
-                        _expandedGroups.Add(group);
-                    }
-
+                    ToggleGroup(_groupOrder[i]);
                     changed = true;
                 }
             }
@@ -245,6 +240,15 @@ namespace Game.UI
             }
         }
 
+        // 숫자키와 헤더 클릭이 함께 쓰는 접기/펼치기. 호출한 쪽이 RefreshCargoPanel을 부른다
+        private void ToggleGroup(string group)
+        {
+            if (_expandedGroups.Remove(group) == false)
+            {
+                _expandedGroups.Add(group);
+            }
+        }
+
         private void LateUpdate()
         {
             if (_cargoList == null)
@@ -269,9 +273,15 @@ namespace Game.UI
 
             // 행은 적재 변화 때만 다시 그리므로 바 너비만 매 프레임 줄인다. 시간 초과가 새로 생기면 #지연 태그를 위해 한 번 다시 그린다
             bool overdueChanged = false;
-            foreach (KeyValuePair<Parcel, (VisualElement fill, bool overdue)> pair in _deadlineFills)
+            foreach (KeyValuePair<Parcel, (VisualElement fill, bool overdue, Label time)> pair in _deadlineFills)
             {
                 pair.Value.fill.style.width = Length.Percent(DeadlineRatio(pair.Key) * 100f);
+                // Fresh만 시간이 줄어든다. Express 만료 시각은 고정이다
+                if (pair.Key.IsFresh)
+                {
+                    pair.Value.time.text = LogisticsCenterUI.FormatDeadline(pair.Key, pair.Key.RemainingDeadline);
+                }
+
                 overdueChanged |= pair.Key.IsOverdue != pair.Value.overdue;
             }
 
@@ -432,6 +442,16 @@ namespace Game.UI
                     group.Q("keyLabel").RemoveFromHierarchy();
                 }
 
+                // 헤더 클릭은 UI Toolkit 이벤트라 차량·상호작용 입력(Input System)과 겹치지 않는다. 하루 종료 뒤에는 숫자키처럼 막는다
+                string clickedGroup = title;
+                group.Q("header").RegisterCallback<ClickEvent>(_ =>
+                {
+                    if (IsOperating())
+                    {
+                        ToggleGroup(clickedGroup);
+                        RefreshCargoPanel();
+                    }
+                });
                 group.Q<Label>("titleLabel").text = title;
                 group.Q<Label>("countLabel").text = $"×{members.Count}";
                 Label distance = group.Q<Label>("distanceLabel");
@@ -474,11 +494,14 @@ namespace Game.UI
                 VisualElement fill = row.Q("deadlineFill");
                 fill.EnableInClassList("parcel-deadline-fill--fresh", parcel.IsFresh);
                 fill.style.width = Length.Percent(DeadlineRatio(parcel) * 100f);
-                _deadlineFills[parcel] = (fill, parcel.IsOverdue);
+                row.Q("deadlineIcon").EnableInClassList("parcel-deadline-icon--fresh", parcel.IsFresh);
+                Label time = row.Q<Label>("deadlineTime");
+                time.text = LogisticsCenterUI.FormatDeadline(parcel, parcel.RemainingDeadline);
+                _deadlineFills[parcel] = (fill, parcel.IsOverdue, time);
             }
             else
             {
-                row.Q("deadline").RemoveFromHierarchy();
+                row.Q("deadlineRow").RemoveFromHierarchy();
             }
 
             CargoTrait traits = parcel.Cargo.Traits;
