@@ -543,6 +543,7 @@ GameObject:
   - component: {fileID: 8770054826105181128}
   - component: {fileID: 472918988908862580}
   - component: {fileID: 4793321953751983574}
+  - component: {fileID: 621518924466486434}
   m_Layer: 0
   m_Name: _BuildingBase
   m_TagString: Untagged
@@ -600,3 +601,21 @@ MonoBehaviour:
   _iconRoot: {fileID: 7482503864365142466}
   _iconTemplate: {fileID: 3103754721737183023}
   _loadedColor: {r: 0.549, g: 0.778, b: 0.961, a: 1}
+  _freshnessColor: {r: 0.45, g: 0.9, b: 0.55, a: 1}
+  _freshnessBarHeight: 0.2
+--- !u!114 &621518924466486434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7921091265164950644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d020a68e26be9a94fbbb20e17bfe8cb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.WorldObjects.InteractionZoneVisual
+  _zone: {fileID: 3094713446634511843}
+  _material: {fileID: 2100000, guid: a0d0b26d9f2d6e844b23defb81b0b95c, type: 2}
+  _color: {r: 0.4, g: 1, b: 0.45, a: 1}
+  _height: 0.8

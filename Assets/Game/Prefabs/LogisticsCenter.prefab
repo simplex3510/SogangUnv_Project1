@@ -2708,6 +2708,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7511964945133618591}
   - component: {fileID: 8215889534746015621}
+  - component: {fileID: 4363810417806729117}
   m_Layer: 0
   m_Name: LogisticsCenter
   m_TagString: Untagged
@@ -2749,6 +2750,22 @@ MonoBehaviour:
   _interactableZone: {fileID: 8376271112355349712}
   _ui: {fileID: 0}
   _uiOpenDuration: 1
+--- !u!114 &4363810417806729117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9124991714476953697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d020a68e26be9a94fbbb20e17bfe8cb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.WorldObjects.InteractionZoneVisual
+  _zone: {fileID: 8376271112355349712}
+  _material: {fileID: 2100000, guid: a0d0b26d9f2d6e844b23defb81b0b95c, type: 2}
+  _color: {r: 0.3, g: 0.8, b: 1, a: 1}
+  _height: 0.8
 --- !u!1 &9198721266791321092
 GameObject:
   m_ObjectHideFlags: 0
