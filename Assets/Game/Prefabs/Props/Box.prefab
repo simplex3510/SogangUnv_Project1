@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 9faea26ffd8c3774f830c940f8c3e5c2, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9faea26ffd8c3774f830c940f8c3e5c2, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9faea26ffd8c3774f830c940f8c3e5c2, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9faea26ffd8c3774f830c940f8c3e5c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -66,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 9faea26ffd8c3774f830c940f8c3e5c2, type: 3}
       propertyPath: m_Name
-      value: box (11)
+      value: Box
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -75,6 +75,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9faea26ffd8c3774f830c940f8c3e5c2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7165917753641988763}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9faea26ffd8c3774f830c940f8c3e5c2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2914625128932782169}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9faea26ffd8c3774f830c940f8c3e5c2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1892356710858557637}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9faea26ffd8c3774f830c940f8c3e5c2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4459107392267412625}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9faea26ffd8c3774f830c940f8c3e5c2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4695166040039552867}
   m_SourcePrefab: {fileID: 100100000, guid: 9faea26ffd8c3774f830c940f8c3e5c2, type: 3}
 --- !u!1 &2168190710835667587 stripped
 GameObject:
@@ -88,7 +100,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2168190710835667587}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1b06e5e93a38780448161cd517d924ae, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -102,3 +114,68 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.7150002, y: 0.71500003, z: 0.7150002}
   m_Center: {x: 0, y: 0.35750008, z: 0}
+--- !u!54 &2914625128932782169
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2168190710835667587}
+  serializedVersion: 5
+  m_Mass: 15
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &1892356710858557637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2168190710835667587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c55fbc2cd6d2af94ea15522edb62627f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.WorldObjects.ObstacleModule
+--- !u!114 &4459107392267412625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2168190710835667587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 915a227317b9b9c4e9a53f30050aae1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.WorldObjects.CollisionObstacleTrigger
+--- !u!114 &4695166040039552867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2168190710835667587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d8c81d300feda24fa3c36586238d1cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.WorldObjects.ObstacleLifetime
+  _mode: 1
+  _config: {fileID: 11400000, guid: 72bc01e2d60f1154fa67f87960c3b259, type: 2}

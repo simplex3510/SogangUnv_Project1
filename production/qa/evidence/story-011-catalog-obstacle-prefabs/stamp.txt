@@ -1,0 +1,17 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/WorldObjects/SwapMeshEffect.cs 1d688ecd67bc32d8acea5656cfe2d45b54b90db7
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/PlayerCargoImpactController.cs df684f98f86442bbf0e09dd2f00d597f87df239f
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/CargoImpactConfig.cs 78c06b7d08886c801ee6ffd597af0f974956da03
+Reviewed-Content-Hash: Assets/Game/Editor/ObstaclePrefabBuilder.cs 61d75f8d5c237f75209704af27f9508beffd142a
+Reviewed-Content-Hash: Assets/Game/Configs/Obstacles/ObstacleCone.asset b4d4e2eb8c52a6e7a2bf64560f29baf13af5e91b
+Reviewed-Content-Hash: Assets/Game/Configs/Obstacles/ObstacleBox.asset efc4acae118869c406a99f76e5fb36cf805d644d
+Reviewed-Content-Hash: Assets/Game/Configs/Obstacles/ObstacleDebrisS.asset e1ac723804c0aa4e0e3592cf60a59262e1cdc9ec
+Reviewed-Content-Hash: Assets/Game/Configs/Obstacles/ObstacleDebrisL.asset 131c4cbdf21ef7fb1c23b268e31340b49cb01815
+Reviewed-Content-Hash: Assets/Game/PhysicsMaterials/ObstacleNoBounce.asset edc45b9aa5a19b56b6105c42225538dbd28bc0c5
+Reviewed-Content-Hash: Assets/Game/Prefabs/Props/Cone.prefab 6bbd9934344a4001aa0bcd63fc7364e8e7c0269e
+Reviewed-Content-Hash: Assets/Game/Prefabs/Props/Box.prefab cf2fc18a99963726b2cb15c0f2d183f55be6085b
+Reviewed-Content-Hash: Assets/Game/Prefabs/Props/Dumpster.prefab 99e47bf5a5248e5eac647c33d8c7cae48d92c2fc
+Reviewed-Content-Hash: Assets/Game/Prefabs/Props/DebrisS.prefab e9ec6db6f36dd2ec1f2b07aac1cb7d3c8b2a5ba8
+Reviewed-Content-Hash: Assets/Game/Prefabs/Props/DebrisL.prefab fa0405fbfc9832ce7aa83ede8c67ecb58a027ff4
+Reviewed-Content-Hash: Assets/Game/Prefabs/Props/Roadwork.prefab 131f49296a19a4d77fea183e83e4ba0c266681d4
+Reviewed-Content-Hash: Assets/Game/Prefabs/Props/RoadSign.prefab 723a1c7094b761c7a1be98d1ff7ef7f9e582c661
+Reviewed-Content-Hash: Assets/Game/Prefabs/Props/OverheadWires.prefab e98b9c8a2b7201673b1065914b73d631b05b0c7b

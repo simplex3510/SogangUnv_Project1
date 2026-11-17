@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 1.875, y: 1.875, z: 1.875}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8971387557847131732}
@@ -41,7 +41,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1767790940691436614}
-  m_Mesh: {fileID: -6975138644988533352, guid: 95939c9f741beae4fb570830662391db, type: 3}
+  m_Mesh: {fileID: -4432124805086160128, guid: 5f758076cdf6b6b4c84269b007c590b4, type: 3}
 --- !u!23 &8785550925794687446
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -67,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6538903991835684241, guid: 95939c9f741beae4fb570830662391db, type: 3}
+  - {fileID: -6538903991835684241, guid: 5f758076cdf6b6b4c84269b007c590b4, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -98,7 +98,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1767790940691436614}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1b06e5e93a38780448161cd517d924ae, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -110,9 +110,9 @@ MeshCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: -6975138644988533352, guid: 95939c9f741beae4fb570830662391db, type: 3}
+  m_Mesh: {fileID: -4432124805086160128, guid: 5f758076cdf6b6b4c84269b007c590b4, type: 3}
 --- !u!1 &6852537010684076890
 GameObject:
   m_ObjectHideFlags: 0
@@ -122,6 +122,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8971387557847131732}
+  - component: {fileID: 3702555317833431992}
+  - component: {fileID: 3864549341010194947}
+  - component: {fileID: 6688964854774019585}
+  - component: {fileID: 4314604334426952029}
+  - component: {fileID: 621814522712673960}
+  - component: {fileID: 3586726106338564351}
   m_Layer: 0
   m_Name: Cone
   m_TagString: Untagged
@@ -145,3 +151,95 @@ Transform:
   - {fileID: 7728441162655653808}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &3702555317833431992
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6852537010684076890}
+  serializedVersion: 5
+  m_Mass: 5
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &3864549341010194947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6852537010684076890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c55fbc2cd6d2af94ea15522edb62627f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.WorldObjects.ObstacleModule
+--- !u!114 &6688964854774019585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6852537010684076890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 915a227317b9b9c4e9a53f30050aae1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.WorldObjects.CollisionObstacleTrigger
+--- !u!114 &4314604334426952029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6852537010684076890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d8c81d300feda24fa3c36586238d1cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.WorldObjects.ObstacleLifetime
+  _mode: 1
+  _config: {fileID: 11400000, guid: ffb8f5792c261d243a48c502dc89621a, type: 2}
+--- !u!114 &621814522712673960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6852537010684076890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93dc530c56eda7e4a84c830fe9226873, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.WorldObjects.SpeedMultiplierEffect
+  _config: {fileID: 11400000, guid: ffb8f5792c261d243a48c502dc89621a, type: 2}
+--- !u!114 &3586726106338564351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6852537010684076890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25f557e19d25fd24d89ef5667e0cd61d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.WorldObjects.SwapMeshEffect
+  _config: {fileID: 0}
+  _swappedMesh: {fileID: 8476337139298378336, guid: a9f46a2e89e105b40b91b726f4d8ab72, type: 3}

@@ -18,7 +18,11 @@ namespace Game.Player.Interaction
         [Tooltip("감소 후 추가 감소를 막는 시간(초)")]
         [SerializeField, Min(0f)] private float _impactCooldown = 0.5f; // TODO(tuning)
 
+        [Tooltip("충돌 시작 후 접촉 유지 충격량까지 합산하는 판정 창(초). 고정물 충돌의 충격이 여러 물리 스텝에 나뉘어 들어오는 것을 모은다")]
+        [SerializeField, Min(0f)] private float _impactWindow = 0.06f; // TODO(tuning)
+
         public float ImpactThreshold => _impactThreshold;
+        public float ImpactWindow => _impactWindow;
         public float DamagePerVelocity => _damagePerVelocity;
         public float MaxDamagePerImpact => _maxDamagePerImpact;
         public float ImpactCooldown => _impactCooldown;

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7017801467398049005}
   - component: {fileID: 2961358478498590733}
   - component: {fileID: 7147589874761195824}
-  - component: {fileID: 8248412371947308675}
+  - component: {fileID: 5588290917758049960}
   m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
@@ -93,14 +93,14 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &8248412371947308675
-MeshCollider:
+--- !u!65 &5588290917758049960
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3384140398350068533}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1b06e5e93a38780448161cd517d924ae, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -111,10 +111,9 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -6836397680486811369, guid: 0bbaff5cdb439ea4ea907f60dd673605, type: 3}
+  serializedVersion: 3
+  m_Size: {x: 0.27500004, y: 0.20609239, z: 0.37000012}
+  m_Center: {x: -0.0075000003, y: 0.10304619, z: 0.00000011175871}
 --- !u!1 &5168854640211608654
 GameObject:
   m_ObjectHideFlags: 0
@@ -126,7 +125,6 @@ GameObject:
   - component: {fileID: 7403965403860010571}
   - component: {fileID: 1068397498782962557}
   - component: {fileID: 3936735773206100242}
-  - component: {fileID: 7740428280766985385}
   m_Layer: 0
   m_Name: lid-left
   m_TagString: Untagged
@@ -206,28 +204,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7740428280766985385
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5168854640211608654}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -6307755552648368233, guid: 0bbaff5cdb439ea4ea907f60dd673605, type: 3}
 --- !u!1 &7081361666333369497
 GameObject:
   m_ObjectHideFlags: 0
@@ -239,7 +215,6 @@ GameObject:
   - component: {fileID: 51434562371203701}
   - component: {fileID: 1234909515441050552}
   - component: {fileID: 6973119745566714497}
-  - component: {fileID: 3013241848537606446}
   m_Layer: 0
   m_Name: lid-right
   m_TagString: Untagged
@@ -319,28 +294,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3013241848537606446
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7081361666333369497}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -5718032629216181097, guid: 0bbaff5cdb439ea4ea907f60dd673605, type: 3}
 --- !u!1 &7987000647273863906
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,6 +303,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5206173300312875296}
+  - component: {fileID: 8786711782673534175}
   m_Layer: 0
   m_Name: Dumpster
   m_TagString: Untagged
@@ -373,3 +327,30 @@ Transform:
   - {fileID: 7017801467398049005}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &8786711782673534175
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7987000647273863906}
+  serializedVersion: 5
+  m_Mass: 80
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
