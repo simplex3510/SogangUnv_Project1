@@ -14,6 +14,17 @@ namespace Game.Player.Interaction
     [DefaultExecutionOrder(300)]
     public class PlayerInteractionController : MonoBehaviour, IInteractor
     {
+        /// <summary>적재 한도 초과로 상차할 수 없을 때의 차단 사유.</summary>
+        public const string CargoFullReason = "적재 초과";
+        /// <summary>무게 한도 초과로 상차할 수 없을 때의 차단 사유. LogisticsCenterUI도 이 값과 비교한다.</summary>
+        public const string WeightLimitReason = "무게 초과";
+        /// <summary>배송지에 내릴 물류가 없을 때의 차단 사유.</summary>
+        public const string NoParcelForTargetReason = "이 배송지로 갈 물류 없음";
+        /// <summary>처분할 상한 물류가 없을 때의 차단 사유.</summary>
+        public const string NoParcelToDisposeReason = "처분할 물류 없음";
+        /// <summary>물류센터에 실을 물류가 없을 때의 차단 사유.</summary>
+        public const string NoParcelToLoadReason = "실을 물류 없음";
+
         [Header("Interact Input")]
         [SerializeField] private InputActionReference _interactionInput;
 
@@ -137,12 +148,12 @@ namespace Game.Player.Interaction
         {
             if (UsedCapacity + parcel.Cargo.CapacityUsage > CargoCapacity)
             {
-                return "CARGO FULL";
+                return CargoFullReason;
             }
 
             if (UsedWeight + parcel.Cargo.WeightUsage > MaxWeight)
             {
-                return "WEIGHT LIMIT";
+                return WeightLimitReason;
             }
 
             return null;
@@ -173,6 +184,23 @@ namespace Game.Player.Interaction
             {
                 // 한도가 0이 되어 아무것도 실을 수 없으므로 배선 누락을 바로 알린다
                 Debug.LogError($"VehicleCargoConfig is not assigned in {gameObject.name}");
+            }
+        }
+
+        private void Start()
+        {
+            // 적재한 Fresh의 신선도 0도 내구도 0과 같은 폐기 경로를 쓴다(기획서 11.6). 시스템 Awake 순서에 의존하지 않으려고 Start에서 구독한다
+            if (DeliveryDeadlineSystem.Instance != null)
+            {
+                DeliveryDeadlineSystem.Instance.FreshnessDepleted += SpoilParcel;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (DeliveryDeadlineSystem.Instance != null)
+            {
+                DeliveryDeadlineSystem.Instance.FreshnessDepleted -= SpoilParcel;
             }
         }
 
@@ -563,12 +591,12 @@ namespace Game.Player.Interaction
             if (interactable is DeliveryTarget target
                 && _loadedParcels.Exists(parcel => parcel.IsDeliverableTo(target)) == false)
             {
-                return "NO PARCEL FOR THIS TARGET";
+                return NoParcelForTargetReason;
             }
 
             if (interactable is DisposalSite && _loadedParcels.Exists(parcel => parcel.IsSpoiled) == false)
             {
-                return "NO PARCEL TO DISPOSE";
+                return NoParcelToDisposeReason;
             }
 
             if (interactable is LogisticsCenter center)
@@ -581,7 +609,7 @@ namespace Game.Player.Interaction
                     Debug.LogWarning($"Parcel #{head.Id} weight {head.Cargo.WeightUsage} exceeds W_max {MaxWeight}; it can never be loaded");
                 }
 
-                return head != null ? GetLoadBlockReason(head) ?? "NO PARCELS TO LOAD" : "NO PARCELS TO LOAD";
+                return head != null ? GetLoadBlockReason(head) ?? NoParcelToLoadReason : NoParcelToLoadReason;
             }
 
             return null;
@@ -639,7 +667,7 @@ namespace Game.Player.Interaction
             _hasExplicitSelection = false;
             _isLoadRequested = false;
             // 개별 한도는 아니고 그룹 상차의 W 초과로 멈춘 경우도 WEIGHT LIMIT로 알린다
-            InteractionBlocked?.Invoke(GetLoadBlockReason(next) ?? "WEIGHT LIMIT");
+            InteractionBlocked?.Invoke(GetLoadBlockReason(next) ?? WeightLimitReason);
             return true;
         }
 
@@ -721,6 +749,8 @@ namespace Game.Player.Interaction
             if (_currentInteractable is LogisticsCenter center && center.TryTakeParcel(parcel))
             {
                 parcel.Status = ParcelStatus.Loaded;
+                // 상차 완료 시점부터 줄어드는 유형(Fresh)의 기준 시각
+                parcel.LoadCompletionTime = Game.Systems.GameTimeSystem.Instance.CurrentSeconds;
                 _loadedParcels.Add(parcel);
                 _loadSelection.Remove(parcel);
                 _loadedInHold++;
@@ -760,6 +790,8 @@ namespace Game.Player.Interaction
 
         private void DeliverParcel(Parcel parcel, DeliveryTarget target)
         {
+            // 신선도 보상은 하차 완료 시점의 남은 신선도로 확정한다(기획서 14.2)
+            parcel.SettleFreshBonus();
             parcel.Status = ParcelStatus.Delivered;
             RecomputeSpeedMultiplier();
             target.NotifyParcelChanged(parcel);

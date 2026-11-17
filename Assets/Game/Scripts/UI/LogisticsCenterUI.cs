@@ -20,7 +20,6 @@ namespace Game.UI
         private const string HoldingClass = "lc-holding";
         private const string DisabledClass = "lc-disabled";
         private const string TargetClass = "lc-row--target";
-        private const string WeightLimitReason = "WEIGHT LIMIT";
         private const string DisposalTitle = "처분 장소";
 
         [SerializeField] private LogisticsCenter _center;
@@ -397,12 +396,14 @@ namespace Game.UI
 
             VisualElement row = AddElement(card, "lc-row");
             VisualElement main = AddElement(row, "lc-row-main");
-            AddElement(main, "parcel-icon").EnableInClassList("parcel-icon--express", parcel.Type == DeliveryType.Express);
+            VisualElement icon = AddElement(main, "parcel-icon");
+            icon.EnableInClassList("parcel-icon--express", parcel.Type == DeliveryType.Express);
+            icon.EnableInClassList("parcel-icon--fresh", parcel.IsFresh);
 
             VisualElement info = AddElement(main, "parcel-info");
             DeliveryReward reward = parcel.Reward;
             // 제한 시간 안에 배송했을 때 받는 금액(적재 HUD와 같은 식)
-            Label price = AddLabel(info, "parcel-price", $"{reward.BaseFee + reward.DistanceFee + reward.TimeBonus + reward.TraitBonus:#,0}₩");
+            Label price = AddLabel(info, "parcel-price", $"{reward.BaseFee + reward.DistanceFee + reward.TimeBonus + reward.TraitBonus + reward.FreshBonusMax:#,0}₩");
             // 상차하면 W를 넘지만 W_max 이내인 행은 경고색으로 두되 누를 수 있게 둔다(6.4)
             price.EnableInClassList("lc-price--warning", isDisabled == false && _controller != null && _controller.WouldExceedWeightCapacity(parcel));
 
@@ -425,7 +426,7 @@ namespace Game.UI
 
             if (isDisabled)
             {
-                bool isWeight = _controller != null && _controller.GetLoadBlockReason(parcel) == WeightLimitReason;
+                bool isWeight = _controller != null && _controller.GetLoadBlockReason(parcel) == PlayerInteractionController.WeightLimitReason;
                 AddLabel(tags, "tag-chip", isWeight ? "#무게 초과" : "#적재 초과").AddToClassList("tag-chip--blocked");
             }
 
@@ -436,8 +437,11 @@ namespace Game.UI
                 VisualElement fill = AddElement(AddElement(deadline, "lc-bar"), "lc-bar-fill");
                 fill.style.width = Length.Percent(DeadlineRatio(parcel) * 100f);
                 _parcelFills[parcel] = fill;
-                // 남은 시간이 아니라 생성 시점에 확정된 만료 시각(게임 시계)을 보여 준다
-                AddLabel(deadline, "lc-deadline-time", FormatClock(parcel.CreationTime + parcel.Deadline));
+                // 남은 시간이 아니라 생성 시점에 확정된 만료 시각(게임 시계)을 보여 준다. Fresh는 대기 중 줄지 않으므로 신선도 총량(m:ss)을 보여 준다
+                string deadlineText = parcel.IsFresh
+                    ? $"↻{Mathf.FloorToInt(parcel.Deadline) / 60}:{Mathf.FloorToInt(parcel.Deadline) % 60:00}"
+                    : FormatClock(parcel.CreationTime + parcel.Deadline);
+                AddLabel(deadline, "lc-deadline-time", deadlineText);
             }
 
             _parcelRows[parcel] = row;

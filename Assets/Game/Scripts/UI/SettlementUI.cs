@@ -11,6 +11,8 @@ namespace Game.UI
     /// <summary>하루 정산 화면. 요약과 항목별 상세 내역을 한 화면에 표시한다(기획서 12.2).</summary>
     public class SettlementUI : MonoBehaviour
     {
+        private const string AmountColumnEm = "10";
+
         [SerializeField] private GameObject _panel;
         [SerializeField] private TMP_Text _finalLabel;
         [SerializeField] private TMP_Text _summaryLabel;
@@ -55,39 +57,34 @@ namespace Game.UI
 
         private void Show(SettlementSystem.SettlementResult result)
         {
-            _finalLabel.text = $"FINAL  {result.FinalAmount:0}";
+            _finalLabel.text = $"최종  {result.FinalAmount:0}";
             _finalLabel.color = result.FinalAmount < 0f ? _lossColor : Color.white;
             // 별점은 SettlementSystem이 판정한다. 여기서는 표시만 한다
             string starText = result.Stars.HasValue
-                ? $"STARS {result.Stars.Value}"
-                : "NO PARCELS TO RATE";
-            // 요약 라벨 높이에 맞춰 2줄로 둔다(3줄이면 FINAL 라벨과 겹친다)
-            _summaryLabel.text = $"{starText}      SUCCESS {result.SuccessCount} / TOTAL {result.TotalCount}\nDELIVERED {result.DeliveredCount}      FAILED {result.FailedCount}";
+                ? $"별점 {result.Stars.Value}"
+                : "평가할 물류 없음";
+            // 요약 라벨 높이에 맞춰 2줄로 둔다(3줄이면 최종 라벨과 겹친다)
+            _summaryLabel.text = $"{starText}      성공 {result.SuccessCount} / 전체 {result.TotalCount}\n배송 완료 {result.DeliveredCount}      실패 {result.FailedCount}";
 
             _builder.Clear();
 
-            // 기본 폰트는 비례폭이므로 고정폭 태그로 감싸 항목명과 금액의 열을 맞춘다
-            _builder.Append("<mspace=0.62em>");
-            AppendLine("BASE FEE", result.BaseFeeTotal);
-            AppendLine("DISTANCE FEE", result.DistanceFeeTotal);
-            AppendLine("TIME BONUS", result.TimeBonusEarned);
-            AppendLine("TIME BONUS MISSED", -result.TimeBonusMissed);
-            AppendLine("TRAIT BONUS", result.TraitBonusTotal);
-            AppendLine("LATE LOSS", -result.LateLoss);
-            AppendLine("FAILURE PENALTY", -result.FailurePenalty);
-            _builder.Append("</mspace>");
+            AppendLine("기본 요금", result.BaseFeeTotal);
+            AppendLine("거리 요금", result.DistanceFeeTotal);
+            AppendLine("시간 보너스", result.TimeBonusEarned);
+            AppendLine("시간 보너스 놓침", -result.TimeBonusMissed);
+            AppendLine("특성 보너스", result.TraitBonusTotal);
+            AppendLine("신선 보너스", result.FreshBonusTotal);
+            AppendLine("지각 손실", -result.LateLoss);
+            AppendLine("실패 페널티", -result.FailurePenalty);
             _detailsLabel.text = _builder.ToString();
 
             _panel.SetActive(true);
-
-            // 정산 화면은 조작이 없으므로 커서를 풀어 둔다
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
         }
 
         private void AppendLine(string label, float amount)
         {
-            _builder.Append(label.PadRight(22)).Append(amount.ToString("+0;-0;0")).Append('\n');
+            // 폭이 다른 한글·숫자가 섞여도 금액 열이 맞도록 <pos>로 열 시작 위치를 고정한다(가장 긴 항목명 약 8.5em)
+            _builder.Append(label).Append("<pos=").Append(AmountColumnEm).Append("em>").Append(amount.ToString("+0;-0;0")).Append('\n');
         }
     }
 }
