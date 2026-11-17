@@ -232,7 +232,12 @@ namespace Game.UI.Hud
 
         private void ClearAll()
         {
-            _stack?.Clear();
+            // 리로드 직후 이전 트리는 이미 해제돼 Clear하면 예외가 난다. 패널에 붙어 있을 때만 지운다
+            if (_stack?.panel != null)
+            {
+                _stack.Clear();
+            }
+
             _labels.Clear();
             _queue.Clear();
         }

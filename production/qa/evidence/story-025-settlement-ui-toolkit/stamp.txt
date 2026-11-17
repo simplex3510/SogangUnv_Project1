@@ -1,0 +1,7 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/SettlementUI.cs a57eb5935cdfae872095f2bfda0ccfb8c9f51d49
+Reviewed-Content-Hash: Assets/Game/UI/Settlement/SettlementWindow.uxml 3d96735e615f6f42db80e164dea8746b555bde8e
+Reviewed-Content-Hash: Assets/Game/UI/Settlement/SettlementWindow.uss ba63b932f0d5bdc089a16ee30b07d4dbea04142a
+Reviewed-Content-Hash: Assets/Game/UI/Settlement/SettlementRow.uxml 279f443310fa2922edd397459a2881ac48c401d6
+Reviewed-Content-Hash: Assets/Game/UI/Settlement/SettlementPanelSettings.asset a3490fbb4fa823f3fbe1502658124eb45514fe9a
+Reviewed-Content-Hash: Assets/Game/Scenes/_DevOnly/DevScene.unity 7b8ffbae8d54d2d587988e1ef2dbfb3e0f504e0b
+Reviewed-Content-Hash: Assets/Game/Scenes/_DevOnly/SampleMapDesign.unity 98a58fb421baf740e8c26cb625c28072a7d1c65d

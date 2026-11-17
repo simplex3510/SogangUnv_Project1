@@ -1,0 +1,73 @@
+/* 임시 GUI(Story 025). 팔레트는 StatusHud·물류센터 창과 같은 슬레이트 */
+.settlement-root {
+    --settlement-loss-color: rgb(242, 102, 89);
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: rgb(255, 255, 255);
+    -unity-font-definition: url("../Hud/MalgunGothicDynamic.asset");
+}
+
+.settlement-root--hidden {
+    display: none;
+}
+
+.settlement-card {
+    width: 700px;
+    height: 560px;
+    padding: 28px 40px 24px 40px;
+    background-color: rgba(38, 44, 54, 0.96);
+    border-width: 3px;
+    border-color: rgb(78, 88, 104);
+    border-radius: 18px;
+}
+
+.settlement-final {
+    font-size: 48px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.settlement-final--loss {
+    color: var(--settlement-loss-color);
+}
+
+.settlement-summary {
+    margin-top: 8px;
+    font-size: 22px;
+    color: rgb(215, 222, 232);
+    -unity-text-align: middle-center;
+    white-space: normal;
+}
+
+.settlement-divider {
+    height: 2px;
+    margin: 16px 0 12px 0;
+    background-color: rgb(78, 88, 104);
+}
+
+.settlement-details {
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+.settlement-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settlement-row-name {
+    font-size: 24px;
+}
+
+.settlement-row-amount {
+    font-size: 24px;
+    -unity-text-align: middle-right;
+    min-width: 120px;
+}

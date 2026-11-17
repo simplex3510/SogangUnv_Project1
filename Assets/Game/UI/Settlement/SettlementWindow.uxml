@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="SettlementWindow.uss" />
+    <ui:Template name="SettlementRow" src="SettlementRow.uxml" />
+    <!-- 정산 화면은 SettlementPanelSettings(Sort Order 100)로 그린다: HUD 0, 물류센터 창 10, 상호작용 패널·토스트보다 항상 앞에 오도록 가장 크게 둔다 -->
+    <ui:VisualElement name="settlementRoot" class="settlement-root settlement-root--hidden" picking-mode="Position">
+        <ui:VisualElement class="settlement-card">
+            <ui:Label name="finalLabel" class="settlement-final" text="최종  0" />
+            <ui:Label name="summaryLabel" class="settlement-summary" text="별점 3      성공 0 / 전체 0&#10;배송 완료 0      실패 0" />
+            <ui:VisualElement class="settlement-divider" />
+            <ui:VisualElement name="detailList" class="settlement-details">
+                <ui:Instance template="SettlementRow" name="sample" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

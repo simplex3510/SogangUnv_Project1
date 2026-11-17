@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="SettlementWindow.uss" />
+    <ui:VisualElement name="row" class="settlement-row" picking-mode="Ignore">
+        <ui:Label name="nameLabel" class="settlement-row-name" picking-mode="Ignore" text="기본 요금" />
+        <ui:Label name="amountLabel" class="settlement-row-amount" picking-mode="Ignore" text="+0" />
+    </ui:VisualElement>
+</ui:UXML>
