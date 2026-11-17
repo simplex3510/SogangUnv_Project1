@@ -438,10 +438,14 @@ namespace Game.UI
                 fill.style.width = Length.Percent(DeadlineRatio(parcel) * 100f);
                 _parcelFills[parcel] = fill;
                 // 남은 시간이 아니라 생성 시점에 확정된 만료 시각(게임 시계)을 보여 준다. Fresh는 대기 중 줄지 않으므로 신선도 총량(m:ss)을 보여 준다
+                if (parcel.IsFresh)
+                {
+                    AddElement(deadline, "lc-deadline-icon");
+                }
                 string deadlineText = parcel.IsFresh
-                    ? $"↻{Mathf.FloorToInt(parcel.Deadline) / 60}:{Mathf.FloorToInt(parcel.Deadline) % 60:00}"
+                    ? $"{Mathf.FloorToInt(parcel.Deadline) / 60}:{Mathf.FloorToInt(parcel.Deadline) % 60:00}"
                     : FormatClock(parcel.CreationTime + parcel.Deadline);
-                AddLabel(deadline, "lc-deadline-time", deadlineText);
+                AddLabel(deadline, "lc-deadline-time", deadlineText).EnableInClassList("lc-deadline-time--icon", parcel.IsFresh);
             }
 
             _parcelRows[parcel] = row;

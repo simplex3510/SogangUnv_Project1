@@ -230,6 +230,19 @@
     color: rgb(215, 222, 232);
 }
 
+/* Fresh 신선도 총량 앞의 새로고침 아이콘. 크기는 글자(13px)에 맞춘다. TODO(tuning) */
+.lc-deadline-icon {
+    width: 13px;
+    height: 13px;
+    margin-left: 8px;
+    background-image: url("../Icons/arrow-clockwise.svg");
+    -unity-background-image-tint-color: rgb(215, 222, 232);
+}
+
+.lc-deadline-time--icon {
+    margin-left: 3px;
+}
+
 /* 누르고 있으면 상차하는 행·헤더. 올리면 밝은 배경과 테두리로 강조, 헤더에 올리면 그룹 행도 함께(lc-row--target) */
 .lc-row,
 .lc-card-header {

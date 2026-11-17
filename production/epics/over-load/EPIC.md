@@ -31,3 +31,8 @@
 | 020 | 표시 문구 한글 통일 | UI | Complete | N/A (minimal) |
 | 021 | 토스트 알림 | UI | Complete | N/A (minimal) |
 | 022 | 플레이어 상호작용 UI의 UI Toolkit 전환 | UI | Complete | N/A (minimal) |
+| 023 | 물류센터 행 ↻ 기호를 SVG 아이콘으로 교체 | UI | Complete | N/A (minimal) |
+| 024 | 동적으로 만드는 UI 요소를 UXML 템플릿으로 분리 | UI | Ready | N/A (minimal) |
+| 025 | 정산 화면 UI Toolkit 전환 + 최상단 노출 | UI | Ready | N/A (minimal) |
+| 026 | 배송지·처분장 월드 아이콘 UI Toolkit 전환 + Fresh 색 | UI | Ready | N/A (minimal) |
+| 027 | 남은 Canvas UI 정리 (HoldInteractButton, GameTimeHUD) | UI | Ready | N/A (minimal) |
