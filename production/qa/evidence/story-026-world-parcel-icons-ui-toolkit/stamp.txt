@@ -1,0 +1,6 @@
+Reviewed-Content-Hash: Assets/Game/UI/Hud/WorldParcelIconsHud.cs effccd001a7a2038621a411e4a502795699a9ee3
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DeliveryTargetParcelUI.cs 0cb1a5f852252b970a3d2267776d2397a6ce7666
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DisposalSiteParcelUI.cs 66caac4f6fc8c664839b4460464392df36689036
+Reviewed-Content-Hash: Assets/Game/UI/Hud/WorldParcelIcons.uss d34d8d1d603d4391e8b46ee3b54c6bbcc1b72b65
+Reviewed-Content-Hash: Assets/Game/UI/Hud/ParcelIcon.uss 214382dac823f340980764bc1db93b1ebc3b7c97
+Reviewed-Content-Hash: Assets/Game/UI/Hud/DurabilityHud.uss 957623b9f523c93ffa68fb6b2b9ae28b93a548d0

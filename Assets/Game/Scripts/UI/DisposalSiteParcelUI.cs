@@ -1,10 +1,8 @@
-using System.Collections.Generic;
-
 using UnityEngine;
-using UnityEngine.UI;
 
 using Game.Logistics;
 using Game.Player.Interaction;
+using Game.UI.Hud;
 
 namespace Game.UI
 {
@@ -12,34 +10,24 @@ namespace Game.UI
     [RequireComponent(typeof(DisposalSite))]
     public class DisposalSiteParcelUI : MonoBehaviour
     {
-        [SerializeField] private RectTransform _iconRoot;
-        [SerializeField] private Image _iconTemplate;
-        [SerializeField] private Color _iconColor = new(0.9f, 0.4f, 0.3f, 1f);
+        [Tooltip("처분 장소 기준 아이콘 묶음 하단 위치(월드 m)")]
+        [SerializeField] private Vector3 _iconOffset = new(0f, 1f, 0f); // TODO(tuning)
 
         private PlayerInteractionController _controller;
-        private readonly List<Image> _icons = new();
-
-        private void Awake()
-        {
-            if (_iconRoot == null || _iconTemplate == null)
-            {
-                Debug.LogError($"Parcel icon references are missing in {gameObject.name}");
-                enabled = false;
-                return;
-            }
-
-            _iconTemplate.gameObject.SetActive(false);
-        }
+        private WorldParcelIconsHud.IconGroup _group;
 
         private void Start()
         {
             _controller = FindAnyObjectByType<PlayerInteractionController>();
-            if (_controller == null)
+            WorldParcelIconsHud hud = WorldParcelIconsHud.Instance;
+            if (_controller == null || hud == null)
             {
-                Debug.LogError("PlayerInteractionController is missing in the scene");
+                Debug.LogError("PlayerInteractionController or WorldParcelIconsHud is missing in the scene");
+                enabled = false;
                 return;
             }
 
+            _group = hud.AddGroup(transform, _iconOffset);
             _controller.LoadedParcelsChanged += OnLoadedParcelsChanged;
             Refresh();
         }
@@ -49,6 +37,11 @@ namespace Game.UI
             if (_controller != null)
             {
                 _controller.LoadedParcelsChanged -= OnLoadedParcelsChanged;
+            }
+
+            if (_group != null && WorldParcelIconsHud.Instance != null)
+            {
+                WorldParcelIconsHud.Instance.RemoveGroup(_group);
             }
         }
 
@@ -60,28 +53,16 @@ namespace Game.UI
         private void Refresh()
         {
             int count = 0;
-            IReadOnlyList<Parcel> loaded = _controller.LoadedParcels;
+            var loaded = _controller.LoadedParcels;
             for (int i = 0; i < loaded.Count; i++)
             {
-                if (loaded[i].IsSpoiled == false)
+                if (loaded[i].IsSpoiled)
                 {
-                    continue;
+                    _group.SetIcon(count++, loaded[i].Type, true, false, -1f);
                 }
-
-                while (_icons.Count <= count)
-                {
-                    Image icon = Instantiate(_iconTemplate, _iconRoot);
-                    icon.color = _iconColor;
-                    _icons.Add(icon);
-                }
-
-                _icons[count++].gameObject.SetActive(true);
             }
 
-            for (int i = count; i < _icons.Count; i++)
-            {
-                _icons[i].gameObject.SetActive(false);
-            }
+            _group.HideFrom(count);
         }
     }
 }

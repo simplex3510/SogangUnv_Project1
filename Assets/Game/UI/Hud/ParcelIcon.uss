@@ -1,0 +1,22 @@
+/* 배송 유형 아이콘 공용(적재 패널 행 + 월드 아이콘). Bootstrap Icons box-seam-fill(MIT), 색으로 유형 구분(임시 2026-11-17: Normal 노랑, Express 빨강, Fresh 초록, 폐기 어두운 회색) */
+.parcel-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+    background-image: url("../Icons/box-seam-fill.svg");
+    -unity-background-image-tint-color: rgb(222, 175, 95);
+}
+
+.parcel-icon--express {
+    -unity-background-image-tint-color: rgb(240, 90, 95);
+}
+
+.parcel-icon--fresh {
+    -unity-background-image-tint-color: rgb(84, 217, 140);
+}
+
+/* 폐기 행은 반투명이라 너무 어두우면 사라지므로 회검정보다 약간 밝게 */
+.parcel-icon--spoiled {
+    -unity-background-image-tint-color: rgb(85, 88, 95);
+}

@@ -1,0 +1,43 @@
+/* 월드 물류 아이콘(Story 026). 배송지·처분장 위에 뜨는 아이콘 묶음. 위치(left/top)는 C#이 매 프레임 정한다 */
+.world-icons-hud {
+    --world-icon-size: 40px;   /* TODO(tuning) */
+    flex-grow: 1;
+}
+
+.world-icon-group {
+    position: absolute;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 180px;
+    translate: -50% -100%;
+}
+
+.world-icon {
+    width: var(--world-icon-size);
+    height: var(--world-icon-size);
+    margin: 1px 1px 10px 1px;
+}
+
+/* 적재 중인 물류: 유형 색 위에 테두리로 구분 */
+.world-icon--loaded {
+    border-width: 2px;
+    border-color: rgb(140, 198, 245);
+    border-radius: 6px;
+}
+
+.world-icon .parcel-icon {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.world-icon-bar {
+    position: absolute;
+    left: 0;
+    bottom: -9px;
+    height: 8px;
+    border-width: 1px;
+    border-color: rgb(20, 40, 28);
+    background-color: rgb(84, 217, 140);
+}

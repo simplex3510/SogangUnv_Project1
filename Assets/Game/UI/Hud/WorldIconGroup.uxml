@@ -1,0 +1,3 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="group" class="world-icon-group" picking-mode="Ignore" />
+</ui:UXML>
