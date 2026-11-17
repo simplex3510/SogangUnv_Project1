@@ -65,6 +65,9 @@ namespace Game.Player.Interaction
         /// <summary>현재 상호작용의 진행도(0~1). 진행 중이 아니면 isActive=false로 발생한다.</summary>
         public event Action<float, bool> InteractionProgressChanged;
 
+        /// <summary>현재 대상이 처분 장소인지. 처분 장소도 종류는 Unload라서 폐기 아이콘 구분용으로 읽는다.</summary>
+        public bool IsTargetDisposalSite => _currentInteractable is DisposalSite;
+
         public event Action<Parcel> LoadedParcelsChanged;
 
         /// <summary>적재 물류가 폐기로 전환될 때 발생한다(원인 무관, 기획서 11.6). 폐기 알림 표시에 사용한다.</summary>

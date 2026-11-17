@@ -1,0 +1,92 @@
+/* 임시 GUI(Story 022). StatusHud와 같은 슬레이트 팔레트·한글 폰트 */
+
+/* ── 설정: 색·크기는 여기 변수만 고친다. 플레이어 기준 좌우 오프셋은 PlayerInteractionHud 컴포넌트 Inspector ── */
+.interaction-hud {
+    --key-panel-bg: rgba(38, 44, 54, 0.92);
+    --key-panel-border: rgb(78, 88, 104);
+    --key-fill-color: rgba(78, 120, 180, 0.85);        /* TODO(tuning) */
+    --recovery-fill-color: rgba(200, 150, 60, 0.85);   /* TODO(tuning) */
+    --key-panel-width: 72px;                           /* TODO(tuning) */
+    --key-panel-height: 88px;                          /* TODO(tuning) */
+    --recovery-panel-width: 56px;                      /* TODO(tuning) */
+    --key-icon-size: 32px;                             /* TODO(tuning) */
+
+    flex-grow: 1;
+    color: rgb(255, 255, 255);
+    -unity-font-definition: url("MalgunGothicDynamic.asset");
+}
+
+/* 위치(left/top)는 C#이 매 프레임 플레이어 화면 위치로 정한다. 패널 중심 높이를 맞추려 translate로 절반만큼 올린다 */
+.key-panel {
+    position: absolute;
+    height: var(--key-panel-height);
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: var(--key-panel-bg);
+    border-width: 3px;
+    border-color: var(--key-panel-border);
+    border-radius: 14px;
+}
+
+.key-panel--hidden {
+    display: none;
+}
+
+.interaction-panel {
+    width: var(--key-panel-width);
+    translate: 0 -50%;
+}
+
+/* 복구 패널은 플레이어 왼쪽에 놓으므로 자기 너비만큼 왼쪽으로 민다 */
+.recovery-panel {
+    width: var(--recovery-panel-width);
+    translate: -100% -50%;
+}
+
+/* 진행도 채움: 아래에서 위로. height(%)는 C#이 정한다 */
+.key-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0;
+    background-color: var(--key-fill-color);
+}
+
+.recovery-panel .key-fill {
+    background-color: var(--recovery-fill-color);
+}
+
+.key-text {
+    font-size: 18px;
+    -unity-font-style: bold;
+}
+
+.recovery-panel .key-text {
+    font-size: 30px;
+}
+
+.interaction-icon {
+    width: var(--key-icon-size);
+    height: var(--key-icon-size);
+    margin-top: 6px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* 종류별 아이콘. C#이 클래스 하나를 붙인다 */
+.interaction-icon--load {
+    background-image: url("../Icons/box-arrow-in-down.svg");
+}
+
+.interaction-icon--unload {
+    background-image: url("../Icons/box-arrow-up.svg");
+}
+
+.interaction-icon--dispose {
+    background-image: url("../Icons/trash3-fill.svg");
+}
+
+.interaction-icon--obstacle {
+    background-image: url("../Icons/hand-index-thumb-fill.svg");
+}

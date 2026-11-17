@@ -46,13 +46,16 @@ namespace Game.Player.Recovery
         private float _lockEndTime = float.NegativeInfinity;
         private bool _isRecoveryLocked;
 
+        private float _stuckTimer;
+        private bool _isStuck;
+
         private bool _lastIconVisible;
         private bool _lastIconLocked;
 
         /// <summary>복구 홀드 진행도(0~1). 진행 중이 아니면 isActive=false로 발생한다. 상·하차 진행 바와 같은 시그니처다.</summary>
         public event Action<float, bool> RecoveryProgressChanged;
 
-        /// <summary>R키 아이콘 상태. 하루 운영 중이면 visible, 복구 잠금 중이면 locked.</summary>
+        /// <summary>복구 패널 상태. visible은 갇힘 또는 R 홀드 중이면서 운영 중이고 잠금이 아닐 때, locked는 복구 후 잠금 중일 때다.</summary>
         public event Action<bool, bool> KeyIconStateChanged;
 
         private void Reset()
@@ -112,9 +115,25 @@ namespace Game.Player.Recovery
                 _movement.SetRecoveryLocked(false);
             }
 
-            bool operating = IsOperating;
-            UpdateKeyIcon(operating, isLocked);
-            UpdateHold(operating && isLocked == false);
+            bool canUse = IsOperating && isLocked == false;
+            UpdateStuck(canUse);
+            UpdateHold(canUse);
+
+            // 홀드 끝에 복구가 실행되면 잠금이 이번 프레임에 시작되므로 잠금 상태를 다시 읽는다
+            isLocked = Time.time < _lockEndTime;
+            UpdateKeyIcon(canUse && isLocked == false && (_isStuck || _isHolding), isLocked);
+        }
+
+        /// <summary>뒤집힘 또는 끼임(입력이 있는데 수평 속도가 v_stuck 미만)이 T_stuck 동안 계속되면 갇힘, 둘 다 풀리면 즉시 해제.</summary>
+        private void UpdateStuck(bool canUse)
+        {
+            bool flipped = Vector3.Dot(_rigidbody.rotation * Vector3.up, Vector3.up) < _recoveryConfig.MinBodyUpDot;
+            Vector3 velocity = _rigidbody.linearVelocity;
+            bool wedged = _movement.HasThrottleInput
+                && new Vector2(velocity.x, velocity.z).magnitude < _recoveryConfig.StuckSpeed;
+
+            _stuckTimer = canUse && (flipped || wedged) ? _stuckTimer + Time.deltaTime : 0f;
+            _isStuck = _stuckTimer >= _recoveryConfig.StuckSeconds;
         }
 
         private void UpdateKeyIcon(bool visible, bool locked)
@@ -298,7 +317,6 @@ namespace Game.Player.Recovery
             _lockEndTime = Time.time + _recoveryConfig.LockSeconds;
             _isRecoveryLocked = true;
             _movement.SetRecoveryLocked(true);
-            UpdateKeyIcon(IsOperating, true);
         }
     }
 }

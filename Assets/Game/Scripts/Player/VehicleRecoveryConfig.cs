@@ -24,7 +24,17 @@ namespace Game.Player.Recovery
         [Tooltip("복구 후 조작할 수 없는 시간(초)")]
         [SerializeField, Min(0f)] private float _lockSeconds = 2f; // TODO(tuning)
 
+        [Tooltip("갇힘 판정 시간(초). 뒤집힘 또는 끼임이 이만큼 계속되면 갇힘으로 본다")]
+        [SerializeField, Min(0f)] private float _stuckSeconds = 1.5f; // TODO(tuning)
+
+        [Tooltip("끼임 판정 수평 속도(m/s). 전진·후진 입력이 있는데 이보다 느리면 끼임 후보다")]
+        [SerializeField, Min(0f)] private float _stuckSpeed = 0.5f; // TODO(tuning)
+
         public float HoldSeconds => _holdSeconds;
+        /// <summary>갇힘 판정 시간 T_stuck(초).</summary>
+        public float StuckSeconds => _stuckSeconds;
+        /// <summary>끼임 판정 수평 속도 v_stuck(m/s).</summary>
+        public float StuckSpeed => _stuckSpeed;
         public float RecordIntervalSeconds => _recordIntervalSeconds;
         public int BufferCapacity => _bufferCapacity;
         public float MinAgeSeconds => _minAgeSeconds;

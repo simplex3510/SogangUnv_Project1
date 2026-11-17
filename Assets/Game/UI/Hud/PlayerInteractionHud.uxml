@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="PlayerInteractionHud.uss" />
+    <ui:VisualElement name="playerInteractionHud" class="interaction-hud" picking-mode="Ignore">
+        <ui:VisualElement name="recoveryPanel" class="key-panel recovery-panel key-panel--hidden" picking-mode="Ignore">
+            <ui:VisualElement name="recoveryFill" class="key-fill" picking-mode="Ignore" />
+            <ui:Label name="recoveryKey" text="R" class="key-text" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="interactionPanel" class="key-panel interaction-panel key-panel--hidden" picking-mode="Ignore">
+            <ui:VisualElement name="interactionFill" class="key-fill" picking-mode="Ignore" />
+            <ui:Label name="interactionKey" text="Space" class="key-text" picking-mode="Ignore" />
+            <ui:VisualElement name="interactionIcon" class="interaction-icon" picking-mode="Ignore" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -57,6 +57,9 @@ namespace Game.Player.Movement
         /// <summary>지면 기준 전진 속도(m/s). 후진이면 음수.</summary>
         public float ForwardSpeed => _forwardSpeed;
 
+        /// <summary>전진·후진 입력이 있는지. 조작 불가 중에는 false다(갇힘 판정용).</summary>
+        public bool HasThrottleInput => CanControl && _input.y != 0f;
+
         /// <summary>고속 모드 게이지 상태(HUD 표시용).</summary>
         public FastModeGauge FastGauge => _fastGauge;
 
