@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using Game.Player.Interaction;
+using Game.Player.Recovery;
 
 namespace Game.UI
 {
@@ -9,11 +10,18 @@ namespace Game.UI
     public class InteractionProgressUI : MonoBehaviour
     {
         [SerializeField] private PlayerInteractionController _controller;
+        [Tooltip("복구 홀드 진행도도 같은 바에 표시한다(Story 007)")]
+        [SerializeField] private VehicleRecoveryController _recoveryController;
         [SerializeField] private GameObject _barRoot;
         [SerializeField] private Image _fill;
 
         private void Awake()
         {
+            if (_recoveryController == null)
+            {
+                _recoveryController = FindAnyObjectByType<VehicleRecoveryController>();
+            }
+
             if (_controller == null)
             {
                 _controller = FindAnyObjectByType<PlayerInteractionController>();
@@ -35,6 +43,11 @@ namespace Game.UI
             {
                 _controller.InteractionProgressChanged += OnProgressChanged;
             }
+
+            if (_recoveryController != null)
+            {
+                _recoveryController.RecoveryProgressChanged += OnProgressChanged;
+            }
         }
 
         private void OnDisable()
@@ -42,6 +55,11 @@ namespace Game.UI
             if (_controller != null)
             {
                 _controller.InteractionProgressChanged -= OnProgressChanged;
+            }
+
+            if (_recoveryController != null)
+            {
+                _recoveryController.RecoveryProgressChanged -= OnProgressChanged;
             }
         }
 

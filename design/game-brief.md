@@ -58,9 +58,9 @@
 - [ ] 주행 방해 오브젝트 — 정적 모듈 컴포넌트·NPC 구조 (quick-spec: world-obstacle-objects-framework)
 - [x] 하루 별점 피드백 (0~3개) — 신규
 - [ ] 밸런싱 수치 확정과 마무리 (dev-plan 8단계)
-- [ ] 충돌 내구도 감소와 피드백 (game-concept 10.2·13)
+- [x] 충돌 내구도 감소와 피드백 (game-concept 10.2·13)
 - [x] 폐기 물류와 처분 장소 (game-concept 11.6)
-- [ ] 차량 리셋·복구 (game-concept 10.6)
+- [x] 차량 리셋·복구 (game-concept 10.6)
 - [ ] Fresh 배송 유형 (game-concept 6.2·7장·11.1)
 - [x] 무게 한도 초과 적재와 속도 감소 (game-concept 8.6) *(you said, 2026-11-16 확정)*
 

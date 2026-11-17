@@ -1,6 +1,9 @@
 using UnityEngine;
 
 using TMPro;
+using UnityEngine.UI;
+
+using Game.Player.Recovery;
 
 using Game.UI;
 using Game.Interaction;
@@ -16,6 +19,13 @@ namespace Game.Player.Interaction
 
         [Header("UIs")]
         [SerializeField] private PlayerObjectUI[] _interactionUIs;
+
+        [Header("Recovery Key Icon (Story 007)")]
+        [Tooltip("R키 아이콘. ShowByType의 단일 선택과 별개로 따로 켜고 끈다")]
+        [SerializeField] private Image _recoveryKeyIcon;
+        [SerializeField] private VehicleRecoveryController _recoveryController;
+        [Tooltip("복구 잠금 중 R키 아이콘의 알파")]
+        [SerializeField, Range(0f, 1f)] private float _lockedIconAlpha = 0.4f; // TODO(tuning)
 
         [Header("Blocked Message")]
         [SerializeField] private TMP_Text _messageText;
@@ -46,6 +56,29 @@ namespace Game.Player.Interaction
         {
             _interactionController.InteractionContextChanged += RefreshInteractionUI;
             _interactionController.InteractionBlocked += ShowMessage;
+
+            if (_recoveryController != null && _recoveryKeyIcon != null)
+            {
+                _recoveryKeyIcon.enabled = false;
+                _recoveryController.KeyIconStateChanged += RefreshRecoveryKeyIcon;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (_recoveryController != null)
+            {
+                _recoveryController.KeyIconStateChanged -= RefreshRecoveryKeyIcon;
+            }
+        }
+
+        private void RefreshRecoveryKeyIcon(bool isVisible, bool isLocked)
+        {
+            _recoveryKeyIcon.enabled = isVisible;
+
+            Color color = _recoveryKeyIcon.color;
+            color.a = isLocked ? _lockedIconAlpha : 1f;
+            _recoveryKeyIcon.color = color;
         }
 
         private void Update()

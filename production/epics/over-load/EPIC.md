@@ -15,7 +15,7 @@
 | 004 | 충돌 내구도 감소 | Logic | Complete | N/A (minimal) |
 | 005 | 폐기 물류 전환과 처분 장소 | Integration | Complete | N/A (minimal) |
 | 006 | 내구도 피드백 UI 3종 | UI | Complete | N/A (minimal) |
-| 007 | 차량 리셋·복구 | Logic | Ready | N/A (minimal) |
+| 007 | 차량 리셋·복구 | Logic | Complete | N/A (minimal) |
 | 008 | Fresh 배송 유형 | Integration | Ready | N/A (minimal) |
 | 009 | 무게 한도 초과 적재와 속도 감소 | Logic | Complete | N/A (minimal) |
 | 010 | 정적 방해물 모듈 컴포넌트 | Logic | Complete | N/A (minimal) |

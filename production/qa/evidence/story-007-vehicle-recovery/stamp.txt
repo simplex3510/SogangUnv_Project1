@@ -1,0 +1,9 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/VehicleRecoveryController.cs 40f5454829dc72583e01b737d4e40ef3beeb890e
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/VehicleRecoveryConfig.cs 04ca316b897e28ab4112f1d9da9898cdd99ab144
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/SafePointBuffer.cs 9c13ca67823ed0330c27d2a704b1dc292c979400
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/PlayerMovementController.cs eadbbf24feb24931702ca34bfbc217f05410857f
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/PlayerUIController.cs 827e578101193183b207d5c6013f5f0c7509e62b
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/InteractionProgressUI.cs 652a19168d4432df88697a9285400d2e4540fd2f
+Reviewed-Content-Hash: Assets/Game/Prefabs/Delivery.prefab 1524afbe9bcb9761433c638c0c6358413c0450da
+Reviewed-Content-Hash: Assets/Game/Configs/VehicleRecoveryConfig.asset a0ab709b84bd5ced83bdc9e74f04de4e4336a475
+Reviewed-Content-Hash: Assets/Game/Scenes/_DevOnly/SampleMapDesign.unity e3705ff6f904ed18d658e93429fcc2c44cee207c

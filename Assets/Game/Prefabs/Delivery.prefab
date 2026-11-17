@@ -124,6 +124,7 @@ RectTransform:
   m_Children:
   - {fileID: 564277369709986901}
   - {fileID: 2944252460407357437}
+  - {fileID: 7681564399813870739}
   m_Father: {fileID: 6164739786679630296}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -460,6 +461,81 @@ MonoBehaviour:
   _rectTransform: {fileID: 2944252460407357437}
   _loadType: 2
   _interactionImage: {fileID: 5896614754005364656}
+--- !u!1 &4646050705264786424
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7681564399813870739}
+  - component: {fileID: 7705539404915341469}
+  - component: {fileID: 7049196662047511153}
+  m_Layer: 0
+  m_Name: RecoveryKeyImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7681564399813870739
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4646050705264786424}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7433886314280389716}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 80}
+  m_SizeDelta: {x: 50, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &7705539404915341469
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4646050705264786424}
+  m_CullTransparentMesh: 1
+--- !u!114 &7049196662047511153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4646050705264786424}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.55, g: 0.8, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &5804778296129160928
 GameObject:
   m_ObjectHideFlags: 0
@@ -1030,6 +1106,7 @@ GameObject:
   - component: {fileID: 3416430264410693408}
   - component: {fileID: 3321739127970385887}
   - component: {fileID: 6813896215551363277}
+  - component: {fileID: 6319487971084586059}
   m_Layer: 6
   m_Name: Delivery
   m_TagString: Untagged
@@ -1129,6 +1206,9 @@ MonoBehaviour:
   _interactionUIs:
   - {fileID: 4311786780744453121}
   - {fileID: 4690844629330939472}
+  _recoveryKeyIcon: {fileID: 7049196662047511153}
+  _recoveryController: {fileID: 6319487971084586059}
+  _lockedIconAlpha: 0.4
   _messageText: {fileID: 0}
   _messageDuration: 1.5
 --- !u!114 &6813896215551363277
@@ -1147,3 +1227,37 @@ MonoBehaviour:
   _impactConfig: {fileID: 11400000, guid: 85d611d75792f864d8a42ea21596b54f, type: 2}
   _traitConfig: {fileID: 11400000, guid: b1d5d565251bb7848b234a39a2bc2d88, type: 2}
   _vehicleConfig: {fileID: 11400000, guid: f74b49c2abf41884b86f4d2023b772c0, type: 2}
+--- !u!114 &6319487971084586059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8172847757324507159}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 251c53ba90e558e4fab970ba8065e8c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.Recovery.VehicleRecoveryController
+  _rigidbody: {fileID: 6104127485426952191}
+  _recoveryConfig: {fileID: 11400000, guid: 187dcaa9999b4bb448bd5791ab7ed70f, type: 2}
+  _vehicleConfig: {fileID: 11400000, guid: f74b49c2abf41884b86f4d2023b772c0, type: 2}
+  _recoveryInput:
+    m_Name: Recovery
+    m_Type: 1
+    m_ExpectedControlType: 
+    m_Id: 5248da58-b9c3-4917-a2df-4bb2f5fcc61d
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 36be6cf5-2e97-468c-b367-35813fc06851
+      m_Path: <Keyboard>/r
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Recovery
+      m_Flags: 0
+    m_Flags: 0
+    m_Priority: 0
+  _logisticsCenterFront: {fileID: 0}

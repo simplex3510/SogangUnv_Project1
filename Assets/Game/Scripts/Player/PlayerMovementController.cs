@@ -39,6 +39,7 @@ namespace Game.Player.Movement
         private float _forwardSpeed;
         private bool _isGrounded;
         private bool _isControlEnabled = true;
+        private bool _isRecoveryLocked;
         private Vector3 _groundNormal = Vector3.up;
         private float _lastGroundedTime = float.NegativeInfinity;
 
@@ -114,15 +115,31 @@ namespace Game.Player.Movement
             _driftInput.action.Disable();
         }
 
+        // 하루 종료 잠금(_isControlEnabled)과 복구 잠금(_isRecoveryLocked)은 별개 사유라 서로를 풀지 않는다
+        private bool CanControl => _isControlEnabled && _isRecoveryLocked == false;
+
         /// <summary>하루 종료 시 주행 입력을 끊고 차량을 즉시 세운다(기획서 3.5).</summary>
         public void SetControlEnabled(bool isEnabled)
         {
             _isControlEnabled = isEnabled;
-            if (isEnabled)
+            if (isEnabled == false)
             {
-                return;
+                ClearControlState();
             }
+        }
 
+        /// <summary>복구 후 잠금 시간 동안 주행 입력을 끊는다(기획서 10.6). 하루 종료 잠금과 별도로 관리한다.</summary>
+        public void SetRecoveryLocked(bool isLocked)
+        {
+            _isRecoveryLocked = isLocked;
+            if (isLocked)
+            {
+                ClearControlState();
+            }
+        }
+
+        private void ClearControlState()
+        {
             // 하루 종료 시 지속 중인 방해물 효과를 해제한다
             _obstacleSpeedEffect.Clear();
             _pendingYawDegrees = 0f;
@@ -140,7 +157,7 @@ namespace Game.Player.Movement
         /// <summary>방해물의 최고 속도 배율 요청. 조작 잠금 중에는 받지 않는다.</summary>
         public void ApplySpeedMultiplier(float multiplier, float durationSeconds)
         {
-            if (_isControlEnabled)
+            if (CanControl)
             {
                 _obstacleSpeedEffect.Apply(multiplier, durationSeconds);
             }
@@ -149,7 +166,7 @@ namespace Game.Player.Movement
         /// <summary>방해물의 진행 방향 회전 요청. 조작 잠금 중에는 받지 않는다.</summary>
         public void RequestHeadingRotation(float yawDegrees)
         {
-            if (_isControlEnabled)
+            if (CanControl)
             {
                 _pendingYawDegrees += yawDegrees;
             }
@@ -168,7 +185,7 @@ namespace Game.Player.Movement
 
         private void Update()
         {
-            if (_isControlEnabled == false)
+            if (CanControl == false)
             {
                 return;
             }
