@@ -81,7 +81,7 @@ namespace Game.Logistics
 
                 // FinalizeDay 배송 완료 루프와 같은 항목 정의다. 한쪽을 바꾸면 다른 쪽도 맞춘다. 실패 페널티는 넣지 않는다
                 DeliveryReward reward = parcel.Reward;
-                TodayIncome += reward.BaseFee + reward.DistanceFee + reward.TraitBonus
+                TodayIncome += reward.BaseFee + reward.DistanceFee + reward.TraitBonus + parcel.FreshBonusEarned
                     + (parcel.IsOverdue ? -reward.LateLoss : reward.TimeBonus);
                 TodayIncomeChanged?.Invoke(TodayIncome);
             }
@@ -103,6 +103,7 @@ namespace Game.Logistics
             float timeBonusEarned = 0f;
             float timeBonusMissed = 0f;
             float traitBonusTotal = 0f;
+            float freshBonusTotal = 0f;
             float lateLossTotal = 0f;
 
             for (int i = 0; i < _deliveredParcels.Count; i++)
@@ -115,6 +116,9 @@ namespace Game.Logistics
 
                 // 특징 보상은 시간 조건과 무관하게 배송 완료 시 지급한다(기획서 11.1)
                 traitBonusTotal += reward.TraitBonus;
+
+                // 신선도 보상은 하차 시점에 확정한 값을 합산한다(기획서 14.2)
+                freshBonusTotal += parcel.FreshBonusEarned;
 
                 // 초과 배송은 시간 추가 보상을 받지 못하고 손실만 부과한다(기획서 11.3)
                 if (parcel.IsOverdue)
@@ -169,7 +173,7 @@ namespace Game.Logistics
             // 최종 금액 산식을 중복하지 않으려고 별점 없는 결과로 먼저 구한다
             float finalAmount = new SettlementResult(
                 baseFeeTotal, distanceFeeTotal, timeBonusEarned, timeBonusMissed, traitBonusTotal,
-                lateLossTotal, failurePenaltyTotal, _deliveredParcels.Count, failedCount, successCount, totalCount, null).FinalAmount;
+                lateLossTotal, failurePenaltyTotal, _deliveredParcels.Count, failedCount, successCount, totalCount, null, freshBonusTotal).FinalAmount;
 
             SettlementResult result = new(
                 baseFeeTotal,
@@ -183,7 +187,8 @@ namespace Game.Logistics
                 failedCount,
                 successCount,
                 totalCount,
-                DailyStarRating.Evaluate(totalCount, successCount, finalAmount, _starRatingConfig.Threshold2, _starRatingConfig.Threshold1));
+                DailyStarRating.Evaluate(totalCount, successCount, finalAmount, _starRatingConfig.Threshold2, _starRatingConfig.Threshold1),
+                freshBonusTotal);
 
             LastResult = result;
             string starText = result.Stars.HasValue ? $"별 {result.Stars.Value}" : "별점 없음";
@@ -199,6 +204,9 @@ namespace Game.Logistics
             public readonly float TimeBonusEarned;
             public readonly float TimeBonusMissed;
             public readonly float TraitBonusTotal;
+
+            /// <summary>Fresh 신선도 보상 합계(기획서 12.2).</summary>
+            public readonly float FreshBonusTotal;
             public readonly float LateLoss;
             public readonly float FailurePenalty;
             public readonly int DeliveredCount;
@@ -225,7 +233,8 @@ namespace Game.Logistics
                 int failedCount,
                 int successCount,
                 int totalCount,
-                int? stars)
+                int? stars,
+                float freshBonusTotal = 0f)
             {
                 BaseFeeTotal = baseFeeTotal;
                 DistanceFeeTotal = distanceFeeTotal;
@@ -239,9 +248,10 @@ namespace Game.Logistics
                 SuccessCount = successCount;
                 TotalCount = totalCount;
                 Stars = stars;
+                FreshBonusTotal = freshBonusTotal;
             }
 
-            public float Income => BaseFeeTotal + DistanceFeeTotal + TimeBonusEarned + TraitBonusTotal;
+            public float Income => BaseFeeTotal + DistanceFeeTotal + TimeBonusEarned + TraitBonusTotal + FreshBonusTotal;
             public float Loss => LateLoss + FailurePenalty;
 
             // 하한을 두지 않고 음수를 그대로 표시한다(기획서 16.1-6)

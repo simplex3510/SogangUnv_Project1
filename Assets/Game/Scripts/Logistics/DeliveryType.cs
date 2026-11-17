@@ -5,5 +5,8 @@ namespace Game.Logistics
     {
         Normal = 0,
         Express = 1,
+
+        /// <summary>신선 배송. 제한 시간(신선도)이 상차 완료 시점부터 줄고, 0이 되면 폐기된다(기획서 6.2).</summary>
+        Fresh = 2,
     }
 }

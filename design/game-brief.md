@@ -61,7 +61,7 @@
 - [x] 충돌 내구도 감소와 피드백 (game-concept 10.2·13)
 - [x] 폐기 물류와 처분 장소 (game-concept 11.6)
 - [x] 차량 리셋·복구 (game-concept 10.6)
-- [ ] Fresh 배송 유형 (game-concept 6.2·7장·11.1)
+- [x] Fresh 배송 유형 (game-concept 6.2·7장·11.1)
 - [x] 무게 한도 초과 적재와 속도 감소 (game-concept 8.6) *(you said, 2026-11-16 확정)*
 
 ## Out of scope

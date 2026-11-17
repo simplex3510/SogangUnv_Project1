@@ -13,6 +13,8 @@ namespace Game.Logistics
         [SerializeField, Min(0f)] private float _distanceFeePerMeter = 10f; // TODO(tuning)
         [Tooltip("제한 시간 내 배송 완료 시 추가 보상")]
         [SerializeField, Min(0f)] private float _timeBonus = 50f; // TODO(tuning)
+        [Tooltip("Fresh 최대 신선도 보상 B_fresh. 하차 시점의 남은 신선도 비율을 곱해 지급한다. Express 시간 보상보다 크게 둔다(제안: 시간 보상 × 2)")]
+        [SerializeField, Min(0f)] private float _freshBonus = 100f; // TODO(tuning)
 
         [Header("손실")]
         [Tooltip("제한 시간 초과 후 배송 완료 시 손실 기준값. 배송 타입별 계수를 곱한다")]
@@ -23,6 +25,7 @@ namespace Game.Logistics
         public float BaseFee => _baseFee;
         public float DistanceFeePerMeter => _distanceFeePerMeter;
         public float TimeBonus => _timeBonus;
+        public float FreshBonus => _freshBonus;
         public float LateLoss => _lateLoss;
         public float FailurePenalty => _failurePenalty;
     }

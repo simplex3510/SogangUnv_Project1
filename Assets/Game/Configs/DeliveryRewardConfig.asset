@@ -15,5 +15,6 @@ MonoBehaviour:
   _baseFee: 100
   _distanceFeePerMeter: 10
   _timeBonus: 50
+  _freshBonus: 100
   _lateLoss: 80
   _failurePenalty: 120

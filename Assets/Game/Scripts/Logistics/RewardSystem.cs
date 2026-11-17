@@ -37,13 +37,17 @@ namespace Game.Logistics
             // 제한 시간이 없는 유형(Normal)은 시간 추가 보상·시간 초과 손실 판정 자체가 없다(기획서 11.1)
             bool hasDeadline = _typeConfig.HasDeadline(type);
 
+            // Fresh는 고정 시간 보상·시간 초과 손실 대신 신선도 보상을 쓴다(기획서 11.1)
+            bool isFresh = type == DeliveryType.Fresh;
+
             return new DeliveryReward(
                 _config.BaseFee,
                 _config.DistanceFeePerMeter * distance,
-                hasDeadline ? _config.TimeBonus : 0f,
+                hasDeadline && isFresh == false ? _config.TimeBonus : 0f,
                 traitBonus,
-                hasDeadline ? _config.LateLoss * _typeConfig.GetLateLossMultiplier(type) : 0f,
-                _config.FailurePenalty * _typeConfig.GetFailurePenaltyMultiplier(type));
+                hasDeadline && isFresh == false ? _config.LateLoss * _typeConfig.GetLateLossMultiplier(type) : 0f,
+                _config.FailurePenalty * _typeConfig.GetFailurePenaltyMultiplier(type),
+                isFresh ? _config.FreshBonus : 0f);
         }
 
         /// <summary>기획서 7.1과 같은 XZ 평면 직선거리 기준.</summary>

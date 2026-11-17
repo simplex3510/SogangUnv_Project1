@@ -17,11 +17,20 @@ MonoBehaviour:
     _spawnProbability: 0.5
     _hasDeadline: 0
     _deadlineMultiplier: 1
+    _deadlineStart: 0
     _lateLossMultiplier: 1
     _failurePenaltyMultiplier: 1
   - _type: 1
     _spawnProbability: 0.5
     _hasDeadline: 1
     _deadlineMultiplier: 0.7
+    _deadlineStart: 0
+    _lateLossMultiplier: 1
+    _failurePenaltyMultiplier: 1
+  - _type: 2
+    _spawnProbability: 0.15
+    _hasDeadline: 1
+    _deadlineMultiplier: 0.35
+    _deadlineStart: 1
     _lateLossMultiplier: 1
     _failurePenaltyMultiplier: 1

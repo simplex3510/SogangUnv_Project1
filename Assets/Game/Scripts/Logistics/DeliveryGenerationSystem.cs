@@ -179,6 +179,7 @@ namespace Game.Logistics
                 generationType,
                 cargo,
                 _typeConfig.HasDeadline(type),
+                _typeConfig.StartsDeadlineOnLoad(type),
                 _typeConfig.GetDeadlineMultiplier(type),
                 reward);
 

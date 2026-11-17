@@ -13,8 +13,10 @@ namespace Game.Logistics
         [SerializeField, Range(0f, 1f)] private float _spawnProbability = 0.5f; // TODO(tuning)
         [Tooltip("배송 제한 시간 적용 여부. 끄면 제한 시간·시간 추가 보상·시간 초과 손실이 없다(기획서 6.2)")]
         [SerializeField] private bool _hasDeadline = true;
-        [Tooltip("배송 제한 시간 계수")]
+        [Tooltip("배송 제한 시간 계수. Fresh는 신선도 계수 M_fresh로 쓰며 Express 계수보다 작게 둔다(제안: Express 계수 × 0.5)")]
         [SerializeField, Min(0f)] private float _deadlineMultiplier = 1f; // TODO(tuning)
+        [Tooltip("제한 시간이 줄기 시작하는 시점. Fresh는 LoadCompletion(상차 완료 시점)")]
+        [SerializeField] private DeadlineStart _deadlineStart = DeadlineStart.Creation;
         [Tooltip("시간 초과 손실 계수")]
         [SerializeField, Min(0f)] private float _lateLossMultiplier = 1f; // TODO(tuning)
         [Tooltip("배송 실패 페널티 계수")]
@@ -24,6 +26,7 @@ namespace Game.Logistics
         public float SpawnProbability => _spawnProbability;
         public bool HasDeadline => _hasDeadline;
         public float DeadlineMultiplier => _deadlineMultiplier;
+        public DeadlineStart DeadlineStart => _deadlineStart;
         public float LateLossMultiplier => _lateLossMultiplier;
         public float FailurePenaltyMultiplier => _failurePenaltyMultiplier;
     }
@@ -91,6 +94,20 @@ namespace Game.Logistics
             }
 
             return 1f;
+        }
+
+        /// <summary>배송 유형의 제한 시간이 상차 완료 시점부터 줄어드는지. 설정에 없는 유형은 생성 시점부터 줄어든다.</summary>
+        public bool StartsDeadlineOnLoad(DeliveryType type)
+        {
+            for (int i = 0; i < _entries.Length; i++)
+            {
+                if (_entries[i].Type == type)
+                {
+                    return _entries[i].DeadlineStart == DeadlineStart.LoadCompletion;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>배송 타입별 시간 초과 손실 계수. 설정에 없는 타입은 1로 처리한다.</summary>

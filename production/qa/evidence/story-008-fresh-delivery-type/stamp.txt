@@ -1,0 +1,16 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DeadlineStart.cs c83cedec4263ebbc1cd00f645c75fa5100097ee2
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DeliveryType.cs fdca2e6321c15f80aa206f681dadc9560f349761
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DeliveryTypeConfig.cs d2b85d0187451c59a112dc5874adcfbf4d9d6262
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/Parcel.cs 177ac84e854b132daa41b6a82c66cda0be7bb502
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DeliveryDeadlineSystem.cs bb4a2736d7e755e00dd2f96fc3f7d500409ee5d5
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DeliveryGenerationSystem.cs e8d1469e5715151fda7ce43958dfde202cb29d94
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/RewardSystem.cs e424d090528c1e929d92c697ffe3a18ed8cc9a43
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DeliveryRewardConfig.cs 7341ba8a332595abede80e8e4a820466da2daba1
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/SettlementSystem.cs 1fa6ef79c050d474dea92437e9de3075154828e9
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/PlayerInteractionController.cs e686b2007260d5d00cc11c107d21826c2f71af74
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/LogisticsCenterUI.cs b6f1a8f7deb8f8bff30a921c69d9b5daa43ef172
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DeliveryTargetParcelUI.cs dbc5f5c950cb0323be27bd7e3b728a2b6a21f2f8
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/SettlementUI.cs f6cf50f6619741b7da6efb9ce6d669e93d7e082d
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DurabilityHud.cs 0a0bd92d840f1140c89da2069287e6686e91f95d
+Reviewed-Content-Hash: Assets/Game/UI/Hud/DurabilityHud.uss e6a4ec326db9f847d2b4806888ad88e25513bf8d
+Reviewed-Content-Hash: Assets/Game/Configs/DeliveryTypeConfig.asset 1b449fdba0103eb0c64377ffc311f0a11591ef5a
