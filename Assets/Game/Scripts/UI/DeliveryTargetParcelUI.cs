@@ -7,7 +7,7 @@ using Game.UI.Hud;
 
 namespace Game.UI
 {
-    /// <summary>배송지에 할당된 물류를 개별 아이콘으로 표시한다(WorldParcelIconsHud에 묶음 등록). 플레이어가 실은 물류는 테두리로 강조하고, 적재한 Fresh는 신선도 바를 붙인다.</summary>
+    /// <summary>배송지에 할당된 물류를 개별 아이콘으로 표시한다(WorldParcelIconsHud에 묶음 등록). 물류센터에 남은 물류는 위(미배송) 패널에 흐리게, 플레이어가 실은 물류는 아래(배송중) 패널에 원래 색으로 두고, Express는 남은 시간 바를, 적재한 Fresh는 신선도 바를 붙인다.</summary>
     [RequireComponent(typeof(DeliveryTarget))]
     public class DeliveryTargetParcelUI : MonoBehaviour
     {
@@ -59,12 +59,12 @@ namespace Game.UI
             RefreshIcons(_target.AllocatedParcels);
         }
 
-        // 신선도는 게임 시간에 따라 줄어들므로 Fresh 아이콘은 매 프레임 갱신한다
+        // 남은 시간·신선도는 게임 시간에 따라 줄어들므로 제한 시간 물류 아이콘은 매 프레임 갱신한다
         private void Update()
         {
             for (int i = 0; i < _iconParcels.Count; i++)
             {
-                if (_iconParcels[i].IsFresh)
+                if (_iconParcels[i].HasDeadline)
                 {
                     ShowIcon(i, _iconParcels[i]);
                 }
@@ -89,7 +89,8 @@ namespace Game.UI
         private void ShowIcon(int index, Parcel parcel)
         {
             bool loaded = parcel.Status == ParcelStatus.Loaded;
-            bool showBar = parcel.IsFresh && loaded && parcel.Deadline > 0f;
+            // 시간이 흐르는 동안만 바를 보인다: Express는 생성 직후부터, Fresh는 실은 뒤부터 줄어든다
+            bool showBar = parcel.HasDeadline && parcel.Deadline > 0f && (parcel.IsFresh == false || loaded);
             _group.SetIcon(index, parcel.Type, false, loaded, showBar ? parcel.RemainingDeadline / parcel.Deadline : -1f);
         }
 

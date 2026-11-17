@@ -14,8 +14,6 @@ namespace Game.UI.Hud
     [RequireComponent(typeof(PanelRenderer))]
     public class WorldParcelIconsHud : MonoBehaviour
     {
-        private const string LoadedClass = "world-icon--loaded";
-
         /// <summary>씬의 월드 아이콘 HUD(1개 배치 가정).</summary>
         public static WorldParcelIconsHud Instance { get; private set; }
 
@@ -35,15 +33,33 @@ namespace Game.UI.Hud
             internal Transform Anchor;
             internal Vector3 Offset;
             internal VisualElement Element;
+            internal VisualElement WaitingPanel;
+            internal VisualElement LoadedPanel;
             internal WorldParcelIconsHud Owner;
             internal readonly List<VisualElement> Icons = new();
 
-            /// <summary>index번째 아이콘을 보이고 유형 색·적재 강조·신선도 바를 정한다. 바가 없으면 freshness는 음수.</summary>
+            /// <summary>index번째 아이콘을 보이고 유형 색·남은 시간 바(Express 빨강, Fresh 초록)를 정한다. loaded면 아래(배송중) 패널, 아니면 위(미배송) 패널에 둔다. 바가 없으면 freshness(남은 비율)는 음수.</summary>
             public void SetIcon(int index, DeliveryType type, bool spoiled, bool loaded, float freshness)
             {
                 VisualElement icon = GetIcon(index);
                 icon.style.display = DisplayStyle.Flex;
-                icon.EnableInClassList(LoadedClass, loaded);
+                VisualElement panel = loaded ? LoadedPanel : WaitingPanel;
+                if (icon.parent != panel)
+                {
+                    // 패널 안에서도 index 순서를 지키도록 앞선 아이콘 수만큼 뒤에 끼운다
+                    int position = 0;
+                    for (int i = 0; i < index; i++)
+                    {
+                        if (Icons[i].parent == panel)
+                        {
+                            position++;
+                        }
+                    }
+
+                    panel.Insert(position, icon);
+                }
+
+                panel.style.display = DisplayStyle.Flex;
 
                 VisualElement parcelIcon = icon.Q("parcelIcon");
                 parcelIcon.EnableInClassList("parcel-icon--express", type == DeliveryType.Express);
@@ -51,6 +67,7 @@ namespace Game.UI.Hud
                 parcelIcon.EnableInClassList("parcel-icon--spoiled", spoiled);
 
                 VisualElement bar = icon.Q("bar");
+                bar.EnableInClassList("world-icon-bar--express", type == DeliveryType.Express);
                 bar.style.display = freshness >= 0f ? DisplayStyle.Flex : DisplayStyle.None;
                 if (freshness >= 0f)
                 {
@@ -58,22 +75,29 @@ namespace Game.UI.Hud
                 }
             }
 
-            /// <summary>count번째부터 끝까지 아이콘을 숨긴다.</summary>
+            /// <summary>count번째부터 끝까지 아이콘을 숨기고, 보이는 아이콘이 없는 패널도 숨긴다.</summary>
             public void HideFrom(int count)
             {
-                for (int i = count; i < Icons.Count; i++)
+                bool hasWaiting = false;
+                bool hasLoaded = false;
+                for (int i = 0; i < Icons.Count; i++)
                 {
-                    Icons[i].style.display = DisplayStyle.None;
+                    bool visible = i < count;
+                    Icons[i].style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+                    hasWaiting |= visible && Icons[i].parent == WaitingPanel;
+                    hasLoaded |= visible && Icons[i].parent == LoadedPanel;
                 }
+
+                WaitingPanel.style.display = hasWaiting ? DisplayStyle.Flex : DisplayStyle.None;
+                LoadedPanel.style.display = hasLoaded ? DisplayStyle.Flex : DisplayStyle.None;
             }
 
             private VisualElement GetIcon(int index)
             {
                 while (Icons.Count <= index)
                 {
-                    VisualElement icon = Owner._iconTemplate.Instantiate().Q("icon");
-                    Element.Add(icon);
-                    Icons.Add(icon);
+                    // 패널 배치는 SetIcon이 정한다
+                    Icons.Add(Owner._iconTemplate.Instantiate().Q("icon"));
                 }
 
                 return Icons[index];
@@ -123,14 +147,18 @@ namespace Game.UI.Hud
         /// <summary>anchor 위 offset(월드 m)에 아이콘 묶음을 만든다. 대상이 사라질 때 <see cref="RemoveGroup"/>으로 돌려준다.</summary>
         public IconGroup AddGroup(Transform anchor, Vector3 offset)
         {
+            VisualElement element = _groupTemplate.Instantiate().Q("group");
             var group = new IconGroup
             {
                 Anchor = anchor,
                 Offset = offset,
                 Owner = this,
-                Element = _groupTemplate.Instantiate().Q("group"),
+                Element = element,
+                WaitingPanel = element.Q("waitingPanel"),
+                LoadedPanel = element.Q("loadedPanel"),
             };
             group.Element.style.display = DisplayStyle.None;
+            group.HideFrom(0);
             _groups.Add(group);
             _root?.Add(group.Element);
             return group;

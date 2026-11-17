@@ -1,3 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <ui:VisualElement name="group" class="world-icon-group" picking-mode="Ignore" />
+    <ui:VisualElement name="group" class="world-icon-group" picking-mode="Ignore">
+        <ui:VisualElement name="waitingPanel" class="world-icon-panel world-icon-panel--waiting" picking-mode="Ignore" />
+        <ui:VisualElement name="loadedPanel" class="world-icon-panel" picking-mode="Ignore" />
+    </ui:VisualElement>
 </ui:UXML>

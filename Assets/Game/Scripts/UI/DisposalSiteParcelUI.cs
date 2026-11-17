@@ -58,7 +58,8 @@ namespace Game.UI
             {
                 if (loaded[i].IsSpoiled)
                 {
-                    _group.SetIcon(count++, loaded[i].Type, true, false, -1f);
+                    // 처분 대기 물류는 모두 차량에 실려 있으므로 배송중 패널 하나만 쓴다
+                    _group.SetIcon(count++, loaded[i].Type, true, true, -1f);
                 }
             }
 

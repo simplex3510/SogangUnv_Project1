@@ -4,26 +4,36 @@
     flex-grow: 1;
 }
 
+/* 위: 미배송(물류센터 대기) 패널, 아래: 배송중(차량 적재) 패널. 빈 패널은 C#이 숨긴다 */
 .world-icon-group {
     position: absolute;
+    flex-direction: column;
+    align-items: center;
+    width: 220px; /* 아이콘 4개가 한 줄에 들어가는 폭 */
+    translate: -50% -100%;
+}
+
+.world-icon-panel {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    width: 180px;
-    translate: -50% -100%;
+    max-width: 100%;
+    margin-top: 4px;
+    padding: 3px 3px 0 3px;
+    border-radius: 6px;
+    background-color: rgba(20, 24, 30, 0.45); /* TODO(tuning) */
 }
 
 .world-icon {
     width: var(--world-icon-size);
     height: var(--world-icon-size);
-    margin: 1px 1px 10px 1px;
+    margin: 1px 5px 10px 5px; /* TODO(tuning) */
 }
 
-/* 적재 중인 물류: 유형 색 위에 테두리로 구분 */
-.world-icon--loaded {
-    border-width: 2px;
-    border-color: rgb(140, 198, 245);
-    border-radius: 6px;
+/* 미배송은 유형 색은 두고 밝기만 낮춰 비활성 느낌을 준다(폐기 회색과 구분되게 채도는 유지) */
+.world-icon-panel--waiting .parcel-icon,
+.world-icon-panel--waiting .world-icon-bar {
+    opacity: 0.45; /* TODO(tuning) */
 }
 
 .world-icon .parcel-icon {
@@ -40,4 +50,10 @@
     border-width: 1px;
     border-color: rgb(20, 40, 28);
     background-color: rgb(84, 217, 140);
+}
+
+/* Express 남은 시간은 빨강, Fresh 신선도는 초록(적재 HUD·물류센터와 같은 색) */
+.world-icon-bar--express {
+    border-color: rgb(50, 20, 22);
+    background-color: rgb(240, 90, 95);
 }
