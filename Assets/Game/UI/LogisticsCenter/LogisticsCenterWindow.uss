@@ -218,10 +218,15 @@
     overflow: hidden;
 }
 
+/* 적재 HUD와 같은 색: Express 빨강, Fresh 초록 */
 .lc-bar-fill {
     height: 100%;
-    background-color: rgb(84, 217, 140);
+    background-color: rgb(240, 90, 95);
     border-radius: 4px;
+}
+
+.lc-bar-fill--fresh {
+    background-color: rgb(84, 217, 140);
 }
 
 .lc-deadline-time {

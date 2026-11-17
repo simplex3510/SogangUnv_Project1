@@ -1,10 +1,10 @@
-/* 배송 유형 아이콘 공용(적재 패널 행 + 월드 아이콘). Bootstrap Icons box-seam-fill(MIT), 색으로 유형 구분(임시 2026-11-17: Normal 노랑, Express 빨강, Fresh 초록, 폐기 어두운 회색) */
+/* 배송 유형 아이콘 공용(적재 패널 행 + 월드 아이콘). Bootstrap Icons box-fill(MIT), 색으로 유형 구분(임시 2026-11-17: Normal 노랑, Express 빨강, Fresh 초록, 폐기 어두운 회색) */
 .parcel-icon {
     flex-shrink: 0;
     width: 28px;
     height: 28px;
     margin-right: 10px;
-    background-image: url("../Icons/box-seam-fill.svg");
+    background-image: url("../Icons/box-fill.svg");
     -unity-background-image-tint-color: rgb(222, 175, 95);
 }
 

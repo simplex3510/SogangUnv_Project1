@@ -435,6 +435,7 @@ namespace Game.UI
             {
                 VisualElement fill = row.Q("deadlineFill");
                 fill.style.width = Length.Percent(DeadlineRatio(parcel) * 100f);
+                fill.EnableInClassList("lc-bar-fill--fresh", parcel.IsFresh);
                 _parcelFills[parcel] = fill;
                 // 남은 시간이 아니라 생성 시점에 확정된 만료 시각(게임 시계)을 보여 준다. Fresh는 대기 중 줄지 않으므로 신선도 총량(m:ss)을 보여 준다
                 Keep(row, "deadlineIcon", parcel.IsFresh);

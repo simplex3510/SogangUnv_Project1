@@ -1,4 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="ParcelIcon.uss" />
     <ui:Style src="DurabilityHud.uss" />
     <ui:Template name="CargoGroupHeader" src="CargoGroupHeader.uxml" />
     <ui:Template name="CenterNavRow" src="CenterNavRow.uxml" />
