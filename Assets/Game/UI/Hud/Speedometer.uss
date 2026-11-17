@@ -6,6 +6,34 @@
     align-items: center;
 }
 
+.overweight-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 6px;
+    display: none;
+}
+
+.overweight-row--visible {
+    display: flex;
+}
+
+.overweight-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 6px;
+    background-image: url("../Icons/exclamation-triangle-fill.svg");
+    -unity-background-image-tint-color: rgb(255, 153, 26);
+}
+
+.overweight-value {
+    -unity-font: url("project://database/Assets/TextMesh%20Pro/Fonts/LiberationSans.ttf");
+    font-size: 22px;
+    color: rgb(255, 153, 26);
+    -unity-font-style: bold;
+    padding: 0;
+    margin: 0;
+}
+
 .speedometer {
     width: 220px;
     padding: 12px 16px 14px 16px;
@@ -60,6 +88,11 @@
 .fast-gauge-fill {
     height: 100%;
     background-color: rgb(64, 217, 140);
+}
+
+/* 고속 모드 강조색(임시). 소진 경고색(주황)보다 앞에 두어 소진이 우선한다 */
+.fast-gauge--fast .fast-gauge-fill {
+    background-color: rgb(64, 170, 255);
 }
 
 .fast-gauge--exhausted .fast-gauge-fill {

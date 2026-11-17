@@ -1,0 +1,4 @@
+Reviewed-Content-Hash: Assets/Game/UI/Hud/SpeedometerHUD.cs 6df04ba1d9ae8c6876f0a4022d93da3d4465e457
+Reviewed-Content-Hash: Assets/Game/UI/Hud/Speedometer.uxml b601d3e92eca2cdf9eb39c8d3cd200b10da1f1d2
+Reviewed-Content-Hash: Assets/Game/UI/Hud/Speedometer.uss 640de96a290d9bf5db46c1dda2f73215cb5ca160
+Reviewed-Content-Hash: Assets/Game/UI/Icons/exclamation-triangle-fill.svg 8340913889de5f0fa82cbd9022bf47ce28878837

@@ -1,6 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:hud="Game.UI.Hud">
     <ui:Style src="Speedometer.uss" />
     <ui:VisualElement name="speedometerRoot" class="speedometer-root" picking-mode="Ignore">
+        <ui:VisualElement name="overweightRow" class="overweight-row" picking-mode="Ignore">
+            <ui:VisualElement name="overweightIcon" class="overweight-icon" picking-mode="Ignore" />
+            <ui:Label name="overweightValue" text="" class="overweight-value" picking-mode="Ignore" />
+        </ui:VisualElement>
         <ui:VisualElement name="speedometer" class="speedometer" picking-mode="Ignore">
             <hud:SpeedArc name="speedArc" class="speed-arc" picking-mode="Ignore">
                 <ui:Label name="speedValue" text="0" class="speed-value" picking-mode="Ignore" />
