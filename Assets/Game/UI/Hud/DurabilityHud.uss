@@ -242,26 +242,6 @@
     -unity-text-align: middle-right;
 }
 
-.discard-notice {
-    position: absolute;
-    top: 210px;
-    left: 50%;
-    translate: -50% 0;
-    padding: 10px 24px;
-    font-size: 22px;
-    background-color: rgba(38, 44, 54, 0.95);
-    border-width: 2px;
-    border-color: rgb(230, 80, 80);
-    border-radius: 14px;
-    opacity: 0;
-    transition-property: opacity;
-    transition-duration: 0.2s;
-}
-
-.discard-notice--visible {
-    opacity: 1;
-}
-
 /* 위치(left/top)는 C#이 매 프레임 차량을 따라 정한다. 기준점을 글자 아래 가운데로 맞춘다 */
 .damage-popup {
     position: absolute;

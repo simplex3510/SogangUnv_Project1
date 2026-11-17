@@ -11,7 +11,7 @@ using Game.Systems;
 namespace Game.UI
 {
     /// <summary>
-    /// 충돌 내구도 피드백 HUD(Story 006, 기획서 13장): 차량 위 감소량 −N, 적재 물류 내구도 패널, 폐기 알림.
+    /// 충돌 내구도 피드백 HUD(Story 006, 기획서 13장): 차량 위 감소량 −N, 적재 물류 내구도 패널. 폐기 알림은 ToastHud가 표시한다(Story 021).
     /// UI Toolkit 시범 화면이며 내구도는 계산하지 않고 이벤트로 받은 값만 표시한다.
     /// </summary>
     [RequireComponent(typeof(PanelRenderer))]
@@ -19,7 +19,6 @@ namespace Game.UI
     {
         private const string SpoiledGroupTitle = "처분 장소";
         private const string LogisticsCenterTitle = "물류센터";
-        private const string DiscardNoticeText = "물류가 폐기되었습니다 — 처분 장소로 이동";
 
         // 유지 시간 비율 중 이 지점부터 선형으로 사라진다
         private const float PopupFadeStart = 0.55f;
@@ -31,6 +30,7 @@ namespace Game.UI
             Key.Digit6, Key.Digit7, Key.Digit8, Key.Digit9,
         };
 
+        // 아래 세 참조는 비우면 Awake에서 씬의 Player를 찾아 채운다
         [Tooltip("감소량 이벤트를 받을 차량의 충돌 컨트롤러")]
         [SerializeField] private PlayerCargoImpactController _impactController;
         [Tooltip("적재 물류 목록·폐기 이벤트를 받을 차량의 상호작용 컨트롤러")]
@@ -47,10 +47,6 @@ namespace Game.UI
         [SerializeField, Min(0.1f)] private float _popupDuration = 0.9f;
         [Tooltip("유지 시간 동안 위로 떠오르는 거리(패널 px)")]
         [SerializeField, Min(0f)] private float _popupRise = 60f;
-
-        [Header("Discard Notice")]
-        [Tooltip("폐기 알림 표시 시간(초)")]
-        [SerializeField, Min(0f)] private float _noticeDuration = 2.5f;
 
         [Header("Cargo Panel")]
         [Tooltip("적재 물류 목록 최대 높이(패널 px). 넘치면 스크롤")]
@@ -76,14 +72,31 @@ namespace Game.UI
         private VisualElement _cargoPanel;
         private VisualElement _disposalPanel;
         private ScrollView _cargoList;
-        private Label _notice;
-        private float _noticeHideTime;
 
         private void Awake()
         {
             if (_camera == null)
             {
                 _camera = Camera.main;
+            }
+
+            // Hud 프리팹은 씬의 차량을 참조할 수 없으므로, 비어 있으면 씬에서 찾는다(세 컴포넌트 모두 Player 오브젝트에 있다)
+            if (_interactionController == null)
+            {
+                _interactionController = FindAnyObjectByType<PlayerInteractionController>();
+            }
+
+            if (_interactionController != null)
+            {
+                if (_impactController == null)
+                {
+                    _impactController = _interactionController.GetComponent<PlayerCargoImpactController>();
+                }
+
+                if (_vehicle == null)
+                {
+                    _vehicle = _interactionController.transform;
+                }
             }
 
             if (_impactController == null || _interactionController == null || _vehicle == null || _camera == null)
@@ -97,7 +110,6 @@ namespace Game.UI
         {
             _impactController.ImpactDamageApplied += OnImpactDamageApplied;
             _interactionController.LoadedParcelsChanged += OnLoadedParcelsChanged;
-            _interactionController.ParcelSpoiled += OnParcelSpoiled;
             GetComponent<PanelRenderer>().RegisterUIReloadCallback(OnUIReload);
         }
 
@@ -106,7 +118,6 @@ namespace Game.UI
             GetComponent<PanelRenderer>().UnregisterUIReloadCallback(OnUIReload);
             _impactController.ImpactDamageApplied -= OnImpactDamageApplied;
             _interactionController.LoadedParcelsChanged -= OnLoadedParcelsChanged;
-            _interactionController.ParcelSpoiled -= OnParcelSpoiled;
             ClearPopups();
             _cargoList = null;
         }
@@ -121,8 +132,7 @@ namespace Game.UI
             _cargoPanel = _root.Q("cargoPanel");
             _disposalPanel = _root.Q("disposalPanel");
             _cargoList = _root.Q<ScrollView>("cargoList");
-            _notice = _root.Q<Label>("discardNotice");
-            if (_hudRoot == null || _centerPanel == null || _cargoPanel == null || _disposalPanel == null || _cargoList == null || _notice == null)
+            if (_hudRoot == null || _centerPanel == null || _cargoPanel == null || _disposalPanel == null || _cargoList == null)
             {
                 Debug.LogError($"DurabilityHud.uxml is not assigned to the PanelRenderer in {gameObject.name}");
                 enabled = false;
@@ -132,7 +142,6 @@ namespace Game.UI
             // 휠은 포인터 위치와 무관하게 Update에서 직접 처리하므로 ScrollView 자체 휠 처리를 막는다
             _cargoList.contentViewport.pickingMode = PickingMode.Ignore;
             _cargoList.style.maxHeight = _listMaxHeight;
-            _notice.text = DiscardNoticeText;
             BuildLogisticsCenterRow();
             RefreshCargoPanel();
         }
@@ -247,12 +256,6 @@ namespace Game.UI
             {
                 RefreshCargoPanel();
             }
-
-            if (_noticeHideTime > 0f && Time.time >= _noticeHideTime)
-            {
-                _notice.RemoveFromClassList("discard-notice--visible");
-                _noticeHideTime = 0f;
-            }
         }
 
         // 물류센터 패널은 적재와 무관하게 항상 보이므로 트리를 받을 때 한 번만 만든다. 번호 키는 붙이지 않는다
@@ -343,17 +346,6 @@ namespace Game.UI
             {
                 RefreshCargoPanel();
             }
-        }
-
-        private void OnParcelSpoiled(Parcel _)
-        {
-            if (_cargoList == null || IsOperating() == false)
-            {
-                return;
-            }
-
-            _notice.AddToClassList("discard-notice--visible");
-            _noticeHideTime = Time.time + _noticeDuration;
         }
 
         private void PlacePopup(Label label, float t)

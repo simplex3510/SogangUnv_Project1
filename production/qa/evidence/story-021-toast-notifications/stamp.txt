@@ -1,0 +1,10 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/Logistics/DeliveryGenerationSystem.cs 71b5ceb4fefca1281a2cbf8ff57da52dae311d88
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/PlayerUIController.cs 2848e65fbc7221ad4288a48c913e1f767d375dba
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DurabilityHud.cs e8976b81c629d4077196e3c49e348a6567648d47
+Reviewed-Content-Hash: Assets/Game/UI/Hud/DurabilityHud.uxml e1a76bb2670b79a9b66ff410f424f9a26e386c16
+Reviewed-Content-Hash: Assets/Game/UI/Hud/DurabilityHud.uss ac93dd2694be84958fd170d73849921afd7f5d06
+Reviewed-Content-Hash: Assets/Game/UI/Hud/ToastHud.cs adc52123e5d2ee5be000477ff53c55efb97ee028
+Reviewed-Content-Hash: Assets/Game/UI/Hud/ToastHud.uxml 4abf3076a07169ebd72f20480b137d964b7e90db
+Reviewed-Content-Hash: Assets/Game/UI/Hud/ToastHud.uss e0e17f9b67499fdca121cfb8f1bc13c8a400ed9b
+Reviewed-Content-Hash: Assets/Game/Prefabs/UI/Hud.prefab c91c8952cbc25a24b85dd84428477b2e6b300cf9
+Reviewed-Content-Hash: Assets/Game/Scenes/_DevOnly/SampleMapDesign.unity 71068186aa3cd16bc9013390ec84be9c74f73b7e

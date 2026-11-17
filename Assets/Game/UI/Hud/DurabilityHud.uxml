@@ -8,6 +8,5 @@
             </ui:VisualElement>
             <ui:VisualElement name="disposalPanel" class="hud-panel hud-panel--disposal" picking-mode="Ignore" />
         </ui:VisualElement>
-        <ui:Label name="discardNotice" class="discard-notice" picking-mode="Ignore" />
     </ui:VisualElement>
 </ui:UXML>

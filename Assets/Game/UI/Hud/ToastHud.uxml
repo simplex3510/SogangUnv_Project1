@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="ToastHud.uss" />
+    <ui:VisualElement name="toastHud" class="toast-hud" picking-mode="Ignore">
+        <ui:VisualElement name="toastStack" class="toast-stack" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

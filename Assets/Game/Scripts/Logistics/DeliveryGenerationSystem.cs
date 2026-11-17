@@ -23,6 +23,9 @@ namespace Game.Logistics
         private float _nextDynamicSpawnSeconds;
         private bool _isDynamicGenerationStopped;
 
+        /// <summary>영업 중 동적 물류 1개가 생성되어 물류센터 대기열에 들어간 직후. 하루 시작 시 정적 물류에는 발생하지 않는다.</summary>
+        public event System.Action<Parcel> DynamicParcelGenerated;
+
         /// <summary>참조 검증을 마쳐 하루 시작을 받을 수 있는 상태인지.</summary>
         public bool IsReady { get; private set; }
 
@@ -184,6 +187,11 @@ namespace Game.Logistics
                 reward);
 
             _logisticsCenter.AddAvailableParcel(parcel);
+            if (generationType == DeliveryGenerationType.Dynamic)
+            {
+                DynamicParcelGenerated?.Invoke(parcel);
+            }
+
             return true;
         }
 

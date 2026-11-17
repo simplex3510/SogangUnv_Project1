@@ -1,6 +1,5 @@
 using UnityEngine;
 
-using TMPro;
 using UnityEngine.UI;
 
 using Game.Player.Recovery;
@@ -11,7 +10,7 @@ using Game.Interaction;
 namespace Game.Player.Interaction
 {
     [RequireComponent(typeof(PlayerInteractionController))]
-    /// <summary>상호작용 종류에 맞는 프롬프트만 켜고 나머지는 끈다. 막힌 상호작용은 사유 문구로 잠시 알린다.</summary>
+    /// <summary>상호작용 종류에 맞는 프롬프트만 켜고 나머지는 끈다. 막힌 상호작용의 사유 문구는 ToastHud가 표시한다(Story 021).</summary>
     public class PlayerUIController : MonoBehaviour
     {
         [Header("References")]
@@ -27,13 +26,6 @@ namespace Game.Player.Interaction
         [Tooltip("복구 잠금 중 R키 아이콘의 알파")]
         [SerializeField, Range(0f, 1f)] private float _lockedIconAlpha = 0.4f; // TODO(tuning)
 
-        [Header("Blocked Message")]
-        [SerializeField] private TMP_Text _messageText;
-        [Tooltip("사유 문구를 표시하는 시간(초)")]
-        [SerializeField, Min(0f)] private float _messageDuration = 1.5f;
-
-        private float _messageTimer;
-
         private void Awake()
         {
             if (_interactionController == null)
@@ -45,17 +37,11 @@ namespace Game.Player.Interaction
                     Debug.LogError($"PlayerInteractionController is missing in {gameObject.name}");
                 }
             }
-
-            if (_messageText != null)
-            {
-                _messageText.gameObject.SetActive(false);
-            }
         }
 
         private void Start()
         {
             _interactionController.InteractionContextChanged += RefreshInteractionUI;
-            _interactionController.InteractionBlocked += ShowMessage;
 
             if (_recoveryController != null && _recoveryKeyIcon != null)
             {
@@ -79,20 +65,6 @@ namespace Game.Player.Interaction
             Color color = _recoveryKeyIcon.color;
             color.a = isLocked ? _lockedIconAlpha : 1f;
             _recoveryKeyIcon.color = color;
-        }
-
-        private void Update()
-        {
-            if (_messageTimer <= 0f)
-            {
-                return;
-            }
-
-            _messageTimer -= Time.deltaTime;
-            if (_messageTimer <= 0f && _messageText != null)
-            {
-                _messageText.gameObject.SetActive(false);
-            }
         }
 
         private void ShowByType(InteractionTypes type)
@@ -119,18 +91,6 @@ namespace Game.Player.Interaction
         public void RefreshInteractionUI(bool isShow, InteractionTypes type = InteractionTypes.None)
         {
             ShowByType(isShow ? type : InteractionTypes.None);
-        }
-
-        private void ShowMessage(string message)
-        {
-            if (_messageText == null)
-            {
-                return;
-            }
-
-            _messageText.text = message;
-            _messageText.gameObject.SetActive(true);
-            _messageTimer = _messageDuration;
         }
     }
 }
