@@ -23,6 +23,10 @@ namespace Game.UI
         private const string DisposalTitle = "처분 장소";
 
         [SerializeField] private LogisticsCenter _center;
+        [Tooltip("배송지 카드 템플릿(CenterCard.uxml)")]
+        [SerializeField] private VisualTreeAsset _cardTemplate;
+        [Tooltip("물류 행 템플릿(CenterRow.uxml)")]
+        [SerializeField] private VisualTreeAsset _rowTemplate;
 
         private PlayerInteractionController _controller;
         private readonly List<ParcelGroup> _groups = new();
@@ -63,6 +67,11 @@ namespace Game.UI
                 Debug.LogError($"LogisticsCenterUI references are missing in {gameObject.name}");
                 enabled = false;
             }
+            else if (_cardTemplate == null || _rowTemplate == null)
+            {
+                Debug.LogError($"LogisticsCenterUI UXML templates are not assigned in {gameObject.name}");
+                enabled = false;
+            }
         }
 
         private void OnEnable()
@@ -94,6 +103,8 @@ namespace Game.UI
                 return;
             }
 
+            // UI Builder 미리보기용 예시 카드·행은 런타임에 지운다
+            _cardList.Clear();
             _trace = new BorderProgress();
             closeButton.clicked += Close;
             _windowRoot.EnableInClassList(HiddenClass, IsOpen == false);
@@ -228,10 +239,8 @@ namespace Game.UI
                 return;
             }
 
-            VisualElement card = AddElement(_cardList, "lc-card");
-            card.AddToClassList("lc-card--warning");
             float distance = CalculateXZDistance(_center.transform.position, DisposalSite.Instance.transform.position);
-            AddCardHeader(card, DisposalTitle, distance, $"폐기 {spoiled}");
+            AddCard(DisposalTitle, distance, $"폐기 {spoiled}").AddToClassList("lc-card--warning");
         }
 
         /// <summary>그룹 상차는 처리 순서 첫 물류부터 시작하므로, 그 물류가 실려야 그룹을 누를 수 있다(결정 D5).</summary>
@@ -318,9 +327,9 @@ namespace Game.UI
 
         private VisualElement AddGroupCard(ParcelGroup group)
         {
-            VisualElement card = AddElement(_cardList, "lc-card");
-            VisualElement header = AddCardHeader(card, group.Target.name, group.Distance, BuildCountText(group.Target));
-            _groupCounts[group.Target] = header.Q<Label>(className: "lc-card-count");
+            VisualElement card = AddCard(group.Target.name, group.Distance, BuildCountText(group.Target));
+            VisualElement header = card.Q("header");
+            _groupCounts[group.Target] = card.Q<Label>("countLabel");
 
             // 적재 한도에 도달해도 그룹은 숨기지 않고 비활성으로 남긴다(기획서 16.2-5)
             if (CanHoldGroup(group))
@@ -378,15 +387,15 @@ namespace Game.UI
             }
         }
 
-        private static VisualElement AddCardHeader(VisualElement card, string title, float distance, string count)
+        private VisualElement AddCard(string title, float distance, string count)
         {
-            VisualElement header = AddElement(card, "lc-card-header");
-            AddElement(header, "lc-pin");
-            AddLabel(header, "lc-card-title", title);
-            AddLabel(header, "lc-card-distance", $"{distance:0}m");
+            VisualElement card = Create(_cardTemplate);
+            _cardList.Add(card);
+            card.Q<Label>("titleLabel").text = title;
+            card.Q<Label>("distanceLabel").text = $"{distance:0}m";
             // 미적재 수량은 차량 적재량과 분리해 표시한다(기획서 8.1)
-            AddLabel(header, "lc-card-count", count);
-            return header;
+            card.Q<Label>("countLabel").text = count;
+            return card;
         }
 
         /// <summary>물류 행: 적재 HUD와 같은 유형 아이콘·예상 보상·해시태그, Express만 제한 시간 바와 만료 시각.</summary>
@@ -394,58 +403,51 @@ namespace Game.UI
         {
             bool isDisabled = CanLoad(parcel) == false;
 
-            VisualElement row = AddElement(card, "lc-row");
-            VisualElement main = AddElement(row, "lc-row-main");
-            VisualElement icon = AddElement(main, "parcel-icon");
+            VisualElement row = Create(_rowTemplate);
+            card.Add(row);
+            VisualElement icon = row.Q("parcelIcon");
             icon.EnableInClassList("parcel-icon--express", parcel.Type == DeliveryType.Express);
             icon.EnableInClassList("parcel-icon--fresh", parcel.IsFresh);
 
-            VisualElement info = AddElement(main, "parcel-info");
             DeliveryReward reward = parcel.Reward;
             // 제한 시간 안에 배송했을 때 받는 금액(적재 HUD와 같은 식)
-            Label price = AddLabel(info, "parcel-price", $"{reward.BaseFee + reward.DistanceFee + reward.TimeBonus + reward.TraitBonus + reward.FreshBonusMax:#,0}₩");
+            Label price = row.Q<Label>("priceLabel");
+            price.text = $"{reward.BaseFee + reward.DistanceFee + reward.TimeBonus + reward.TraitBonus + reward.FreshBonusMax:#,0}₩";
             // 상차하면 W를 넘지만 W_max 이내인 행은 경고색으로 두되 누를 수 있게 둔다(6.4)
             price.EnableInClassList("lc-price--warning", isDisabled == false && _controller != null && _controller.WouldExceedWeightCapacity(parcel));
 
-            VisualElement tags = AddElement(info, "parcel-tags");
             CargoTrait traits = parcel.Cargo.Traits;
-            if ((traits & CargoTrait.Fragile) != 0)
-            {
-                AddLabel(tags, "tag-chip", "#취급주의");
-            }
-
-            if ((traits & CargoTrait.Heavy) != 0)
-            {
-                AddLabel(tags, "tag-chip", "#고중량");
-            }
-
-            if ((traits & CargoTrait.Large) != 0)
-            {
-                AddLabel(tags, "tag-chip", "#대형");
-            }
-
+            Keep(row, "tagFragile", (traits & CargoTrait.Fragile) != 0);
+            Keep(row, "tagHeavy", (traits & CargoTrait.Heavy) != 0);
+            Keep(row, "tagLarge", (traits & CargoTrait.Large) != 0);
             if (isDisabled)
             {
                 bool isWeight = _controller != null && _controller.GetLoadBlockReason(parcel) == PlayerInteractionController.WeightLimitReason;
-                AddLabel(tags, "tag-chip", isWeight ? "#무게 초과" : "#적재 초과").AddToClassList("tag-chip--blocked");
+                row.Q<Label>("tagBlocked").text = isWeight ? "#무게 초과" : "#적재 초과";
+            }
+            else
+            {
+                row.Q("tagBlocked").RemoveFromHierarchy();
             }
 
             // 제한 시간이 없는 물류는 바와 시각을 두지 않는다(기획서 8.2)
             if (parcel.HasDeadline)
             {
-                VisualElement deadline = AddElement(row, "lc-deadline");
-                VisualElement fill = AddElement(AddElement(deadline, "lc-bar"), "lc-bar-fill");
+                VisualElement fill = row.Q("deadlineFill");
                 fill.style.width = Length.Percent(DeadlineRatio(parcel) * 100f);
                 _parcelFills[parcel] = fill;
                 // 남은 시간이 아니라 생성 시점에 확정된 만료 시각(게임 시계)을 보여 준다. Fresh는 대기 중 줄지 않으므로 신선도 총량(m:ss)을 보여 준다
-                if (parcel.IsFresh)
-                {
-                    AddElement(deadline, "lc-deadline-icon");
-                }
+                Keep(row, "deadlineIcon", parcel.IsFresh);
                 string deadlineText = parcel.IsFresh
                     ? $"{Mathf.FloorToInt(parcel.Deadline) / 60}:{Mathf.FloorToInt(parcel.Deadline) % 60:00}"
                     : FormatClock(parcel.CreationTime + parcel.Deadline);
-                AddLabel(deadline, "lc-deadline-time", deadlineText).EnableInClassList("lc-deadline-time--icon", parcel.IsFresh);
+                Label time = row.Q<Label>("deadlineTime");
+                time.text = deadlineText;
+                time.EnableInClassList("lc-deadline-time--icon", parcel.IsFresh);
+            }
+            else
+            {
+                row.Q("deadline").RemoveFromHierarchy();
             }
 
             _parcelRows[parcel] = row;
@@ -617,20 +619,19 @@ namespace Game.UI
             return parcel.Deadline > 0f ? Mathf.Clamp01(parcel.RemainingDeadline / parcel.Deadline) : 0f;
         }
 
-        private static VisualElement AddElement(VisualElement parent, string className)
+        // 템플릿 한 개를 만들어 TemplateContainer 래퍼 없이 루트 요소만 꺼낸다(래퍼가 끼면 카드·행 간격 기준이 달라진다)
+        private static VisualElement Create(VisualTreeAsset template)
         {
-            var element = new VisualElement { pickingMode = PickingMode.Ignore };
-            element.AddToClassList(className);
-            parent.Add(element);
-            return element;
+            return template.Instantiate()[0];
         }
 
-        private static Label AddLabel(VisualElement parent, string className, string text)
+        // 템플릿에 고정된 조건부 요소를 조건이 거짓이면 뺀다
+        private static void Keep(VisualElement root, string name, bool keep)
         {
-            var label = new Label(text) { pickingMode = PickingMode.Ignore };
-            label.AddToClassList(className);
-            parent.Add(label);
-            return label;
+            if (keep == false)
+            {
+                root.Q(name).RemoveFromHierarchy();
+            }
         }
 
         private static float CalculateXZDistance(Vector3 a, Vector3 b)

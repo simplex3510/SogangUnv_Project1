@@ -1,12 +1,22 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:Style src="DurabilityHud.uss" />
+    <ui:Template name="CargoGroupHeader" src="CargoGroupHeader.uxml" />
+    <ui:Template name="CenterNavRow" src="CenterNavRow.uxml" />
+    <ui:Template name="ParcelRow" src="ParcelRow.uxml" />
+    <ui:Template name="DamagePopup" src="DamagePopup.uxml" />
     <ui:VisualElement name="hudRoot" class="hud-root" picking-mode="Ignore">
         <ui:VisualElement name="cargoColumn" class="cargo-column" picking-mode="Ignore">
-            <ui:VisualElement name="centerPanel" class="hud-panel hud-panel--center" picking-mode="Ignore" />
+            <ui:VisualElement name="centerPanel" class="hud-panel hud-panel--center" picking-mode="Ignore">
+                <ui:Instance template="CenterNavRow" name="sample" picking-mode="Ignore" />
+            </ui:VisualElement>
             <ui:VisualElement name="cargoPanel" class="hud-panel cargo-panel" picking-mode="Ignore">
-                <ui:ScrollView name="cargoList" mode="Vertical" vertical-scroller-visibility="Hidden" horizontal-scroller-visibility="Hidden" picking-mode="Ignore" />
+                <ui:ScrollView name="cargoList" mode="Vertical" vertical-scroller-visibility="Hidden" horizontal-scroller-visibility="Hidden" picking-mode="Ignore">
+                    <ui:Instance template="CargoGroupHeader" name="sample" picking-mode="Ignore" />
+                    <ui:Instance template="ParcelRow" name="sample" picking-mode="Ignore" />
+                </ui:ScrollView>
             </ui:VisualElement>
             <ui:VisualElement name="disposalPanel" class="hud-panel hud-panel--disposal" picking-mode="Ignore" />
         </ui:VisualElement>
+        <ui:Instance template="DamagePopup" name="sample" picking-mode="Ignore" />
     </ui:VisualElement>
 </ui:UXML>

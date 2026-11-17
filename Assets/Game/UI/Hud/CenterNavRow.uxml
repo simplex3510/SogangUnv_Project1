@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="DurabilityHud.uss" />
+    <ui:VisualElement name="row" class="logistics-center-row" picking-mode="Ignore">
+        <ui:VisualElement name="navIndicator" class="nav-indicator" picking-mode="Ignore">
+            <ui:VisualElement name="navArrow" class="nav-arrow nav-arrow--center" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:Label name="titleLabel" class="cargo-group-title" picking-mode="Ignore" text="물류센터" />
+        <ui:Label name="distanceLabel" class="nav-distance" picking-mode="Ignore" text="80m" />
+    </ui:VisualElement>
+</ui:UXML>

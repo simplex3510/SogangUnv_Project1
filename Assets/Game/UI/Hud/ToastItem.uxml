@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="ToastHud.uss" />
+    <ui:Label name="toastLabel" class="toast toast--parcel toast--shown" picking-mode="Ignore" text="새 물류 — 배송지 · 일반 배송" />
+</ui:UXML>

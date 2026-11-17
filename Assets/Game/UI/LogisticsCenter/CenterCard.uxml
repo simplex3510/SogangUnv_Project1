@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="../Hud/DurabilityHud.uss" />
+    <ui:Style src="LogisticsCenterWindow.uss" />
+    <ui:VisualElement name="card" class="lc-card" picking-mode="Ignore">
+        <ui:VisualElement name="header" class="lc-card-header" picking-mode="Ignore">
+            <ui:VisualElement name="pin" class="lc-pin" picking-mode="Ignore" />
+            <ui:Label name="titleLabel" class="lc-card-title" picking-mode="Ignore" text="배송지" />
+            <ui:Label name="distanceLabel" class="lc-card-distance" picking-mode="Ignore" text="120m" />
+            <ui:Label name="countLabel" class="lc-card-count" picking-mode="Ignore" text="남은 2 · 적재 0" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

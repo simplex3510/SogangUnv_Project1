@@ -1,7 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:Style src="../Hud/DurabilityHud.uss" />
     <ui:Style src="LogisticsCenterWindow.uss" />
-    <ui:VisualElement name="windowRoot" class="lc-root lc-root--hidden" picking-mode="Ignore">
+    <ui:Template name="CenterCard" src="CenterCard.uxml" />
+    <ui:Template name="CenterRow" src="CenterRow.uxml" />
+    <ui:VisualElement name="windowRoot" class="lc-root" picking-mode="Ignore">
         <ui:VisualElement class="lc-window">
             <ui:VisualElement class="lc-head">
                 <ui:VisualElement class="lc-head-text">
@@ -16,7 +18,10 @@
                 <ui:Label name="capacityBadge" class="lc-badge" />
                 <ui:Label name="weightBadge" class="lc-badge" />
             </ui:VisualElement>
-            <ui:ScrollView name="cardList" class="lc-list" mode="Vertical" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto" />
+            <ui:ScrollView name="cardList" class="lc-list" mode="Vertical" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto">
+                <ui:Instance template="CenterCard" name="sample" />
+                <ui:Instance template="CenterRow" name="sample" />
+            </ui:ScrollView>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="DurabilityHud.uss" />
+    <ui:VisualElement name="group" class="cargo-group" picking-mode="Ignore">
+        <ui:VisualElement name="header" class="cargo-group-header" picking-mode="Ignore">
+            <ui:VisualElement name="navIndicator" class="nav-indicator" picking-mode="Ignore">
+                <ui:VisualElement name="navArrow" class="nav-arrow" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label name="keyLabel" class="group-key" picking-mode="Ignore" text="1" />
+            <ui:Label name="titleLabel" class="cargo-group-title" picking-mode="Ignore" text="배송지" />
+            <ui:Label name="countLabel" class="cargo-group-count" picking-mode="Ignore" text="×2" />
+            <ui:Label name="distanceLabel" class="nav-distance" picking-mode="Ignore" text="120m" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

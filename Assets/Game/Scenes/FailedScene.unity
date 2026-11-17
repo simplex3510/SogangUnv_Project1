@@ -19938,6 +19938,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.UI.LogisticsCenterUI
   _center: {fileID: 35495546}
+  _cardTemplate: {fileID: 9197481963319205126, guid: 0789a35165c3df249963768c1e0d8dc1, type: 3}
+  _rowTemplate: {fileID: 9197481963319205126, guid: 1ad865e26d54cbe4e86d6a7a20d2fb96, type: 3}
 --- !u!1931382934 &715133283
 PanelRenderer:
   m_ObjectHideFlags: 0

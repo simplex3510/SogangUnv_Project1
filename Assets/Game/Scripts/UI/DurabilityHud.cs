@@ -54,6 +54,16 @@ namespace Game.UI
         [Tooltip("마우스 휠 한 칸·PageUp/PageDown 한 번의 스크롤 거리(패널 px)")]
         [SerializeField, Min(1f)] private float _scrollStep = 120f;
 
+        [Header("Templates")]
+        [Tooltip("배송지 그룹 헤더 템플릿(CargoGroupHeader.uxml)")]
+        [SerializeField] private VisualTreeAsset _groupHeaderTemplate;
+        [Tooltip("물류센터 행 템플릿(CenterNavRow.uxml)")]
+        [SerializeField] private VisualTreeAsset _centerRowTemplate;
+        [Tooltip("물류 행 템플릿(ParcelRow.uxml)")]
+        [SerializeField] private VisualTreeAsset _parcelRowTemplate;
+        [Tooltip("감소량 −N 팝업 템플릿(DamagePopup.uxml)")]
+        [SerializeField] private VisualTreeAsset _damagePopupTemplate;
+
         private readonly List<(Label label, float startTime)> _popups = new();
         // 펼친 그룹 키(배송지 이름 또는 처분 장소). 없는 키는 접힘
         private readonly HashSet<string> _expandedGroups = new();
@@ -99,6 +109,13 @@ namespace Game.UI
                 }
             }
 
+            if (_groupHeaderTemplate == null || _centerRowTemplate == null || _parcelRowTemplate == null || _damagePopupTemplate == null)
+            {
+                Debug.LogError($"DurabilityHud UXML templates are not assigned in {gameObject.name}");
+                enabled = false;
+                return;
+            }
+
             if (_impactController == null || _interactionController == null || _vehicle == null || _camera == null)
             {
                 Debug.LogError($"DurabilityHud references are missing in {gameObject.name}");
@@ -137,6 +154,12 @@ namespace Game.UI
                 Debug.LogError($"DurabilityHud.uxml is not assigned to the PanelRenderer in {gameObject.name}");
                 enabled = false;
                 return;
+            }
+
+            // UI Builder 미리보기용 예시 요소는 런타임에 지운다
+            foreach (VisualElement sample in _root.Query("sample").ToList())
+            {
+                sample.RemoveFromHierarchy();
             }
 
             // 휠은 포인터 위치와 무관하게 Update에서 직접 처리하므로 ScrollView 자체 휠 처리를 막는다
@@ -262,22 +285,17 @@ namespace Game.UI
         private void BuildLogisticsCenterRow()
         {
             _centerPanel.Clear();
-            VisualElement row = AddElement(_centerPanel, "logistics-center-row");
+            VisualElement row = Create(_centerRowTemplate);
+            _centerPanel.Add(row);
             if (_logisticsCenter == null)
             {
                 _logisticsCenter = FindAnyObjectByType<LogisticsCenter>();
             }
 
-            VisualElement arrow = AddNavBadge(row);
-            arrow.AddToClassList("nav-arrow--center");
-            AddLabel(row, "cargo-group-title", LogisticsCenterTitle);
-            _centerNav = (arrow, AddLabel(row, "nav-distance", string.Empty), _logisticsCenter != null ? _logisticsCenter.transform : null);
-        }
-
-        // 행 맨 왼쪽의 원형 나침반 배지. 테두리는 고정이고 안의 화살표만 돈다. 거리는 행 오른쪽 끝 열에 따로 둔다
-        private static VisualElement AddNavBadge(VisualElement parent)
-        {
-            return AddElement(AddElement(parent, "nav-indicator"), "nav-arrow");
+            row.Q<Label>("titleLabel").text = LogisticsCenterTitle;
+            Label distance = row.Q<Label>("distanceLabel");
+            distance.text = string.Empty;
+            _centerNav = (row.Q("navArrow"), distance, _logisticsCenter != null ? _logisticsCenter.transform : null);
         }
 
         // 화살표 위쪽 = 차량 전방. 수평면에서 전방과 목적지 방향의 부호 있는 각도(시계 방향 +)로 돌린다
@@ -332,8 +350,8 @@ namespace Game.UI
             }
 
             // 0.x 감소도 0으로 보이지 않게 올림한다
-            var label = new Label($"−{Mathf.CeilToInt(damage)}") { pickingMode = PickingMode.Ignore };
-            label.AddToClassList("damage-popup");
+            var label = (Label)Create(_damagePopupTemplate);
+            label.text = $"−{Mathf.CeilToInt(damage)}";
             // hudRoot는 패널 전체를 채우므로 좌표계가 패널과 같고, 폰트·색을 상속받는다
             _hudRoot.Add(label);
             PlacePopup(label, 0f);
@@ -400,21 +418,25 @@ namespace Game.UI
                 List<Parcel> members = groups[title];
                 bool expanded = _expandedGroups.Contains(title);
 
-                VisualElement group = AddElement(title == SpoiledGroupTitle ? _disposalPanel : _cargoList, "cargo-group");
-                // 긴 배송지 이름은 말줄임하고 개수는 항상 보이게 따로 둔다
-                VisualElement header = AddElement(group, "cargo-group-header");
+                VisualElement group = Create(_groupHeaderTemplate);
+                (title == SpoiledGroupTitle ? _disposalPanel : _cargoList).Add(group);
                 // 폐기 그룹은 처분 장소, 그 외는 배송지를 가리킨다
                 Transform destination = members[0].IsSpoiled ? DisposalSite.Instance?.transform : members[0].Target.transform;
-                VisualElement arrow = AddNavBadge(header);
                 // 숫자키가 닿는 1~9번째 그룹만 키 번호를 붙인다
                 if (i < GroupToggleKeys.Length)
                 {
-                    AddLabel(header, "group-key", $"{i + 1}");
+                    group.Q<Label>("keyLabel").text = $"{i + 1}";
+                }
+                else
+                {
+                    group.Q("keyLabel").RemoveFromHierarchy();
                 }
 
-                AddLabel(header, "cargo-group-title", title);
-                AddLabel(header, "cargo-group-count", $"×{members.Count}");
-                _groupNavs.Add((arrow, AddLabel(header, "nav-distance", string.Empty), destination));
+                group.Q<Label>("titleLabel").text = title;
+                group.Q<Label>("countLabel").text = $"×{members.Count}";
+                Label distance = group.Q<Label>("distanceLabel");
+                distance.text = string.Empty;
+                _groupNavs.Add((group.Q("navArrow"), distance, destination));
                 if (expanded)
                 {
                     for (int j = 0; j < members.Count; j++)
@@ -431,59 +453,43 @@ namespace Game.UI
 
         private void AddParcelRow(VisualElement group, Parcel parcel)
         {
-            VisualElement row = AddElement(group, "parcel-row");
+            VisualElement row = Create(_parcelRowTemplate);
+            group.Add(row);
             row.EnableInClassList("parcel-row--spoiled", parcel.IsSpoiled);
 
             // 상자 그림 대신 배송 유형 색 블록(Normal 파랑, Express 빨강, Fresh 초록)
-            VisualElement icon = AddElement(row, "parcel-icon");
+            VisualElement icon = row.Q("parcelIcon");
             icon.EnableInClassList("parcel-icon--express", parcel.Type == DeliveryType.Express);
             icon.EnableInClassList("parcel-icon--fresh", parcel.IsFresh);
             // 폐기 물류는 원래 유형과 관계없이 폐기 색으로 덮는다(USS에서 뒤에 선언)
             icon.EnableInClassList("parcel-icon--spoiled", parcel.IsSpoiled);
 
-            VisualElement info = AddElement(row, "parcel-info");
             DeliveryReward reward = parcel.Reward;
             // 제한 시간 안에(Fresh는 신선도가 가득일 때) 배송했을 때 받는 금액
-            AddLabel(info, "parcel-price", $"{reward.BaseFee + reward.DistanceFee + reward.TimeBonus + reward.TraitBonus + reward.FreshBonusMax:#,0}₩");
+            row.Q<Label>("priceLabel").text = $"{reward.BaseFee + reward.DistanceFee + reward.TimeBonus + reward.TraitBonus + reward.FreshBonusMax:#,0}₩";
 
             // 폐기 행에는 바가 없다. Normal은 제한 시간이 없어 바가 없다
             if (parcel.HasDeadline && parcel.IsSpoiled == false)
             {
-                VisualElement fill = AddElement(AddElement(info, "parcel-deadline"), "parcel-deadline-fill");
+                VisualElement fill = row.Q("deadlineFill");
                 fill.EnableInClassList("parcel-deadline-fill--fresh", parcel.IsFresh);
                 fill.style.width = Length.Percent(DeadlineRatio(parcel) * 100f);
                 _deadlineFills[parcel] = (fill, parcel.IsOverdue);
             }
-
-            VisualElement tags = AddElement(info, "parcel-tags");
-            if (parcel.IsSpoiled)
+            else
             {
-                AddLabel(tags, "tag-chip", "#폐기").AddToClassList("tag-chip--spoiled");
-            }
-
-            if (parcel.IsOverdue && parcel.IsSpoiled == false)
-            {
-                AddLabel(tags, "tag-chip", "#지연").AddToClassList("tag-chip--overdue");
+                row.Q("deadline").RemoveFromHierarchy();
             }
 
             CargoTrait traits = parcel.Cargo.Traits;
-            if ((traits & CargoTrait.Fragile) != 0)
-            {
-                AddLabel(tags, "tag-chip", "#취급주의");
-            }
-
-            if ((traits & CargoTrait.Heavy) != 0)
-            {
-                AddLabel(tags, "tag-chip", "#고중량");
-            }
-
-            if ((traits & CargoTrait.Large) != 0)
-            {
-                AddLabel(tags, "tag-chip", "#대형");
-            }
+            Keep(row, "tagSpoiled", parcel.IsSpoiled);
+            Keep(row, "tagOverdue", parcel.IsOverdue && parcel.IsSpoiled == false);
+            Keep(row, "tagFragile", (traits & CargoTrait.Fragile) != 0);
+            Keep(row, "tagHeavy", (traits & CargoTrait.Heavy) != 0);
+            Keep(row, "tagLarge", (traits & CargoTrait.Large) != 0);
 
             // 0이 아닌 내구도가 0으로 보이지 않게 올림한다
-            AddLabel(row, "parcel-durability", $"내구도 {Mathf.CeilToInt(parcel.CurrentDurability)}/{parcel.Cargo.Durability}");
+            row.Q<Label>("durabilityLabel").text = $"내구도 {Mathf.CeilToInt(parcel.CurrentDurability)}/{parcel.Cargo.Durability}";
         }
 
         private static float DeadlineRatio(Parcel parcel)
@@ -491,20 +497,19 @@ namespace Game.UI
             return parcel.Deadline > 0f ? Mathf.Clamp01(parcel.RemainingDeadline / parcel.Deadline) : 0f;
         }
 
-        private static VisualElement AddElement(VisualElement parent, string className)
+        // 템플릿 한 개를 만들어 TemplateContainer 래퍼 없이 루트 요소만 꺼낸다(래퍼가 끼면 절대 위치·행 간격 기준이 달라진다)
+        private static VisualElement Create(VisualTreeAsset template)
         {
-            var element = new VisualElement { pickingMode = PickingMode.Ignore };
-            element.AddToClassList(className);
-            parent.Add(element);
-            return element;
+            return template.Instantiate()[0];
         }
 
-        private static Label AddLabel(VisualElement parent, string className, string text)
+        // 템플릿에 고정된 조건부 요소를 조건이 거짓이면 뺀다
+        private static void Keep(VisualElement root, string name, bool keep)
         {
-            var label = new Label(text) { pickingMode = PickingMode.Ignore };
-            label.AddToClassList(className);
-            parent.Add(label);
-            return label;
+            if (keep == false)
+            {
+                root.Q(name).RemoveFromHierarchy();
+            }
         }
     }
 }

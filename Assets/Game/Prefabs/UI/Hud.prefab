@@ -348,6 +348,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.UI.Hud.ToastHud
   _maxCount: 3
   _holdSeconds: 2
+  _toastTemplate: {fileID: 9197481963319205126, guid: 3689928750a50f64893ef760e0a82d7d, type: 3}
 --- !u!1 &8059167238142763380
 GameObject:
   m_ObjectHideFlags: 0
@@ -402,6 +403,10 @@ MonoBehaviour:
   _popupRise: 60
   _listMaxHeight: 1024
   _scrollStep: 120
+  _groupHeaderTemplate: {fileID: 9197481963319205126, guid: 2c14815e05b54244dad72257d95b37ef, type: 3}
+  _centerRowTemplate: {fileID: 9197481963319205126, guid: 20e032ca3eb6d804da0ecd40e7234be6, type: 3}
+  _parcelRowTemplate: {fileID: 9197481963319205126, guid: 5b8eba7c778ebd9499c018acc6c25ba4, type: 3}
+  _damagePopupTemplate: {fileID: 9197481963319205126, guid: b8a738e82d3b35847b7b9ab160ee3656, type: 3}
 --- !u!1931382934 &8089469393271320194
 PanelRenderer:
   m_ObjectHideFlags: 0

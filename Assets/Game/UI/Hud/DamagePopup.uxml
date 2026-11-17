@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="DurabilityHud.uss" />
+    <ui:Label name="damageLabel" class="damage-popup" picking-mode="Ignore" text="−5" style="left: 120px; top: 80px;" />
+</ui:UXML>

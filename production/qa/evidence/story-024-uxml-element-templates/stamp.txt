@@ -1,0 +1,17 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DurabilityHud.cs 8fc0acb196a264e67b29dcc13a3ca30e4b459f64
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/LogisticsCenterUI.cs 16b1e0e84d0c2dd75a57ba9fd7d8406dd502afb7
+Reviewed-Content-Hash: Assets/Game/UI/Hud/ToastHud.cs dfc31a24e7ecdc47165eec182c3111b59b666d45
+Reviewed-Content-Hash: Assets/Game/UI/Hud/DurabilityHud.uxml 9a77a4c75ce5b97c002661dba9b57362df4bf7bd
+Reviewed-Content-Hash: Assets/Game/UI/Hud/ToastHud.uxml 41c9a0a562f82a1e4c7673c71c5bca0ff90a5230
+Reviewed-Content-Hash: Assets/Game/UI/LogisticsCenter/LogisticsCenterWindow.uxml e2edd3387e3a837a1397a28dfce1f989576e1c15
+Reviewed-Content-Hash: Assets/Game/UI/Hud/CargoGroupHeader.uxml f57ba9cf4da870061665295a8128c04784b73172
+Reviewed-Content-Hash: Assets/Game/UI/Hud/CenterNavRow.uxml f787f86994d99da35f75374d5f6c4cf6e7604dbf
+Reviewed-Content-Hash: Assets/Game/UI/Hud/ParcelRow.uxml cde339f1782bd33c119557466297efeda708a5ce
+Reviewed-Content-Hash: Assets/Game/UI/Hud/DamagePopup.uxml d0ca610918130a341ebe735c750ee5fdbfe8c485
+Reviewed-Content-Hash: Assets/Game/UI/Hud/ToastItem.uxml e4e4c0dd4ab6eeed75e3d3ab1bdef16cc4ad4f66
+Reviewed-Content-Hash: Assets/Game/UI/LogisticsCenter/CenterCard.uxml 28641f1b35d9cc747de33d213b9c359a652c900a
+Reviewed-Content-Hash: Assets/Game/UI/LogisticsCenter/CenterRow.uxml 36586915699d411c6cd2890312a39677a1b77d0c
+Reviewed-Content-Hash: Assets/Game/Prefabs/UI/Hud.prefab 12c989f7f1ef6eac5f106bcbb8d86da6fad785a6
+Reviewed-Content-Hash: Assets/Game/Scenes/FailedScene.unity 94cbe42d2235716164bb6ef3820f20a5b2542187
+Reviewed-Content-Hash: Assets/Game/Scenes/_DevOnly/DevScene.unity 1fd5975de52afb8de69240476ff13da7227e4279
+Reviewed-Content-Hash: Assets/Game/Scenes/_DevOnly/SampleMapDesign.unity faa00af315de36928cdb097b7e9a4db69af92cca

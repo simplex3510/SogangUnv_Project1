@@ -1,0 +1,25 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="../Hud/DurabilityHud.uss" />
+    <ui:Style src="LogisticsCenterWindow.uss" />
+    <ui:VisualElement name="row" class="lc-row" picking-mode="Ignore">
+        <ui:VisualElement name="main" class="lc-row-main" picking-mode="Ignore">
+            <ui:VisualElement name="parcelIcon" class="parcel-icon" picking-mode="Ignore" />
+            <ui:VisualElement name="info" class="parcel-info" picking-mode="Ignore">
+                <ui:Label name="priceLabel" class="parcel-price" picking-mode="Ignore" text="1,000₩" />
+                <ui:VisualElement name="tags" class="parcel-tags" picking-mode="Ignore">
+                    <ui:Label name="tagFragile" class="tag-chip" picking-mode="Ignore" text="#취급주의" />
+                    <ui:Label name="tagHeavy" class="tag-chip" picking-mode="Ignore" text="#고중량" />
+                    <ui:Label name="tagLarge" class="tag-chip" picking-mode="Ignore" text="#대형" />
+                    <ui:Label name="tagBlocked" class="tag-chip tag-chip--blocked" picking-mode="Ignore" text="#적재 초과" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="deadline" class="lc-deadline" picking-mode="Ignore">
+            <ui:VisualElement name="bar" class="lc-bar" picking-mode="Ignore">
+                <ui:VisualElement name="deadlineFill" class="lc-bar-fill" picking-mode="Ignore" style="width: 60%;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="deadlineIcon" class="lc-deadline-icon" picking-mode="Ignore" />
+            <ui:Label name="deadlineTime" class="lc-deadline-time lc-deadline-time--icon" picking-mode="Ignore" text="3:00" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

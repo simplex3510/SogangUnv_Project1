@@ -25,7 +25,6 @@ namespace Game.UI.Hud
             Spoiled,
         }
 
-        private const string ToastClass = "toast";
         private const string ShownClass = "toast--shown";
         private const string SpoiledText = "물류가 폐기되었습니다 — 처분 장소로 이동";
 
@@ -36,6 +35,9 @@ namespace Game.UI.Hud
         [UnityEngine.Serialization.FormerlySerializedAs("_parcelHoldSeconds")]
         [SerializeField, Min(0.1f)] private float _holdSeconds = 2f; // TODO(tuning)
 
+        [Tooltip("토스트 한 개 템플릿(ToastItem.uxml)")]
+        [SerializeField] private VisualTreeAsset _toastTemplate;
+
         private readonly ToastQueue _queue = new();
         private readonly Dictionary<ToastQueue.Entry, Label> _labels = new();
         private readonly List<ToastQueue.Entry> _expired = new();
@@ -43,6 +45,15 @@ namespace Game.UI.Hud
         private DeliveryGenerationSystem _generationSystem;
         private DeliveryDeadlineSystem _deadlineSystem;
         private PlayerInteractionController _interactionController;
+
+        private void Awake()
+        {
+            if (_toastTemplate == null)
+            {
+                Debug.LogError($"ToastHud UXML template is not assigned in {gameObject.name}");
+                enabled = false;
+            }
+        }
 
         private void OnEnable()
         {
@@ -65,7 +76,11 @@ namespace Game.UI.Hud
             {
                 Debug.LogError($"ToastHud UXML elements are missing in {gameObject.name}");
                 enabled = false;
+                return;
             }
+
+            // UI Builder 미리보기용 예시 토스트는 런타임에 지운다
+            _stack.Clear();
         }
 
         private void Start()
@@ -171,8 +186,12 @@ namespace Game.UI.Hud
                 return;
             }
 
-            var label = new Label(text) { pickingMode = PickingMode.Ignore };
-            label.AddToClassList(ToastClass);
+            // 템플릿은 UI Builder에서 보이도록 parcel 종류·등장 상태로 저장돼 있다. 기본 상태(투명)로 되돌린 뒤 종류를 붙인다.
+            // TemplateContainer 래퍼 없이 루트 라벨만 꺼낸다
+            var label = (Label)_toastTemplate.Instantiate()[0];
+            label.text = text;
+            label.RemoveFromClassList(ShownClass);
+            label.RemoveFromClassList(GetKindClass(ToastKind.Parcel));
             label.AddToClassList(GetKindClass(kind));
             _stack.Insert(0, label);
             _labels[entry] = label;
