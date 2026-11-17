@@ -187,8 +187,8 @@
     -unity-background-image-tint-color: rgb(85, 88, 95);
 }
 
-/* 상차한 Fresh의 남은 신선도. 폭은 C#이 매 프레임 정한다 */
-.parcel-freshness {
+/* 제한 시간 물류의 남은 시간(Fresh는 신선도). 폭은 C#이 매 프레임 정한다. Express 빨강, Fresh 초록(임시 2026-11-17) */
+.parcel-deadline {
     height: 6px;
     margin-top: 4px;
     background-color: rgb(30, 35, 44);
@@ -196,10 +196,14 @@
     overflow: hidden;
 }
 
-.parcel-freshness-fill {
+.parcel-deadline-fill {
     height: 100%;
-    background-color: rgb(84, 217, 140);
+    background-color: rgb(240, 90, 95);
     border-radius: 3px;
+}
+
+.parcel-deadline-fill--fresh {
+    background-color: rgb(84, 217, 140);
 }
 
 .parcel-info {
@@ -225,7 +229,8 @@
     border-radius: 8px;
 }
 
-.tag-chip--spoiled {
+.tag-chip--spoiled,
+.tag-chip--overdue {
     background-color: rgb(200, 60, 60);
 }
 

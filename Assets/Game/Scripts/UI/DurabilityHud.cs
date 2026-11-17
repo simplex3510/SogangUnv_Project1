@@ -63,8 +63,8 @@ namespace Game.UI
         private readonly HashSet<string> _expandedGroups = new();
         // 패널 위에서부터의 그룹 순서. 숫자키 번호와 같다
         private readonly List<string> _groupOrder = new();
-        // 펼친 그룹에 그려진 Fresh 물류의 신선도 바
-        private readonly Dictionary<Parcel, VisualElement> _freshnessFills = new();
+        // 펼친 그룹에 그려진 제한 시간 물류(Express·Fresh)의 남은 시간 바와, 행을 그릴 때의 시간 초과 여부
+        private readonly Dictionary<Parcel, (VisualElement fill, bool overdue)> _deadlineFills = new();
         // 그룹 헤더의 방향 표시(화살표·거리)와 그 목적지. 패널을 다시 그릴 때 채우고 회전·거리만 매 프레임 바꾼다
         private readonly List<(VisualElement arrow, Label distance, Transform destination)> _groupNavs = new();
         private LogisticsCenter _logisticsCenter;
@@ -235,10 +235,17 @@ namespace Game.UI
                 PlacePopup(_popups[i].label, t);
             }
 
-            // 행은 적재 변화 때만 다시 그리므로 신선도 바만 매 프레임 줄인다
-            foreach (KeyValuePair<Parcel, VisualElement> pair in _freshnessFills)
+            // 행은 적재 변화 때만 다시 그리므로 바 너비만 매 프레임 줄인다. 시간 초과가 새로 생기면 #지연 태그를 위해 한 번 다시 그린다
+            bool overdueChanged = false;
+            foreach (KeyValuePair<Parcel, (VisualElement fill, bool overdue)> pair in _deadlineFills)
             {
-                pair.Value.style.width = Length.Percent(FreshnessRatio(pair.Key) * 100f);
+                pair.Value.fill.style.width = Length.Percent(DeadlineRatio(pair.Key) * 100f);
+                overdueChanged |= pair.Key.IsOverdue != pair.Value.overdue;
+            }
+
+            if (overdueChanged)
+            {
+                RefreshCargoPanel();
             }
 
             if (_noticeHideTime > 0f && Time.time >= _noticeHideTime)
@@ -367,7 +374,7 @@ namespace Game.UI
             _cargoList.Clear();
             _disposalPanel.Clear();
             _groupOrder.Clear();
-            _freshnessFills.Clear();
+            _deadlineFills.Clear();
             _groupNavs.Clear();
 
             var groups = new Dictionary<string, List<Parcel>>();
@@ -447,17 +454,24 @@ namespace Game.UI
             // 제한 시간 안에(Fresh는 신선도가 가득일 때) 배송했을 때 받는 금액
             AddLabel(info, "parcel-price", $"{reward.BaseFee + reward.DistanceFee + reward.TimeBonus + reward.TraitBonus + reward.FreshBonusMax:#,0}₩");
 
-            if (parcel.IsFresh && parcel.IsSpoiled == false)
+            // 폐기 행에는 바가 없다. Normal은 제한 시간이 없어 바가 없다
+            if (parcel.HasDeadline && parcel.IsSpoiled == false)
             {
-                VisualElement fill = AddElement(AddElement(info, "parcel-freshness"), "parcel-freshness-fill");
-                fill.style.width = Length.Percent(FreshnessRatio(parcel) * 100f);
-                _freshnessFills[parcel] = fill;
+                VisualElement fill = AddElement(AddElement(info, "parcel-deadline"), "parcel-deadline-fill");
+                fill.EnableInClassList("parcel-deadline-fill--fresh", parcel.IsFresh);
+                fill.style.width = Length.Percent(DeadlineRatio(parcel) * 100f);
+                _deadlineFills[parcel] = (fill, parcel.IsOverdue);
             }
 
             VisualElement tags = AddElement(info, "parcel-tags");
             if (parcel.IsSpoiled)
             {
                 AddLabel(tags, "tag-chip", "#폐기").AddToClassList("tag-chip--spoiled");
+            }
+
+            if (parcel.IsOverdue && parcel.IsSpoiled == false)
+            {
+                AddLabel(tags, "tag-chip", "#지연").AddToClassList("tag-chip--overdue");
             }
 
             CargoTrait traits = parcel.Cargo.Traits;
@@ -480,7 +494,7 @@ namespace Game.UI
             AddLabel(row, "parcel-durability", $"내구도 {Mathf.CeilToInt(parcel.CurrentDurability)}/{parcel.Cargo.Durability}");
         }
 
-        private static float FreshnessRatio(Parcel parcel)
+        private static float DeadlineRatio(Parcel parcel)
         {
             return parcel.Deadline > 0f ? Mathf.Clamp01(parcel.RemainingDeadline / parcel.Deadline) : 0f;
         }
