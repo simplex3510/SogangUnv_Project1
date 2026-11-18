@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 using Unity.Profiling;
 
+using Game.Manager;
 using Game.Player.Interaction;
 using Game.Player.Movement;
 using Game.Systems;
@@ -104,7 +105,7 @@ namespace Game.Player.Recovery
             _recoveryInput.Disable();
         }
 
-        private bool IsOperating => DailyOperationSystem.Instance != null && DailyOperationSystem.Instance.IsOperating;
+        private bool IsOperating => DailyOperationSystem.Instance != null && DailyOperationSystem.Instance.IsOperating && GameManager.IsPaused == false;
 
         private void Update()
         {

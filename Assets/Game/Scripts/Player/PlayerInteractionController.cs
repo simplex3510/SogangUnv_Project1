@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 
 using Game.Interaction;
 using Game.Logistics;
+using Game.Manager;
 
 namespace Game.Player.Interaction
 {
@@ -311,7 +312,8 @@ namespace Game.Player.Interaction
 
         private void Update()
         {
-            if (_isControlEnabled == false)
+            // 퇴근 확인창이 떠 있는 동안은 입력을 무시한다(진행 중인 상태는 그대로 둔다)
+            if (_isControlEnabled == false || GameManager.IsPaused)
             {
                 return;
             }

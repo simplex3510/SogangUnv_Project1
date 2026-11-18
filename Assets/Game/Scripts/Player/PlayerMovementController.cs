@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+using Game.Manager;
 using Game.Player.Interaction;
 using Game.WorldObjects;
 
@@ -122,7 +123,7 @@ namespace Game.Player.Movement
         }
 
         // 하루 종료 잠금(_isControlEnabled)과 복구 잠금(_isRecoveryLocked)은 별개 사유라 서로를 풀지 않는다
-        private bool CanControl => _isControlEnabled && _isRecoveryLocked == false;
+        private bool CanControl => _isControlEnabled && _isRecoveryLocked == false && GameManager.IsPaused == false;
 
         /// <summary>하루 종료 시 주행 입력을 끊고 차량을 즉시 세운다(기획서 3.5).</summary>
         public void SetControlEnabled(bool isEnabled)

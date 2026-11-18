@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 using Game.Logistics;
+using Game.Manager;
 using Game.Player.Interaction;
 
 namespace Game.UI
@@ -46,6 +47,8 @@ namespace Game.UI
         // PanelRenderer가 다시 불러오면 이전 요소는 해제되므로 트리를 받을 때마다 새로 만든다
         private BorderProgress _trace;
 
+        private const int EscapePriority = 100;
+
         public bool IsOpen { get; private set; }
 
         private sealed class ParcelGroup
@@ -77,12 +80,26 @@ namespace Game.UI
         private void OnEnable()
         {
             GetComponent<PanelRenderer>().RegisterUIReloadCallback(OnUIReload);
+            GameManager.AddEscapeHandler(EscapePriority, TryCloseOnEscape);
         }
 
         private void OnDisable()
         {
             GetComponent<PanelRenderer>().UnregisterUIReloadCallback(OnUIReload);
+            GameManager.RemoveEscapeHandler(TryCloseOnEscape);
             _cardList = null;
+        }
+
+        // Esc가 열린 창을 먼저 닫는다. 닫을 창이 없으면 다음 핸들러(퇴근 확인)로 넘긴다
+        private bool TryCloseOnEscape()
+        {
+            if (IsOpen == false)
+            {
+                return false;
+            }
+
+            Close();
+            return true;
         }
 
         // PanelRenderer는 트리를 만들거나 다시 불러올 때마다 루트를 넘겨준다. 트리가 오기 전에는 표시를 건너뛴다(_cardList == null)

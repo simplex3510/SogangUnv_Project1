@@ -1,11 +1,152 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="../LogisticsCenter/LogisticsCenterWindow.uss"/>
     <Style src="project://database/Assets/Game/UI/StartMenu/StartMenu.uss?fileID=7433441132597879392&amp;guid=3a9e14a4152595b4c93afb9303f95989&amp;type=3#StartMenu"/>
     <ui:VisualElement name="startMenu" picking-mode="Ignore" class="start-menu">
         <ui:VisualElement name="menuArea" picking-mode="Ignore" class="start-menu__area" style="padding-bottom: 80px;">
             <ui:VisualElement name="titleLogo" picking-mode="Ignore" class="start-menu__title"/>
             <ui:Button name="startButton" text="출근" class="start-menu__button"/>
-            <ui:Button name="controlsButton" text="조작법" class="start-menu__button"/>
+            <ui:Button name="guideButton" text="게임 설명" class="start-menu__button"/>
             <ui:Button name="quitButton" text="퇴근" class="start-menu__button"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="guideArea" picking-mode="Ignore" class="guide-area guide-area--hidden">
+        <ui:VisualElement name="guidePanel" class="lc-window guide">
+            <ui:VisualElement class="lc-head">
+                <ui:VisualElement class="lc-head-text">
+                    <ui:Label text="게임 설명" class="lc-title"/>
+                    <ui:Label text="조작법과 하루 운영 규칙을 확인할 수 있습니다." class="lc-subtitle"/>
+                </ui:VisualElement>
+                <ui:Button name="guideCloseButton" class="lc-close guide__close"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="lc-divider"/>
+            <ui:ScrollView name="guideScroll" mode="Vertical" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto" class="lc-list">
+                <ui:VisualElement class="lc-card">
+                    <ui:VisualElement class="lc-card-header">
+                        <ui:VisualElement class="lc-pin"/>
+                        <ui:Label text="게임 목표" class="lc-card-title"/>
+                    </ui:VisualElement>
+                    <ui:Label text="물류센터에서 물류를 싣고 배송지에 내려 하루(09:00~18:00)의 수익을 만드세요. 하루가 끝나면 정산과 함께 별 0~3개로 평가받습니다." class="guide__text"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="lc-card">
+                    <ui:VisualElement class="lc-card-header">
+                        <ui:VisualElement class="lc-pin"/>
+                        <ui:Label text="조작법" class="lc-card-title"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="↑ ↓ ← →" class="lc-badge guide__key"/>
+                        <ui:Label text="차량 이동" class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="Ctrl" class="lc-badge guide__key"/>
+                        <ui:Label text="일반 / 고속 주행 모드 전환. 고속은 게이지를 소모하고, 전환에는 쿨다운이 있습니다" class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="Shift + ← →" class="lc-badge guide__key"/>
+                        <ui:Label text="드리프트" class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="Space" class="lc-badge guide__key"/>
+                        <ui:Label text="물류센터·배송지·처분 장소에서 UI 열기. 꾹 누르면 상차·하차·처분" class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="R (유지)" class="lc-badge guide__key"/>
+                        <ui:Label text="갇혔을 때 차량 복구" class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="1 ~ 9" class="lc-badge guide__key"/>
+                        <ui:Label text="적재 물류 패널의 그룹 펼침 / 접기 (0 전체 펼침, ` 전체 접기)" class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="마우스 휠" class="lc-badge guide__key"/>
+                        <ui:Label text="적재 물류 패널 스크롤 (PgUp/PgDn도 가능)" class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="Esc" class="lc-badge guide__key"/>
+                        <ui:Label text="열린 창 닫기 / 퇴근 확인" class="guide__row-text"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="lc-card">
+                    <ui:VisualElement class="lc-card-header">
+                        <ui:VisualElement class="lc-pin"/>
+                        <ui:Label text="하루의 흐름" class="lc-card-title"/>
+                    </ui:VisualElement>
+                    <ui:Label text="출근하면 하루가 시작되고 기본 물류가 생깁니다. 16:00까지 새 물류가 계속 추가됩니다. 18:00이 되거나 모든 배송을 마치면 하루가 끝나고 정산합니다. UI를 열어 두어도 시간은 멈추지 않습니다." class="guide__text"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="lc-card">
+                    <ui:VisualElement class="lc-card-header">
+                        <ui:VisualElement class="lc-pin"/>
+                        <ui:Label text="배송 유형" class="lc-card-title"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="일반" class="lc-badge guide__key guide__key--normal"/>
+                        <ui:Label text="제한 시간이 없습니다." class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="신속" class="lc-badge guide__key guide__key--express"/>
+                        <ui:Label text="제한 시간 안에 배송하면 추가 보상을 받고, 넘기면 보상이 줄고 손실이 생깁니다." class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="신선" class="lc-badge guide__key guide__key--fresh"/>
+                        <ui:Label text="싣는 순간부터 신선도가 줄어듭니다. 0이 되면 폐기되어 배송에 실패합니다." class="guide__row-text"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="lc-card">
+                    <ui:VisualElement class="lc-card-header">
+                        <ui:VisualElement class="lc-pin"/>
+                        <ui:Label text="물류 특징" class="lc-card-title"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="#취급주의" class="lc-badge guide__key"/>
+                        <ui:Label text="충돌에 약합니다." class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="#고중량" class="lc-badge guide__key"/>
+                        <ui:Label text="무게 한도를 더 씁니다." class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="lc-row guide__row">
+                        <ui:Label text="#대형" class="lc-badge guide__key"/>
+                        <ui:Label text="적재 한도를 더 씁니다." class="guide__row-text"/>
+                    </ui:VisualElement>
+                    <ui:Label text="특징이 많을수록 보상이 커집니다." class="guide__text"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="lc-card">
+                    <ui:VisualElement class="lc-card-header">
+                        <ui:VisualElement class="lc-pin"/>
+                        <ui:Label text="적재 한도" class="lc-card-title"/>
+                    </ui:VisualElement>
+                    <ui:Label text="적재 한도는 넘길 수 없습니다. 무게 한도는 일정 배율까지 넘겨 실을 수 있지만 그만큼 차량이 느려집니다." class="guide__text"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="lc-card">
+                    <ui:VisualElement class="lc-card-header">
+                        <ui:VisualElement class="lc-pin"/>
+                        <ui:Label text="충돌과 폐기" class="lc-card-title"/>
+                    </ui:VisualElement>
+                    <ui:Label text="충돌하면 실린 물류의 내구도가 줄고, 세게 부딪힐수록 많이 줄어듭니다. 0이 되면 폐기 물류가 되어 배송할 수 없고 처분 장소에서 버려야 합니다. 충돌 자체로 속도나 돈이 깎이지는 않습니다." class="guide__text"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="lc-card">
+                    <ui:VisualElement class="lc-card-header">
+                        <ui:VisualElement class="lc-pin"/>
+                        <ui:Label text="보상과 정산" class="lc-card-title"/>
+                    </ui:VisualElement>
+                    <ui:Label text="배송 보상은 기본 배송료, 거리, 시간·신선도 보너스, 물류 특징으로 구성됩니다. 영업 종료까지 배송하지 못한 물류에는 페널티가 있습니다. 모든 물류를 조건에 맞게 배송하면 별 3개이고, 성공 비율이 높을수록 별이 늘어납니다." class="guide__text"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="lc-card">
+                    <ui:VisualElement class="lc-card-header">
+                        <ui:VisualElement class="lc-pin"/>
+                        <ui:Label text="화면 보는 법" class="lc-card-title"/>
+                    </ui:VisualElement>
+                    <ui:Label text="적재 물류 패널의 화살표는 배송지 방향입니다. 속도계 게이지의 강조색은 고속 모드입니다. 알림은 화면 위쪽에 잠깐 떴다가 사라집니다." class="guide__text"/>
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="quitConfirm" class="quit-confirm quit-confirm--hidden">
+        <ui:VisualElement class="quit-confirm__box">
+            <ui:Label text="게임을 정지하고 퇴근하시겠습니까?" class="quit-confirm__text"/>
+            <ui:VisualElement class="quit-confirm__buttons">
+                <ui:Button name="quitYesButton" text="예" class="quit-confirm__button"/>
+                <ui:Button name="quitNoButton" text="아니오" class="quit-confirm__button"/>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -37,3 +37,4 @@
 | 026 | 배송지·처분장 월드 아이콘 UI Toolkit 전환 + Fresh 색 | UI | Ready | N/A (minimal) |
 | 027 | 남은 Canvas UI 정리 (HoldInteractButton, GameTimeHUD) | UI | Complete | N/A (minimal) |
 | 028 | 시작 화면 (메뉴 카메라 구도 + 사선 메뉴) | UI | Complete | N/A (minimal) |
+| 029 | 게임 설명 패널 + Esc 퇴근 확인창 | UI | Complete | N/A (minimal) |

@@ -57,3 +57,126 @@
 .start-menu__button:disabled {
     opacity: 0.4;
 }
+
+/* 메뉴 영역은 게임 설명 패널이 열리면 통째로 숨긴다(로고·버튼 포함) */
+.start-menu__area--hidden {
+    display: none;
+}
+
+/* 게임 설명 패널(Story 029). guide-area 폭은 메뉴 영역과 같게 코드가 넣는다. 왼쪽 차량을 가리지 않는다 */
+.guide-area {
+    padding: 48px;
+}
+
+.guide-area--hidden {
+    display: none;
+}
+
+/* 창·카드·행·배지·스크롤바는 물류센터 창(LogisticsCenterWindow.uss) 클래스를 그대로 쓴다. 여기서는 크기와 본문만 */
+.lc-window.guide {
+    width: auto;
+    height: auto;
+    flex-grow: 1;
+}
+
+.guide__close:focus {
+    -unity-background-image-tint-color: rgb(255, 120, 120);
+}
+
+.guide__text {
+    padding: 8px 6px 2px 6px;
+    font-size: 16px;
+    color: rgb(215, 222, 232);
+    white-space: normal;
+}
+
+.guide__row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.guide__key {
+    flex-shrink: 0;
+    width: 140px; /* 배지 폭을 고정해 설명 열을 한 줄로 맞춘다 */
+    margin: 0 12px 0 0;
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+}
+
+/* 배송 유형 아이콘(ParcelIcon.uss)과 같은 색: 일반 노랑, 신속 빨강, 신선 초록 */
+.guide__key--normal {
+    background-color: rgb(222, 175, 95);
+    color: rgb(30, 35, 44);
+}
+
+.guide__key--express {
+    background-color: rgb(240, 90, 95);
+}
+
+.guide__key--fresh {
+    background-color: rgb(84, 217, 140);
+    color: rgb(30, 35, 44);
+}
+
+.guide__row-text {
+    flex-grow: 1;
+    flex-shrink: 1;
+    font-size: 16px;
+    white-space: normal;
+}
+
+/* 퇴근 확인창(Story 029). 다른 UI 위에서 화면 전체를 덮는 모달 */
+.quit-confirm {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: rgb(255, 255, 255);
+    -unity-font-definition: url("../Hud/MalgunGothicDynamic.asset");
+}
+
+.quit-confirm--hidden {
+    display: none;
+}
+
+.quit-confirm__box {
+    padding: 40px 56px;
+    align-items: center;
+    background-color: rgba(38, 44, 54, 0.96);
+    border-width: 3px;
+    border-color: rgb(78, 88, 104);
+    border-radius: 18px;
+}
+
+.quit-confirm__text {
+    margin-bottom: 32px;
+    font-size: 34px;
+    -unity-font-style: bold;
+}
+
+.quit-confirm__buttons {
+    flex-direction: row;
+}
+
+.quit-confirm__button {
+    width: 200px;
+    height: 72px;
+    margin: 0 12px;
+    font-size: 30px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    background-color: rgba(58, 66, 80, 0.96);
+    border-width: 3px;
+    border-color: rgb(78, 88, 104);
+    border-radius: 14px;
+}
+
+.quit-confirm__button:hover,
+.quit-confirm__button:focus {
+    border-color: rgb(255, 255, 255);
+    background-color: rgba(78, 88, 104, 0.98);
+}
