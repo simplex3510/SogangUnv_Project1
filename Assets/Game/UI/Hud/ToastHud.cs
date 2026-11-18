@@ -175,6 +175,7 @@ namespace Game.UI.Hud
                 return;
             }
 
+            Game.Audio.GameAudio.PlayToast();
             ToastQueue.Entry entry = _queue.Push(text, Time.time + _holdSeconds, _maxCount, out ToastQueue.Entry evicted);
             if (evicted != null)
             {

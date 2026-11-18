@@ -148,6 +148,7 @@ namespace Game.UI
             }
 
             IsOpen = true;
+            Game.Audio.GameAudio.PlayMenuOpen();
             _isHolding = false;
             _needsRefresh = false;
             _windowRoot?.RemoveFromClassList(HiddenClass);
@@ -174,6 +175,7 @@ namespace Game.UI
             }
 
             IsOpen = false;
+            Game.Audio.GameAudio.PlayMenuClose();
             ClearRows();
             _windowRoot?.AddToClassList(HiddenClass);
 
@@ -508,6 +510,21 @@ namespace Game.UI
             }
         }
 
+        // 이 물류센터에 같은 배송지로 갈 물류(그룹)가 남아 있는지
+        private bool HasAvailableParcelFor(DeliveryTarget target)
+        {
+            IReadOnlyList<Parcel> available = _center.AvailableParcels;
+            for (int i = 0; i < available.Count; i++)
+            {
+                if (available[i].Target == target)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void OnLoadedParcelsChanged(Parcel parcel)
         {
             if (IsOpen == false || parcel == null)
@@ -519,6 +536,11 @@ namespace Game.UI
             RemoveParcelRow(parcel);
             RefreshGroupCount(parcel.Target);
             RefreshSummary();
+
+            if (parcel.Status == ParcelStatus.Loaded && HasAvailableParcelFor(parcel.Target) == false)
+            {
+                Game.Audio.GameAudio.PlayGroupLoaded();
+            }
 
             if (_isHolding == false)
             {

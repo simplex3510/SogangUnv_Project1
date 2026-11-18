@@ -54,6 +54,9 @@ namespace Game.Player.Movement
 
         public VehicleDrivingMode DrivingMode => _drivingMode;
 
+        /// <summary>드리프트 중인지(효과음용).</summary>
+        public bool IsDrifting => _isDrifting;
+
         /// <summary>지면 기준 전진 속도(m/s). 후진이면 음수.</summary>
         public float ForwardSpeed => _forwardSpeed;
 

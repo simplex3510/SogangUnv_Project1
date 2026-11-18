@@ -35,6 +35,9 @@ namespace Game.Player.Interaction
         /// <summary>적재 물류 중 하나 이상의 내구도가 실제로 줄어든 충돌마다 한 번 발생한다. 값은 특징 배율 적용 전 일반 물류 기준 감소량이다(기획서 13장 −N 표시).</summary>
         public event Action<float> ImpactDamageApplied;
 
+        /// <summary>하한선을 넘는 충돌마다 한 번 발생한다. 적재 물류와 무관하다(충돌 효과음용).</summary>
+        public event Action ImpactOccurred;
+
         private void Reset()
         {
             _rigidbody = GetComponent<Rigidbody>();
@@ -136,6 +139,7 @@ namespace Game.Player.Interaction
             }
 
             _cooldownEndTime = Time.fixedTime + _impactConfig.ImpactCooldown;
+            ImpactOccurred?.Invoke();
             Debug.Log($"[CargoImpact] damage=min(({deltaVelocity:0.##}-{_impactConfig.ImpactThreshold:0.##})*{_impactConfig.DamagePerVelocity:0.##}, {_impactConfig.MaxDamagePerImpact:0.##})={damage:0.##}");
 
             var parcels = _interaction.LoadedParcels;
