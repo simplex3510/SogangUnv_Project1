@@ -214,9 +214,10 @@ InitTestScene*.unity*
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
 /[Aa]ssets/[Ss]ceneDependencyCache*
-# Third-party asset packs are not committed.
-/[Aa]ssets/Resources/*
-!/[Aa]ssets/Resources/.gitkeep
+# Third-party asset packs are not committed (용량이 커서 GitHub에 올리지 않는다).
+# Resources 폴더는 참조와 무관하게 전부 빌드에 들어가므로 쓰지 않는다.
+/[Aa]ssets/ExternalAssets/*
+!/[Aa]ssets/ExternalAssets/.gitkeep
 # Local agent scratch output.
 /AgentScripts
 /ScreenShots

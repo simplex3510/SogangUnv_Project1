@@ -9,5 +9,5 @@
 - [UI Toolkit 전면 전환 예정](project-ui-toolkit-migration.md) — Canvas UI/HUD는 나중에 전부 UI Toolkit으로 리팩토링, 지금은 최소 수정
 - ["회귀" 대신 풀어 쓰기](feedback-no-regression-jargon.md) — 사용자에게는 "기존 기능 깨짐 여부"로 말함
 - [UI 메모 backlog](project-ui-backlog.md) — 미개발 UI 메모는 production/ui-backlog.md, UI 작업 정할 때 전체 확인 요청
-- [DevScene·FailedScene 미사용](project-dev-scenes-unused.md) — 검증·스크린샷은 SampleMapDesign만
-- [사운드 파일 gitignore](project-sounds-gitignored.md) — Resources/Sounds는 커밋 안 됨, 이동 보류 중
+- [QA 기준 씬은 Release](project-dev-scenes-unused.md) — 밸런싱·실측은 Release/MainGameScene(Boot부터), SampleMapDesign 맵 값은 임시, Dev/FailedScene 미사용
+- [외부 에셋은 ExternalAssets](project-sounds-gitignored.md) — 사운드·모델·스카이박스는 Assets/ExternalAssets/(gitignore), Resources 폴더 쓰지 않음
