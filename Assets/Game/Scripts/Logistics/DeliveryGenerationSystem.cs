@@ -184,6 +184,7 @@ namespace Game.Logistics
                 _typeConfig.HasDeadline(type),
                 _typeConfig.StartsDeadlineOnLoad(type),
                 _typeConfig.GetDeadlineMultiplier(type),
+                _typeConfig.GetDistanceMultiplier(type),
                 reward);
 
             _logisticsCenter.AddAvailableParcel(parcel);

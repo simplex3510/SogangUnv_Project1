@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Game.Logistics
 {
-    /// <summary>배송 제한 시간 산정 설정. T_base(D) = 고정 시간 + 미터당 시간 * 거리, R은 무작위 편차(초)이며 게임 시간 기준이다.</summary>
+    /// <summary>배송 제한 시간 산정 설정. T = 고정 시간 * M_type + 미터당 시간 * 거리 * M_dist + R, 게임 시간 기준이다. 미터당 시간은 실제 이동 시간(게임 속도 / 차량 속도)에 맞춘다.</summary>
     [CreateAssetMenu(menuName = "Game/Logistics/DeliveryDeadlineConfig", fileName = "DeliveryDeadlineConfig")]
     public class DeliveryDeadlineConfig : ScriptableObject
     {

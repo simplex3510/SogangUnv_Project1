@@ -15,6 +15,8 @@ namespace Game.Logistics
         [SerializeField] private bool _hasDeadline = true;
         [Tooltip("배송 제한 시간 계수. Fresh는 신선도 계수 M_fresh로 쓰며 Express 계수보다 작게 둔다(제안: Express 계수 × 0.5)")]
         [SerializeField, Min(0f)] private float _deadlineMultiplier = 1f; // TODO(tuning)
+        [Tooltip("거리 항 계수 M_dist. 제한 시간(신선도)의 거리 비례 부분에만 곱한다")]
+        [SerializeField, Min(0f)] private float _distanceMultiplier = 1f; // TODO(tuning)
         [Tooltip("제한 시간이 줄기 시작하는 시점. Fresh는 LoadCompletion(상차 완료 시점)")]
         [SerializeField] private DeadlineStart _deadlineStart = DeadlineStart.Creation;
         [Tooltip("시간 초과 손실 계수")]
@@ -26,6 +28,7 @@ namespace Game.Logistics
         public float SpawnProbability => _spawnProbability;
         public bool HasDeadline => _hasDeadline;
         public float DeadlineMultiplier => _deadlineMultiplier;
+        public float DistanceMultiplier => _distanceMultiplier;
         public DeadlineStart DeadlineStart => _deadlineStart;
         public float LateLossMultiplier => _lateLossMultiplier;
         public float FailurePenaltyMultiplier => _failurePenaltyMultiplier;
@@ -90,6 +93,20 @@ namespace Game.Logistics
                 if (_entries[i].Type == type)
                 {
                     return _entries[i].DeadlineMultiplier;
+                }
+            }
+
+            return 1f;
+        }
+
+        /// <summary>배송 타입별 제한 시간 거리 항 계수. 설정에 없는 타입은 1로 처리한다.</summary>
+        public float GetDistanceMultiplier(DeliveryType type)
+        {
+            for (int i = 0; i < _entries.Length; i++)
+            {
+                if (_entries[i].Type == type)
+                {
+                    return _entries[i].DistanceMultiplier;
                 }
             }
 

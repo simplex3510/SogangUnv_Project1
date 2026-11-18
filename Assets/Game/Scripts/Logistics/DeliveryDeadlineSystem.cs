@@ -50,7 +50,7 @@ namespace Game.Logistics
             }
         }
 
-        /// <summary>물류를 생성하고 제한 시간을 확정한다. T_limit = T_base(D) * M_type + R (제한 시간이 있는 유형만)</summary>
+        /// <summary>물류를 생성하고 제한 시간을 확정한다. T_limit = T_base * M_type + 초/m * D * M_dist + R (제한 시간이 있는 유형만)</summary>
         public Parcel CreateParcel(
             Vector3 origin,
             DeliveryTarget target,
@@ -60,15 +60,20 @@ namespace Game.Logistics
             bool hasDeadline,
             bool deadlineStartsOnLoad,
             float deadlineMultiplier,
+            float distanceMultiplier,
             DeliveryReward reward)
         {
             float distance = CalculateXZDistance(origin, target.transform.position);
             float deadline = 0f;
+            float baseTerm = 0f;
+            float distanceTerm = 0f;
             if (hasDeadline)
             {
-                float baseDeadline = _config.BaseSeconds + _config.SecondsPerMeter * distance;
+                // 거리 항은 유형 계수와 분리한다. 신선도처럼 기본 시간이 짧은 유형도 이동 시간 보정은 그대로 받는다
+                baseTerm = _config.BaseSeconds * deadlineMultiplier;
+                distanceTerm = _config.SecondsPerMeter * distance * distanceMultiplier;
                 float variation = Random.Range(_config.VariationMinSeconds, _config.VariationMaxSeconds);
-                deadline = Mathf.Max(baseDeadline * deadlineMultiplier + variation, 0f);
+                deadline = Mathf.Max(baseTerm + distanceTerm + variation, 0f);
             }
 
             Parcel parcel = new Parcel(
@@ -87,7 +92,7 @@ namespace Game.Logistics
             _trackedParcels.Add(parcel);
             target.AddParcel(parcel);
 
-            string deadlineText = hasDeadline ? (type == DeliveryType.Fresh ? $"신선도 {deadline:0}초(상차 후 감소)" : $"{deadline:0}초") : "없음";
+            string deadlineText = hasDeadline ? (type == DeliveryType.Fresh ? $"신선도 {deadline:0}초(상차 후 감소)" : $"{deadline:0}초") + $" [기본 {baseTerm:0} + 거리 {distanceTerm:0}]" : "없음";
             Debug.Log($"[Parcel #{parcel.Id}] 배송지 {target.name}, 타입 {type}, 생성 {generationType}, 특징 {cargo.Traits}, 내구도 {cargo.Durability}, 용량 {cargo.CapacityUsage}, 무게 {cargo.WeightUsage}, 거리 {distance:0.0}m, 제한 시간 {deadlineText}, 보상 {reward.BaseFee + reward.DistanceFee:0}/{reward.TimeBonus:0}/특징 {reward.TraitBonus:0}/신선 {reward.FreshBonusMax:0}");
 
             return parcel;
