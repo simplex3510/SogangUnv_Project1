@@ -19,7 +19,7 @@
 
 .settlement-card {
     width: 700px;
-    height: 560px;
+    height: 630px;
     padding: 28px 40px 24px 40px;
     background-color: rgba(38, 44, 54, 0.96);
     border-width: 3px;
@@ -70,4 +70,43 @@
     font-size: 24px;
     -unity-text-align: middle-right;
     min-width: 120px;
+}
+
+.settlement-card--hidden {
+    display: none;
+}
+
+/* 확인 버튼. 퇴근 확인창 버튼과 같은 슬레이트 톤 */
+.settlement-confirm {
+    align-self: center;
+    width: 200px;
+    height: 52px;
+    margin-top: 16px;
+    font-size: 24px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    background-color: rgb(58, 66, 80);
+    border-width: 2px;
+    border-color: rgb(110, 122, 140);
+    border-radius: 10px;
+}
+
+.settlement-confirm:hover,
+.settlement-confirm:focus {
+    background-color: rgb(78, 88, 104);
+    border-color: rgb(215, 222, 232);
+}
+
+.settlement-fade {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(0, 0, 0);
+    opacity: 0;
+}
+
+.settlement-fade--hidden {
+    display: none;
 }

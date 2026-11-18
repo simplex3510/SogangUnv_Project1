@@ -3,13 +3,16 @@
     <ui:Template name="SettlementRow" src="SettlementRow.uxml" />
     <!-- 정산 화면은 SettlementPanelSettings(Sort Order 100)로 그린다: HUD 0, 물류센터 창 10, 상호작용 패널·토스트보다 항상 앞에 오도록 가장 크게 둔다 -->
     <ui:VisualElement name="settlementRoot" class="settlement-root settlement-root--hidden" picking-mode="Position">
-        <ui:VisualElement class="settlement-card">
+        <ui:VisualElement name="settlementCard" class="settlement-card">
             <ui:Label name="finalLabel" class="settlement-final" text="최종  0" />
             <ui:Label name="summaryLabel" class="settlement-summary" text="별점 3      성공 0 / 전체 0&#10;배송 완료 0      실패 0" />
             <ui:VisualElement class="settlement-divider" />
             <ui:VisualElement name="detailList" class="settlement-details">
                 <ui:Instance template="SettlementRow" name="sample" />
             </ui:VisualElement>
+            <ui:Button name="confirmButton" text="확인" class="settlement-confirm" />
         </ui:VisualElement>
     </ui:VisualElement>
+    <!-- 정산 후 메인 복귀 페이드 막. 정산 카드보다 위, 다른 모든 게임 UI보다 앞 -->
+    <ui:VisualElement name="settlementFade" class="settlement-fade settlement-fade--hidden" picking-mode="Position" />
 </ui:UXML>

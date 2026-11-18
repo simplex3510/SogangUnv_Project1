@@ -3316,7 +3316,7 @@ PanelRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   serializedVersion: 1
-  m_PanelSettings: {fileID: 11400000, guid: 91408486e7ac1ab499ff1757db5a86b7, type: 2}
+  m_PanelSettings: {fileID: 11400000, guid: 59d301ef3fe90a842a01c96fe1e4be4c, type: 2}
   sourceAsset: {fileID: 9197481963319205126, guid: 08f242562a6342442839ebdd913a55f2, type: 3}
   m_ParentUI: {fileID: 0}
   m_WorldSpaceSizeMode: 1
@@ -4289,6 +4289,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.UI.SettlementUI
   _rowTemplate: {fileID: 9197481963319205126, guid: d6446eb8738be2b4491290d3f1e8a782, type: 3}
+  _config: {fileID: 11400000, guid: c48739575d19b5b4b8271d375f228461, type: 2}
 --- !u!1931382934 &1513066488
 PanelRenderer:
   m_ObjectHideFlags: 0

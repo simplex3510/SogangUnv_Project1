@@ -37,7 +37,12 @@ namespace Game.Manager
         {
             if (instance != null && instance != this)
             {
-                Debug.LogError("Multiple instances of singleton detected!");
+                // 씬을 다시 불러오면 DontDestroyOnLoad로 남은 인스턴스가 있으므로 새 사본만 조용히 지운다
+                if (instance.gameObject.scene.name != "DontDestroyOnLoad")
+                {
+                    Debug.LogError("Multiple instances of singleton detected!");
+                }
+
                 Destroy(this.gameObject);
             }
             else

@@ -18,6 +18,14 @@ namespace Game.UI
         [Tooltip("메뉴 영역이 차지하는 화면 오른쪽 폭(%)")]
         [SerializeField, Range(35f, 55f)] private float _menuWidthPercent = 45f; // TODO(tuning)
 
+        [Header("정산 후 복귀 (design/quick-specs/settlement-return-to-menu-2026-11-18.md)")]
+        [Tooltip("정산을 닫은 뒤 페이드 아웃을 시작하기까지 기다리는 시간(초)")]
+        [SerializeField, Range(0f, 2f)] private float _returnDelaySeconds = 0.5f; // TODO(tuning)
+        [Tooltip("화면이 검게 되기까지 걸리는 시간(초)")]
+        [SerializeField, Range(0.2f, 3f)] private float _fadeSeconds = 1f; // TODO(tuning)
+
+        public float ReturnDelaySeconds => _returnDelaySeconds;
+        public float FadeSeconds => _fadeSeconds;
         public float BlendTime => _blendTime;
         public CinemachineBlendDefinition.Styles BlendStyle => _blendStyle;
         public float RowOffset => _rowOffset;

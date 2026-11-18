@@ -57,6 +57,12 @@ namespace Game.Logistics
             LogisticsCenter.DeliveryTargets.Add(this);
         }
 
+        // 정적 목록이라 씬을 다시 불러오면 파괴된 배송지가 남는다
+        private void OnDestroy()
+        {
+            LogisticsCenter.DeliveryTargets.Remove(this);
+        }
+
         public bool CanAllocate()
         {
             return DailyAssignedCount < MaxDailyAssignmentCount;
