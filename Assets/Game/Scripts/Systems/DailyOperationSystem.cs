@@ -21,6 +21,9 @@ namespace Game.Systems
         // 영업 중인지. 종료 후에는 조기 종료 판정과 조작을 다시 켜지 않는다
         public bool IsOperating { get; private set; }
 
+        /// <summary>하루가 시작되어 조작이 풀린 직후.</summary>
+        public event System.Action DayStarted;
+
         /// <summary>오늘 일차. 1부터 시작하고 하루 동안 바뀌지 않는다.</summary>
         // shortcut: 여러 날 진행이 없어 1 고정이다. 일차 증가가 생기면 StartDay()에서 올린다
         public int CurrentDay { get; private set; } = 1;
@@ -46,7 +49,8 @@ namespace Game.Systems
 
             // 정적 물류가 준비되기 전에는 플레이어가 움직이지 못한다(기획서 3.4-7)
             SetControlEnabled(false);
-            StartDay();
+            // 하루는 시작 화면에서 시작을 누를 때 시작한다. 그때까지 시계도 멈춘다(start-screen 퀵 스펙)
+            gameTime.enabled = false;
         }
 
         private void OnDestroy()
@@ -62,10 +66,12 @@ namespace Game.Systems
         {
             Debug.Log("[하루 운영] 시작");
 
+            GameTimeSystem.Instance.enabled = true;
             DeliveryAssignmentSystem.ResetDailyAssignment();
             _generationSystem.StartDay();
             SetControlEnabled(true);
             IsOperating = true;
+            DayStarted?.Invoke();
         }
 
         private void Update()

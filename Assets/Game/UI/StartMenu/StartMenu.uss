@@ -1,0 +1,59 @@
+/* 임시 GUI(Story 028). 팔레트는 StatusHud·정산 화면과 같은 슬레이트 */
+.start-menu {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: row;
+    justify-content: flex-end;
+    color: rgb(255, 255, 255);
+    -unity-font-definition: url("../Hud/MalgunGothicDynamic.asset");
+}
+
+.start-menu--hidden {
+    display: none;
+}
+
+/* 화면 오른쪽 영역. 폭은 StartScreenConfig에서 넣는다. 행 사선 이동은 코드의 translate */
+.start-menu__area {
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 184px; /* 로고 오른쪽 끝 여백을 차량 왼쪽 여백과 맞춘다(SampleMapDesign MenuCam 기준) */
+    padding-bottom: 36px; /* 맨 아래 버튼 바닥을 차량 바퀴 바닥 높이에 맞춘다 */
+}
+
+/* 타이틀 로고 PNG(981x596, tools/title-logo/title-logo.html로 생성)를 비율 그대로 줄여 쓴다.
+   왼쪽으로 당겨 로고 안의 OVER→LOAD 사선이 아래 버튼 사선과 한 줄로 이어지게 한다 */
+.start-menu__title {
+    width: 720px;
+    height: 437px;
+    margin: 0 0 16px -250px;
+    background-image: url("TitleLogo.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.start-menu__button {
+    width: 360px;
+    height: 80px;
+    margin: 0 0 20px 0;
+    font-size: 34px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+    background-color: rgba(38, 44, 54, 0.92);
+    border-width: 3px;
+    border-color: rgb(78, 88, 104);
+    border-radius: 18px;
+}
+
+/* 포커스 강조는 키보드로 움직일 때만 보인다(마우스를 쓰면 코드가 start-menu--keyboard를 뗀다) */
+.start-menu__button:hover,
+.start-menu--keyboard .start-menu__button:focus {
+    border-color: rgb(255, 255, 255);
+    background-color: rgba(58, 66, 80, 0.96);
+}
+
+.start-menu__button:disabled {
+    opacity: 0.4;
+}

@@ -125,7 +125,15 @@ namespace Game.Audio
                 SettlementSystem.Instance.Settled += OnSettled;
             }
 
-            // 씬 시작이 곧 일과 시작이다(DailyOperationSystem.Start → StartDay)
+            // 일과 시작은 시작 화면에서 출근을 누를 때다(StartMenuUI → DailyOperationSystem.StartDay)
+            if (DailyOperationSystem.Instance != null)
+            {
+                DailyOperationSystem.Instance.DayStarted += OnDayStarted;
+            }
+        }
+
+        private void OnDayStarted()
+        {
             PlayOneShot(_dayStart, _dayStartVolume);
             if (_bgm.clip != null)
             {
@@ -154,6 +162,11 @@ namespace Game.Audio
             if (SettlementSystem.Instance != null)
             {
                 SettlementSystem.Instance.Settled -= OnSettled;
+            }
+
+            if (DailyOperationSystem.Instance != null)
+            {
+                DailyOperationSystem.Instance.DayStarted -= OnDayStarted;
             }
         }
 

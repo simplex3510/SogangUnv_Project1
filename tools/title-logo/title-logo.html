@@ -1,0 +1,109 @@
+<!doctype html>
+<!-- 시작 화면 타이틀 로고 생성기(Story 028). 브라우저로 열면 캔버스에 그리고, window.exportPng()가 투명 PNG data URL을 돌려준다.
+     폰트: Bungee (SIL Open Font License) — 게임 배포에 쓸 수 있다. -->
+<html>
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Bungee&display=block" rel="stylesheet">
+<style>
+  body { margin: 0; background: #7d8a99; }
+  canvas { display: block; width: 800px; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1600" height="900"></canvas>
+<script>
+const W = 1600, H = 900;
+const SIZE = 250;
+const DEPTH = 22;              // 아래쪽 입체 두께(px)
+const OUTLINE = 30;            // 바깥 테두리 두께
+const COLORS = {
+  over: ['#FFE680', '#FFC21A', '#F29A0A'],
+  load: ['#FFFFFF', '#E9EEF5', '#B9C3D1'],
+  mark: ['#FF9A4D', '#F2672E', '#C9431B'],
+  outline: '#262C36',
+  depth: '#151A21',
+};
+// 두 줄을 아래로 갈수록 오른쪽으로 밀어 메뉴와 같은 '\' 사선을 만든다
+const LINES = [
+  { text: 'OVER?', x: 70, y: 330, kind: 'over' },
+  { text: 'LOAD!', x: 230, y: 610, kind: 'load' },
+];
+
+function grad(ctx, y, stops) {
+  const g = ctx.createLinearGradient(0, y - SIZE * 0.78, 0, y);
+  g.addColorStop(0, stops[0]); g.addColorStop(0.55, stops[1]); g.addColorStop(1, stops[2]);
+  return g;
+}
+
+function eachChar(ctx, line, fn) {
+  let x = line.x;
+  for (const ch of line.text) {
+    fn(ch, x);
+    x += ctx.measureText(ch).width - 6;
+  }
+}
+
+function draw() {
+  const c = document.getElementById('c');
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  ctx.translate(W / 2, H / 2);
+  ctx.rotate(-6 * Math.PI / 180);
+  ctx.transform(1, 0, -0.12, 1, 0, 0);   // 앞으로 기울인 속도감
+  ctx.translate(-W / 2, -H / 2);
+  ctx.font = `${SIZE}px Bungee`;
+  ctx.textBaseline = 'alphabetic';
+  ctx.lineJoin = 'round';
+
+  // 1) 입체 두께: 테두리 모양을 아래로 여러 번 겹친다
+  for (let d = DEPTH; d > 0; d--) {
+    ctx.strokeStyle = ctx.fillStyle = COLORS.depth;
+    ctx.lineWidth = OUTLINE;
+    for (const line of LINES) eachChar(ctx, line, (ch, x) => {
+      ctx.strokeText(ch, x + d * 0.35, line.y + d);
+      ctx.fillText(ch, x + d * 0.35, line.y + d);
+    });
+  }
+  // 2) 바깥 테두리
+  ctx.strokeStyle = COLORS.outline;
+  ctx.lineWidth = OUTLINE;
+  for (const line of LINES) eachChar(ctx, line, (ch, x) => ctx.strokeText(ch, x, line.y));
+  // 3) 글자 면(그라데이션)
+  for (const line of LINES) eachChar(ctx, line, (ch, x) => {
+    const stops = /[?!]/.test(ch) ? COLORS.mark : COLORS[line.kind];
+    ctx.fillStyle = grad(ctx, line.y, stops);
+    ctx.fillText(ch, x, line.y);
+  });
+  // 4) 윗면 하이라이트: 글자 위쪽 절반에 흰 반투명을 얹는다
+  ctx.save();
+  ctx.globalCompositeOperation = 'source-atop';
+  for (const line of LINES) {
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.fillRect(0, line.y - SIZE * 0.78, W, SIZE * 0.3);
+  }
+  ctx.restore();
+  ctx.restore();
+}
+
+// 내용이 있는 영역만 잘라 투명 PNG로 내보낸다
+window.exportPng = () => {
+  const src = document.getElementById('c');
+  const data = src.getContext('2d').getImageData(0, 0, W, H).data;
+  let x0 = W, y0 = H, x1 = 0, y1 = 0;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (data[(y * W + x) * 4 + 3] > 8) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  }
+  const pad = 8, w = x1 - x0 + 1 + pad * 2, h = y1 - y0 + 1 + pad * 2;
+  const out = document.createElement('canvas');
+  out.width = w; out.height = h;
+  out.getContext('2d').drawImage(src, x0 - pad, y0 - pad, w, h, 0, 0, w, h);
+  window.pngData = out.toDataURL('image/png');
+  return { w, h, length: window.pngData.length };
+};
+
+document.fonts.load(`${SIZE}px Bungee`).then(() => { draw(); window.ready = true; });
+</script>
+</body>
+</html>

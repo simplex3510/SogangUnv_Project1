@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Game/UI/StartMenu/StartMenu.uss?fileID=7433441132597879392&amp;guid=3a9e14a4152595b4c93afb9303f95989&amp;type=3#StartMenu"/>
+    <ui:VisualElement name="startMenu" picking-mode="Ignore" class="start-menu">
+        <ui:VisualElement name="menuArea" picking-mode="Ignore" class="start-menu__area" style="padding-bottom: 80px;">
+            <ui:VisualElement name="titleLogo" picking-mode="Ignore" class="start-menu__title"/>
+            <ui:Button name="startButton" text="출근" class="start-menu__button"/>
+            <ui:Button name="controlsButton" text="조작법" class="start-menu__button"/>
+            <ui:Button name="quitButton" text="퇴근" class="start-menu__button"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
