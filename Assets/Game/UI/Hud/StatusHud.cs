@@ -12,10 +12,6 @@ namespace Game.UI.Hud
     {
         private const string HiddenClass = "status-hud--hidden";
         private const string IncomeLossClass = "income-label--loss";
-        private const string IncomeIconSetClass = "income-icon--set";
-
-        [Tooltip("수익 패널 왼쪽 아이콘. 비우면 빈 칸만 보인다")]
-        [SerializeField] private Sprite _incomeIcon;
 
         private SettlementSystem _settlementSystem;
         private VisualElement _statusHud;
@@ -56,13 +52,6 @@ namespace Game.UI.Hud
 
             // 정산 뒤 UI를 다시 불러와도 숨김을 유지한다
             _statusHud.EnableInClassList(HiddenClass, _settled);
-
-            VisualElement incomeIcon = root.Q("incomeIcon");
-            if (incomeIcon != null && _incomeIcon != null)
-            {
-                incomeIcon.style.backgroundImage = new StyleBackground(_incomeIcon);
-                incomeIcon.AddToClassList(IncomeIconSetClass);
-            }
 
             ShowIncome(_settlementSystem != null ? _settlementSystem.TodayIncome : 0f);
         }
