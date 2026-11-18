@@ -184,8 +184,17 @@ namespace Game.UI
             _fade.style.opacity = 1f;
             yield return null;
 
-            // 씬을 새로 불러와 시작 화면(MenuCam, 하루 정지)부터 다시 시작한다
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            // 씬을 새로 불러와 시작 화면(MenuCam, 하루 정지)부터 다시 시작한다. Boot로 시작했으면 Boot부터 다시 불러온다
+            string scenePath = Game.Systems.GameSceneLoader.BootScenePath ?? SceneManager.GetActiveScene().path;
+#if UNITY_EDITOR
+            // 개발용 씬은 Build Settings에 없어 LoadScene으로 못 부르므로 에디터 전용 경로로 다시 불러온다
+            if (SceneUtility.GetBuildIndexByScenePath(scenePath) < 0)
+            {
+                UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(scenePath, new LoadSceneParameters(LoadSceneMode.Single));
+                yield break;
+            }
+#endif
+            SceneManager.LoadScene(scenePath);
         }
 
         private bool SwallowEscapeWhileReturning()

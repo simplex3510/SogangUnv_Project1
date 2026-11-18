@@ -65,6 +65,12 @@ namespace Game.UI
                 _center = GetComponentInParent<LogisticsCenter>();
             }
 
+            // UI 씬이 맵 씬과 분리되면 인스펙터 참조가 끊기므로 씬 전체에서 찾는다
+            if (_center == null)
+            {
+                _center = FindAnyObjectByType<LogisticsCenter>();
+            }
+
             if (_center == null)
             {
                 Debug.LogError($"LogisticsCenterUI references are missing in {gameObject.name}");

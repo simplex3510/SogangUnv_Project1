@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 using Game.Manager;
+using Game.Player.Movement;
 using Game.Systems;
 
 namespace Game.UI
@@ -54,6 +55,17 @@ namespace Game.UI
 
         private void Awake()
         {
+            // UI 씬이 맵 씬과 분리되면 인스펙터 참조가 끊기므로 차량에 붙은 메뉴 카메라를 찾는다
+            if (_menuCamera == null)
+            {
+                _menuCamera = FindAnyObjectByType<PlayerMovementController>()?.GetComponentInChildren<CinemachineCamera>(true);
+            }
+
+            if (_brain == null)
+            {
+                _brain = FindAnyObjectByType<CinemachineBrain>();
+            }
+
             if (_config == null || _menuCamera == null || _brain == null || _hudPanels == null)
             {
                 Debug.LogError($"StartMenuUI references are missing in {gameObject.name}");

@@ -39,6 +39,12 @@ namespace Game.Logistics
 
         private void Start()
         {
+            // Systems 씬이 맵 씬과 분리되면 인스펙터 참조가 끊기므로 씬 전체에서 찾는다
+            if (_logisticsCenter == null)
+            {
+                _logisticsCenter = FindAnyObjectByType<LogisticsCenter>();
+            }
+
             if (_config == null || _typeConfig == null || _traitConfig == null || _logisticsCenter == null)
             {
                 Debug.LogError($"DeliveryGenerationSystem references are missing in {gameObject.name}");

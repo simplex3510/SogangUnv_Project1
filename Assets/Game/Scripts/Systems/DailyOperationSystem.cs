@@ -37,6 +37,17 @@ namespace Game.Systems
         {
             GameTimeSystem gameTime = GameTimeSystem.Instance;
 
+            // Systems 씬이 맵 씬과 분리되면 플레이어 참조가 끊기므로 씬 전체에서 찾는다
+            if (_movementController == null)
+            {
+                _movementController = FindAnyObjectByType<PlayerMovementController>();
+            }
+
+            if (_interactionController == null)
+            {
+                _interactionController = FindAnyObjectByType<PlayerInteractionController>();
+            }
+
             if (gameTime == null || _generationSystem == null || _settlementSystem == null
                 || _movementController == null || _interactionController == null)
             {

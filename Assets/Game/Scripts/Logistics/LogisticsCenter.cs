@@ -31,6 +31,15 @@ namespace Game.Logistics
 
         public float UIOpenDuration => _uiOpenDuration;
 
+        private void Start()
+        {
+            // 맵 씬이 UI 씬과 분리되면 인스펙터 참조가 끊기므로 씬 전체에서 찾는다
+            if (_ui == null)
+            {
+                _ui = FindAnyObjectByType<LogisticsCenterUI>();
+            }
+        }
+
         private void Awake()
         {
             if (_interactableZone == null)
