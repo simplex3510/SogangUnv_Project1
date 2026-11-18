@@ -1,7 +1,7 @@
 # Story 003: 밸런싱 수치 확정과 마무리
 
 > **Epic**: over-load
-> **Status**: Ready
+> **Status**: Deferred
 > **Layer**: Feature
 > **Type**: Config/Data
 > **Estimate**: L
@@ -11,7 +11,7 @@
 ## Context
 
 **GDD**: `design/game-brief.md`
-**Requirement**: Brief MVP feature 8 (밸런싱 수치 확정과 마무리, dev-plan 8단계)
+**Requirement**: Brief MVP feature "밸런싱 수치 확정과 마무리" (Features 9번째 항목, dev-plan 8단계)
 
 **ADR Governing Implementation**: N/A (minimal — no ADRs)
 **ADR Decision Summary**: N/A (minimal — no ADRs)
@@ -30,8 +30,8 @@
 
 - [ ] 기획서 16.4의 미결정 수치를 설정 데이터에 채운다
 - [ ] 코드의 `// TODO(tuning)` 주석을 모두 해소한다
-- [ ] Play 테스트로 하루 1회 완주해 정산이 의도한 범위에 드는지 기록한다
-- [ ] 별점 구간 산식과 배송 형태별 성공 조건을 확정해 기록한다
+- [ ] Play 테스트로 하루 1회 완주해, 일반적인 플레이(배송 실패 1~2건)에서 최종 정산이 0 이상이고 별 1~2개가 나오는지 기록한다
+- [ ] `game-concept.md` 12.4의 별점 경계값 `T1`·`T2`를 실측으로 조정하고 결과를 기록한다
 - [ ] 스모크 점검 결과를 `production/qa/smoke-2026-11-16.md` 형식(날짜는 실행일)으로 남긴다
 
 ---
@@ -39,7 +39,7 @@
 ## Implementation Notes
 
 - 수치는 코드가 아닌 `Assets/Game/Configs/`의 설정 에셋에 둔다 (게임플레이 값은 데이터 기반).
-- 충돌 내구도 산식 등 미결정 사항(기획서 16.6)이 밸런싱에 영향을 주면 이 스토리 전에 확정한다.
+- 충돌 내구도 산식은 확정됐다(`game-concept.md` 10.2, 2026-11-16). 이 스토리에서는 `TODO(tuning)` 초기값만 실측으로 조정한다.
 
 ---
 
@@ -76,5 +76,5 @@
 
 ## Dependencies
 
-- Depends on: `production/epics/over-load/story-001-map-level-wiring.md`, `production/epics/over-load/story-002-daily-star-rating.md`
+- Depends on: `production/epics/over-load/story-001-map-level-wiring.md`, `production/epics/over-load/story-002-daily-star-rating.md`, `production/epics/over-load/story-004-collision-durability.md`, `production/epics/over-load/story-008-fresh-delivery-type.md`, `production/epics/over-load/story-009-overweight-loading.md`
 - Unlocks: None

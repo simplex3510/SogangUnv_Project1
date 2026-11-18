@@ -1,7 +1,8 @@
 # Story 001: 맵 레벨 게임플레이 배선과 1회 완주
 
 > **Epic**: over-load
-> **Status**: Ready
+> **Status**: Deferred
+> **Deferred**: 2026-11-16 — 추가·변경된 기획(배선 대상 씬 미정 등)을 반영해 판단하지 못해 순서를 뒤로 미룸. 재개 전에 최신 기획으로 내용을 다시 검토하고 Status를 Ready로 되돌린다.
 > **Layer**: Feature
 > **Type**: Integration
 > **Estimate**: M
@@ -30,8 +31,8 @@
 
 - [ ] 새 맵 씬에서 플레이어 스폰, 물류센터, 배송지 5곳이 시스템·UI와 연결되어 있다
 - [ ] 09:00~18:00 하루를 시작부터 정산 화면까지 1회 완주할 수 있다
-- [ ] 물류센터~배송지 실측 거리를 기록하고, 제한 시간·보상 계수 조정 대상을 정리한다
-- [ ] 도로·건물·장애물 충돌이 의도대로 동작하고, 차량이 맵 밖으로 빠지지 않는다
+- [ ] 물류센터~배송지 5곳의 실측 거리를 `production/qa/evidence/story-001-distances.md`에 표로 기록하고, 조정이 필요한 제한 시간·보상 계수 항목을 같은 파일에 나열한다
+- [ ] 차량이 도로·건물·장애물 콜라이더를 통과하지 않는다(고속 모드 최고 속도로 종류별 1회씩 충돌해 확인). 맵 경계 4면 어디서도 차량이 맵 밖으로 나가지 않는다
 - [ ] 완주 장면의 스크린샷을 `production/qa/evidence/`에 보관한다
 
 ---
@@ -40,6 +41,7 @@
 
 - 7.5a 프리팹(`Assets/Game/Prefabs/Map/`)과 7.5b 레벨 배치는 완료 상태. 남은 것은 7.5c 배선.
 - `.unity`·`.prefab`·`.meta`는 Editor가 열려 있을 때 직접 편집하지 않는다 (Unity CLI 사용).
+- **Performance**: 목표 60fps(Editor Play mode). 배선 완료 후 Profiler로 하루 1회 완주 중 프레임을 확인하고, 결과를 distances 파일에 한 줄로 남긴다.
 
 ---
 
@@ -78,4 +80,4 @@
 ## Dependencies
 
 - Depends on: None
-- Unlocks: `production/epics/over-load/story-002-daily-star-rating.md`, `production/epics/over-load/story-003-balancing.md`
+- Unlocks: `production/epics/over-load/story-003-balancing.md`

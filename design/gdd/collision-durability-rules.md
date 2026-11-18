@@ -1,7 +1,7 @@
 # 차량 충돌 및 물류 내구도 규칙
 
-**문서 상태:** 기획 검토안 (2026-11-14 작성, 2026-11-16 구현 현황 추가)  
-**정본 관계:** 확정 규칙의 정본은 `game-concept.md`(6.4·10.2·16.6·17장 30·31)이다. 본 문서는 충돌-내구도 연계 규칙의 상세 검토안을 모아 둔 문서이며, 확정된 내용은 `game-concept.md`에 반영한다.
+**문서 상태:** 확정 (2026-11-14 검토안 작성, 2026-11-16 확정. 수치는 `TODO(tuning)`)  
+**정본 관계:** 확정 규칙의 정본은 `game-concept.md`(6.3·6.4·10.2·11.6·16.6·17장 30·31·35)이다. 본 문서는 충돌-내구도 연계 규칙의 상세 근거와 구현 주의 사항을 모아 둔 문서이며, 두 문서가 다르면 `game-concept.md`가 우선한다.
 
 ---
 
@@ -12,10 +12,12 @@
 | 충돌의 효과 | 차량 충돌은 적재된 물류의 내구도를 감소시킨다 | `game-concept.md` 10.2 |
 | 직접 페널티 없음 | 충돌로 속도 저하 디버프, 보상 직접 감소, 경제적 페널티는 발생하지 않는다 | `game-concept.md` 10.2 |
 | 보상 영향 경로 | 충돌이 보상에 미치는 영향은 내구도를 거쳐서만 발생한다 | `game-concept.md` 6.4 |
-| Fragile | 일반 물류보다 낮은 내구도를 가진다 | `game-concept.md` 6.3·6.4 |
+| Fragile | 초기 내구도는 일반 물류와 같고, 충돌 감소 배율(×1.5)로 더 크게 감소한다 (2026-11-16 변경) | `game-concept.md` 6.3·6.4·10.2 |
 | Heavy·Large | 적재 판정용 추상 수치이며 차량 질량 등 물리에 반영하지 않는다 | `game-concept.md` 17장 27 |
 | 초기·현재 내구도 | 초기 내구도는 생성 시 고정, 현재 내구도는 초기값에서 시작해 충돌로 감소한다 | `game-concept.md` 6.4 |
-| 초기 내구도 산식 | `max(기준 내구도 − Σ 특징별 감산값, 1)`. 현재 설정값 기준 100, Fragile −50 | `game-concept.md` 6.4 |
+| 초기 내구도 산식 | `max(기준 내구도 − Σ 특징별 감산값, 1)`. 기준 100, Fragile 감산 0 (기존 −50에서 변경) | `game-concept.md` 6.4 |
+| 충돌 세기·감소 산식 | 3장. 하한선 1.5 m/s, 계수 12, 1회 상한 60, 쿨다운 0.5초 (2026-11-16 확정) | `game-concept.md` 10.2 |
+| 남은 내구도와 보상 | 반영하지 않는다. 0이 되면 폐기 물류 | `game-concept.md` 6.4·11.6 |
 
 ### 1.1. 구현 현황 (2026-11-16)
 
@@ -24,24 +26,28 @@
 | 초기 내구도 산정·보관 | 구현 | `CargoTraitConfig.CreateSpec`, `CargoSpec.Durability`, `Parcel.Cargo` |
 | 현재 내구도 | 미구현 | — |
 | 충돌 판정·감소(2~3장) | 미구현 | — |
-| 내구도 0 처리, 보상 연계, 피드백 | 미구현 (6장 미결정) | — |
+| 내구도 0 처리(폐기 전환) | 미구현 (규칙 확정, `game-concept.md` 11.6) | — |
+| 보상 연계, 피드백 | 미구현 (6장 미결정) | — |
 
 구현 시 필요 사항: `CargoSpec`은 생성 시점 스냅샷(`readonly struct`)이고 `Parcel.Cargo`는 읽기 전용이므로, 감소 대상인 현재 내구도는 `Parcel`에 별도 필드로 둔다. 초기 내구도는 `CargoSpec.Durability`를 그대로 사용한다.
 
 ---
 
-## 2. 충돌 세기 판정 (검토안)
+## 2. 충돌 세기 판정 (확정 2026-11-16)
 
 ### 2.1. 기준: 속도 변화량
 
 충돌 세기는 충돌로 내 차량이 받은 속도 변화량으로 판정한다.
 
 ```
-deltaVelocity = collision.impulse.magnitude / rigidbody.mass
+deltaVelocity = |수평(v_after − v_before)|
 ```
 
-- `collision.impulse`: 물리 엔진이 충돌을 해소하기 위해 내 차량에 가한 충격량
-- `rigidbody.mass`: 내 차량의 질량
+- `v_before`: 충돌이 시작된 물리 스텝 직전의 차량 속도
+- `v_after`: 판정 창(`ImpactWindow`, 3장)이 끝난 시점의 차량 속도
+- 수평: 수직(y) 성분은 빼고 계산한다(착지·튀어오름 배제)
+
+물리적으로 `충격량 ÷ 차량 질량`과 같은 값이다. 2026-11-17까지는 `collision.impulse.magnitude / rigidbody.mass`를 썼다. 그런데 고정물 충돌의 충격이 여러 물리 스텝에 나뉘어 들어와 첫 스텝분만 잡혔고(가로등 −26, 기대 −42), 여러 스텝을 합산하면 수직 성분이 섞여 접근 속도보다 큰 값이 나왔다(공사 차단물 −52). 속도 비교 방식은 두 문제가 없고, 값이 접근 속도를 넘지 않는다(Story 011 실측, `production/qa/evidence/story-011-catalog-obstacle-prefabs/play-observation.md`).
 
 화물이 받는 충격은 차량이 갑자기 멈추거나 밀려나는 정도에 비례한다는 점에서, 속도 변화량을 기준으로 삼는다.
 
@@ -64,10 +70,11 @@ deltaVelocity = collision.impulse.magnitude / rigidbody.mass
 
 ---
 
-## 3. 내구도 감소 산식 (검토안)
+## 3. 내구도 감소 산식 (확정 2026-11-16)
 
 ```
 damage = min((deltaVelocity - ImpactThreshold) * DamagePerVelocity, MaxDamagePerImpact)
+parcelDamage = damage * TraitMultiplier   // Fragile 1.5, 그 밖 1
 ```
 
 | 규칙 | 내용 | 목적 |
@@ -76,29 +83,33 @@ damage = min((deltaVelocity - ImpactThreshold) * DamagePerVelocity, MaxDamagePer
 | 선형 비례 | 하한선을 넘은 만큼 비례하여 감소한다 | "세게 부딪힐수록 더 깨진다"의 직관적 이해 |
 | 1회 상한 | 한 번의 충돌 감소량은 `MaxDamagePerImpact`를 넘지 않는다 | 단 한 번의 사고로 일반 물류가 파손되는 상황 완화 |
 | 쿨다운 | 충돌 후 `ImpactCooldown` 동안 추가 감소를 막는다 | 튕김에 의한 연쇄 재접촉의 중복 감소 방지 |
-| 시작 시점만 판정 | 충돌 시작(`OnCollisionEnter`)만 판정하고, 접촉 유지(`OnCollisionStay`)는 판정하지 않는다 | 벽을 미는 동안 엔진 힘으로 매 프레임 생기는 충격량 배제 |
+| 시작 후 판정 창 | 충돌 시작(`OnCollisionEnter`)이 판정 창(`ImpactWindow`)을 연다. 창이 닫힐 때 2.1의 속도 변화량으로 한 번 판정한다. 접촉 유지(`OnCollisionStay`)는 창을 열지 않는다 | 고정물 충돌의 충격이 여러 물리 스텝에 나뉘어 들어와도 전체를 잡는다(2026-11-17 실측, Story 011). 벽을 미는 동안에는 직전 속도가 0에 가까워 감소가 없다 |
 | 지면 제외 | 접촉 법선이 지면 판정 기준(`VehicleConfig.GroundNormalMinDot`) 이상이면 무시한다 | 베이크된 단일 맵 메시에서 바닥 접촉 배제 |
-| 균등 감소 | 적재된 모든 물류에 같은 양을 감소시킨다 | Fragile은 내구도가 낮으므로 같은 충격에도 먼저 파손됨. 조정 수치를 하나로 유지 |
+| 균등 감소 + Fragile 배율 | 적재된 모든 물류에 같은 `damage`를 기준으로 감소시키고, Fragile만 감소 배율을 곱한다. 특징이 여럿이어도 Fragile 배율만 적용한다 | 초기 내구도를 하나로 두고 취약함은 배율 하나로 조정 |
+| 충돌 외 감소 없음 | 월드 오브젝트 효과 등 충돌 외 사건은 내구도를 감소시키지 않는다 | 내구도 단일 책임(`world-obstacle-objects-framework` R1) |
+| 반발 계수 기준 | 충돌면 물리 재질의 반발 계수는 0을 기준으로 한다 | 반발이 있으면 충격량이 최대 약 2배가 됨(4장 1번) |
 
-### 3.1. 제안 수치 (미확정)
+### 3.1. 초기 수치 (확정, `TODO(tuning)`)
 
-| 항목 | 제안값 | 근거 |
+| 항목 | 초기값 | 근거 |
 |---|---|---|
-| `ImpactThreshold` | 5 m/s | 일반 주행 중 가벼운 접촉 무시 |
-| `DamagePerVelocity` | 4 / (m/s) | Δv 15 m/s 충돌 시 −40 |
-| `MaxDamagePerImpact` | 60 | 기본 내구도 100 기준, 1회 충돌로 일반 물류 파손 방지 |
+| `ImpactThreshold` | 1.5 m/s | 고속 최고 속도(5 m/s)의 30%. 일반 주행 중 가벼운 접촉 무시 |
+| `DamagePerVelocity` | 12 / (m/s) | 고속 정면 벽 충돌(Δv ≈ 5) 시 −42 |
+| `MaxDamagePerImpact` | 60 | 반발 등으로 Δv가 커져도 1회 충돌로 일반 물류가 폐기되지 않게 함 |
 | `ImpactCooldown` | 0.5초 | 튕김에 의한 재접촉 흡수 |
+| `ImpactWindow` | 0.06초 (물리 스텝 3회) | 고정물 충돌 충격이 2~3 스텝에 나뉘어 들어옴(2026-11-17 실측). 창 안에 섞이는 가속·감속은 최대 Δv 약 0.34(가속 5.6 m/s² × 0.06초), 입력 없는 감속은 약 0.24로 하한선 1.5보다 작다. 단 가벼운 상대(Box, Δv 약 1.4)는 하한선까지 여유가 0.1 정도라 하한선·감속을 조정할 때 다시 확인한다 |
+| Fragile 감소 배율 | 1.5 | 고속 정면 충돌 2회에 폐기(−63 × 2) |
 
-차량 최고 속도와 질량을 확인하지 않은 상태의 제안값이며, Play mode에서 검증 후 조정한다.
+차량 기준값: 최고 속도 일반 3 m/s·고속 5 m/s, 질량 100(`VehicleConfig.asset`, Delivery 프리팹, 2026-11-16 확인). 기존 제안값(하한 5 m/s, 계수 4)은 이 차량에서 감소가 거의 일어나지 않아 폐기했다. Play mode 실측 후 16.4에서 조정한다.
 
 ### 3.2. 로그 예시
 
 ```
-[CargoImpact] impulse=21300 mass=1500 → deltaVelocity=14.2
-[CargoImpact] damage=min((14.2-5)*4, 60)=36
-[CargoImpact] Parcel#3 (Normal)  100 → 64
-[CargoImpact] Parcel#5 (Fragile)  60 → 24
-[CargoImpact] 쿨다운 중 재접촉 deltaVelocity=6.1 → 무시
+[CargoImpact] v 4.92 → 0.12 → deltaVelocity=4.8
+[CargoImpact] damage=min((4.8-1.5)*12, 60)=39.6
+[CargoImpact] Parcel#3 (Normal)  100 → 60.4
+[CargoImpact] Parcel#5 (Fragile ×1.5)  100 → 40.6
+[CargoImpact] 쿨다운 중 재접촉 deltaVelocity=2.1 → 무시
 ```
 
 ---
@@ -113,20 +124,22 @@ damage = min((deltaVelocity - ImpactThreshold) * DamagePerVelocity, MaxDamagePer
 
 ## 5. 후속 확장 지점 (현재 범위 아님)
 
-- **상대별 피해 배율:** 추적 차량처럼 "닿으면 특히 위험한" 상대가 필요하면, 상대 오브젝트에 피해 배율을 가진 컴포넌트를 두고 판정 시 읽는다. 물리 공식만으로 부족하다고 확인된 뒤 도입한다.
+- ~~**상대별 피해 배율**~~ → 도입하지 않는다(2026-11-16). 물류 내구도는 플레이어 차량의 충돌 판정만 결정하며, 오브젝트 계열은 피해 배율을 제공하지 않는다(`design/quick-specs/world-obstacle-objects-framework-2026-11-16.md` R1).
 - **적재 무게의 물리 반영:** 적재량에 따라 차량 질량이 변하는 효과는 `game-concept.md` 17장 27의 개정이 필요하다. 현재는 반영하지 않는다.
 
 ---
 
 ## 6. 미결정 사항
 
-다음 항목은 확정되지 않았으며 구현자가 임의로 정하지 않는다(`game-concept.md` 16.6).
+**2026-11-16 모두 확정** (`game-concept.md` 16.6):
 
-- 2~3장 검토안의 확정 여부와 수치
-- 점프 후 착지 충격의 포함 여부 (현재 검토안은 제외)
-- Fragile 등 특징별 감소 배율 도입 여부 (현재 검토안은 균등 감소)
-- 충돌 외 내구도 감소 사건의 추가 여부
-- 내구도 0 도달 시 처리 (예: 배송 불가 / 배송 가능하나 보상 0)
-- 내구도와 배송 보상·배송 성공의 연계 (예: 남은 내구도 비율로 보상 배율 적용)
-- 내구도 감소를 플레이어에게 알리는 피드백(UI·연출)
-- 충돌면 물리 재질의 반발 계수 기준
+- ~~2~3장 검토안의 확정 여부와 수치~~ → 확정, 수치는 3.1
+- ~~착지 충격 포함 여부~~ → 제외
+- ~~특징별 감소 배율~~ → Fragile만 ×1.5, Fragile 초기 내구도 감산 폐지
+- ~~충돌 외 내구도 감소 사건~~ → 없음
+- ~~내구도 0 도달 시 처리~~ → 폐기 물류로 전환(`game-concept.md` 11.6)
+- ~~남은 내구도와 배송 보상의 연계~~ → 반영하지 않음
+- ~~피드백~~ → 감소량 표시, 적재 물류 내구도 표시, 폐기 알림(`game-concept.md` 13장)
+- ~~반발 계수 기준~~ → 0
+
+남은 확인: 충돌 판정 구현 후 Play mode 실측으로 수치를 조정하고, 월드 오브젝트·NPC와의 접촉에서 내구도가 중복 감소하지 않는지 확인한다.

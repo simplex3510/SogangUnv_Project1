@@ -1,0 +1,6 @@
+Reviewed-Content-Hash: Assets/Game/Scripts/UI/DurabilityHud.cs 9a38f958fd34b546a0771712ca4b9a376ca11b0a
+Reviewed-Content-Hash: Assets/Game/UI/Hud/DurabilityHud.uxml aa8a30cdac879e6fb664155a2fbd77dd27d4a37c
+Reviewed-Content-Hash: Assets/Game/UI/Hud/DurabilityHud.uss 820ea96885db68799d8b81b7dc9ce25d540252e9
+Reviewed-Content-Hash: Assets/Game/UI/Hud/MalgunGothicDynamic.asset b4fbfb664503e0e5e86917f944ca79ce2059b524
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/PlayerCargoImpactController.cs 97793fe1db9da28d0352a329ca184e83f485e3b0
+Reviewed-Content-Hash: Assets/Game/Scripts/Player/PlayerInteractionController.cs 6d0267be895a69a59891b2e2a84d0502ec3aafe5
