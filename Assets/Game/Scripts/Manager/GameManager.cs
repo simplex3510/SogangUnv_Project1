@@ -7,15 +7,6 @@ namespace Game.Manager
     {
         [SerializeField] private InputActionReference _escapeKey;
 
-        private void Start()
-        {
-            // 마우스 커서 숨기기
-            Cursor.visible = false;
-
-            // (선택 사항) 마우스 커서를 화면 중앙에 고정 및 숨김
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-
         private void OnEnable()
         {
             _escapeKey.action.performed += Terminate;

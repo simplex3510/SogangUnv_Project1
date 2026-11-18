@@ -5,6 +5,8 @@ using UnityEngine;
 namespace Game.Systems
 {
     /// <summary>게임 내 시간과 배속의 단일 기준. Time.timeScale은 건드리지 않는다.</summary>
+    // 같은 프레임 처리 순서(기획서 3.7): 시간 진행·영업 종료(-100) → 물류 생성(100) → 제한 시간(150) → 하루 운영(200) → 상·하차(300)
+    [DefaultExecutionOrder(-100)]
     public class GameTimeSystem : MonoBehaviour
     {
         public static GameTimeSystem Instance { get; private set; }

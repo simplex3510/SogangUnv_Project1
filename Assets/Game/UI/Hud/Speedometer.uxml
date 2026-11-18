@@ -1,17 +1,17 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:hud="Game.UI.Hud">
-    <ui:Style src="Speedometer.uss" />
-    <ui:VisualElement name="speedometerRoot" class="speedometer-root" picking-mode="Ignore">
-        <ui:VisualElement name="overweightRow" class="overweight-row" picking-mode="Ignore">
-            <ui:VisualElement name="overweightIcon" class="overweight-icon" picking-mode="Ignore" />
-            <ui:Label name="overweightValue" text="" class="overweight-value" picking-mode="Ignore" />
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:hud="Game.UI.Hud" editor-extension-mode="False">
+    <Style src="project://database/Assets/Game/UI/Hud/Speedometer.uss?fileID=7433441132597879392&amp;guid=d25f10402154c624488d1aa8ab2cefec&amp;type=3#Speedometer"/>
+    <ui:VisualElement name="speedometerRoot" picking-mode="Ignore" class="speedometer-root">
+        <ui:VisualElement name="overweightRow" picking-mode="Ignore" class="overweight-row">
+            <ui:VisualElement name="overweightIcon" picking-mode="Ignore" class="overweight-icon"/>
+            <ui:Label name="overweightValue" text="" picking-mode="Ignore" class="overweight-value"/>
         </ui:VisualElement>
-        <ui:VisualElement name="speedometer" class="speedometer" picking-mode="Ignore">
-            <hud:SpeedArc name="speedArc" class="speed-arc" picking-mode="Ignore">
-                <ui:Label name="speedValue" text="0" class="speed-value" picking-mode="Ignore" />
-                <ui:Label name="speedUnit" text="km/h" class="speed-unit" picking-mode="Ignore" />
+        <ui:VisualElement name="speedometer" picking-mode="Ignore" class="speedometer" style="padding-top: 20px; padding-left: 20px; padding-right: 20px; padding-bottom: 20px; height: 220px;">
+            <hud:SpeedArc name="speedArc" picking-mode="Ignore" class="speed-arc" style="height: 170px; margin-bottom: -16px; border-top-color: rgb(0, 0, 0);">
+                <ui:Label name="speedValue" text="0" picking-mode="Ignore" class="speed-value" style="align-self: center; align-content: flex-start; justify-content: flex-start; -unity-text-align: middle-center; width: 38px; padding-left: 4px;"/>
+                <ui:Label name="speedUnit" text="km/h" picking-mode="Ignore" class="speed-unit" style="margin-top: 0;"/>
             </hud:SpeedArc>
-            <ui:VisualElement name="fastGauge" class="fast-gauge" picking-mode="Ignore">
-                <ui:VisualElement name="fastGaugeFill" class="fast-gauge-fill" picking-mode="Ignore" />
+            <ui:VisualElement name="fastGauge" picking-mode="Ignore" class="fast-gauge" style="align-items: stretch; align-content: auto; margin-top: 0; justify-content: flex-start; height: 22px; font-size: 14px; border-bottom-left-radius: 12px; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-left-width: 3px;">
+                <ui:VisualElement name="fastGaugeFill" picking-mode="Ignore" class="fast-gauge-fill"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DeliveryRewardConfig
   m_EditorClassIdentifier: Assembly-CSharp::Game.Logistics.DeliveryRewardConfig
   _baseFee: 100
-  _distanceFeePerMeter: 10
+  _distanceFeePerMeter: 2
   _timeBonus: 50
   _freshBonus: 100
   _lateLoss: 80

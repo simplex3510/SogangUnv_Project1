@@ -480,6 +480,11 @@ namespace Game.Player.Interaction
 
             EndHoldLoad();
             CloseUIOf(_currentInteractable);
+
+            // Update가 멈추므로 키 안내를 여기서 끈다. 다시 켜지면 Update가 현재 상태로 다시 알린다
+            _lastCanInteract = false;
+            _lastType = InteractionTypes.None;
+            InteractionContextChanged?.Invoke(false, InteractionTypes.None);
         }
 
         /// <summary>대상의 상호작용을 실행한다. 물류센터는 상차 UI를 연다.</summary>
