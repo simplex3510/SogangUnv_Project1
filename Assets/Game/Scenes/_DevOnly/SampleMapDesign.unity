@@ -4398,7 +4398,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Audio.GameAudio
   _bgmClip: {fileID: 8300000, guid: c603066011c93884db4ac3a7ee9934ea, type: 3}
-  _bgmVolume: 0.2
+  _bgmVolume: 0.15
   _idleClip: {fileID: 8300000, guid: deae44d0a93954d49846a4c5e5fbd33f, type: 3}
   _idleVolume: 0.35
   _accelerateClip: {fileID: 8300000, guid: 3470ea62811250f4189d7f2acea0dd6f, type: 3}

@@ -68,6 +68,7 @@ namespace Game.Audio
         private AudioSource _drift;
         private AudioSource _bgm;
         private Coroutine _bgmFade;
+        private bool _dayStarted;
 
         private PlayerMovementController _movement;
         private PlayerInteractionController _interactionController;
@@ -134,6 +135,7 @@ namespace Game.Audio
 
         private void OnDayStarted()
         {
+            _dayStarted = true;
             PlayOneShot(_dayStart, _dayStartVolume);
             if (_bgm.clip != null)
             {
@@ -190,7 +192,8 @@ namespace Game.Audio
             _accelerate.volume = _accelerateVolume;
             _drift.volume = _driftVolume;
 
-            SetLoop(_idle, isOperating && isMoving == false);
+            // 시작 화면(출근 전)에서도 공회전 소리는 들린다. 막는 건 BGM뿐이다
+            SetLoop(_idle, (isOperating || _dayStarted == false) && isMoving == false);
             SetLoop(_accelerate, isOperating && isMoving);
             SetLoop(_drift, isOperating && _movement.IsDrifting);
         }
