@@ -244,7 +244,9 @@ namespace Game.UI
         /// <summary>폐기 물류는 목적지가 처분 장소이므로 마지막에 처분 장소 카드로 묶어 보여 준다(기획서 11.6). 상차 대상이 아니라 누를 수 없다.</summary>
         private void AddDisposalCard()
         {
-            if (_controller == null || DisposalSite.Instance == null)
+            // 물류센터에서 가장 가까운 처분 장소까지의 거리를 보여 준다
+            DisposalSite site = DisposalSite.FindNearest(_center.transform.position);
+            if (_controller == null || site == null)
             {
                 return;
             }
@@ -264,7 +266,7 @@ namespace Game.UI
                 return;
             }
 
-            float distance = CalculateXZDistance(_center.transform.position, DisposalSite.Instance.transform.position);
+            float distance = CalculateXZDistance(_center.transform.position, site.transform.position);
             AddCard(DisposalTitle, distance, $"폐기 {spoiled}").AddToClassList("lc-card--warning");
         }
 

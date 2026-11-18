@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using UnityEngine;
 
 using Game.Interaction;
@@ -10,8 +12,10 @@ namespace Game.Logistics
     /// </summary>
     public class DisposalSite : InteractableObject
     {
-        /// <summary>씬의 처분 장소(1곳 배치 가정). 폐기 전환 시 목적지로 쓴다.</summary>
-        public static DisposalSite Instance { get; private set; }
+        private static readonly List<DisposalSite> Sites = new();
+
+        /// <summary>활성화된 모든 처분 장소. 맵에 여러 곳을 둘 수 있다.</summary>
+        public static IReadOnlyList<DisposalSite> All => Sites;
 
         [SerializeField] private DisposalConfig _config;
 
@@ -20,8 +24,6 @@ namespace Game.Logistics
 
         private void Awake()
         {
-            Instance = this;
-
             // 프롬프트는 하차와 같은 UI를 쓰므로 타입을 고정해 씬 배선 실수를 막는다
             _interactionType = InteractionTypes.Unload;
 
@@ -44,12 +46,33 @@ namespace Game.Logistics
             }
         }
 
-        private void OnDestroy()
+        private void OnEnable()
         {
-            if (Instance == this)
+            Sites.Add(this);
+        }
+
+        private void OnDisable()
+        {
+            Sites.Remove(this);
+        }
+
+        /// <summary>수평(XZ) 거리로 가장 가까운 처분 장소. 하나도 없으면 null.</summary>
+        public static DisposalSite FindNearest(Vector3 position)
+        {
+            DisposalSite nearest = null;
+            float best = float.MaxValue;
+            foreach (DisposalSite site in Sites)
             {
-                Instance = null;
+                Vector3 offset = site.transform.position - position;
+                float sqr = offset.x * offset.x + offset.z * offset.z;
+                if (sqr < best)
+                {
+                    best = sqr;
+                    nearest = site;
+                }
             }
+
+            return nearest;
         }
 
         /// <summary>처분할 물류 유무는 적재 목록을 가진 PlayerInteractionController가 판정한다.</summary>

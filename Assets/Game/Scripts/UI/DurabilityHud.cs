@@ -314,7 +314,14 @@ namespace Game.UI
             PointArrow(_centerNav);
             for (int i = 0; i < _groupNavs.Count; i++)
             {
-                PointArrow(_groupNavs[i]);
+                (VisualElement arrow, Label distance, Transform destination) nav = _groupNavs[i];
+                // 차량이 움직이면 가장 가까운 처분 장소가 바뀔 수 있다
+                if (_groupOrder[i] == SpoiledGroupTitle)
+                {
+                    nav.destination = DisposalSite.FindNearest(_vehicle.position)?.transform;
+                }
+
+                PointArrow(nav);
             }
         }
 
@@ -430,8 +437,8 @@ namespace Game.UI
 
                 VisualElement group = Create(_groupHeaderTemplate);
                 (title == SpoiledGroupTitle ? _disposalPanel : _cargoList).Add(group);
-                // 폐기 그룹은 처분 장소, 그 외는 배송지를 가리킨다
-                Transform destination = members[0].IsSpoiled ? DisposalSite.Instance?.transform : members[0].Target.transform;
+                // 폐기 그룹은 가장 가까운 처분 장소, 그 외는 배송지를 가리킨다. 처분 장소는 UpdateArrows에서 매 프레임 다시 고른다
+                Transform destination = members[0].IsSpoiled ? DisposalSite.FindNearest(_vehicle.position)?.transform : members[0].Target.transform;
                 // 숫자키가 닿는 1~9번째 그룹만 키 번호를 붙인다
                 if (i < GroupToggleKeys.Length)
                 {
