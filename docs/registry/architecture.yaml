@@ -40,7 +40,7 @@
 #   unsupported layout, with its number.
 
 version: 1
-last_updated: ""
+last_updated: "2026-11-21"
 
 # ─── STATE OWNERSHIP ─────────────────────────────────────────────────────────
 # Who is the authoritative owner of each piece of shared game state.
@@ -53,7 +53,37 @@ last_updated: ""
 # interface: how other systems access this state (read-only property, method call,
 #   signal, shared resource, etc.) — this is the contract other ADRs depend on.
 
-state_ownership: []
+state_ownership:
+  - state: session_state
+    status: active
+    owner_system: networking-server
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    interface: "SessionState enum (Closed/Lobby/DayStarting/DayRunning/Settlement), 서버 소유 NetworkVariable, 클라이언트 읽기 전용"
+    write_access: server-only
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: ""
+  - state: parcel_state
+    status: active
+    owner_system: networking-server
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    interface: "ParcelState struct(물류 ID, ParcelStatus, 예약자·적재 차량 ID, 내구도, 남은 제한 시간, 폐기 여부, 목적지), 서버 소유 NetworkList, 클라이언트 읽기 전용"
+    write_access: server-only
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: ""
+  - state: game_clock
+    status: active
+    owner_system: networking-server
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    interface: "서버 시계 기준값을 갱신 시점에 복제, 클라이언트는 표시만 로컬 진행, 판정은 서버 값만"
+    write_access: server-only
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: ""
 
 # Example:
 #
@@ -81,7 +111,43 @@ state_ownership: []
 #
 # pattern options: signal | direct_call | event_bus | shared_resource | rpc | none
 
-interfaces: []
+interfaces:
+  - contract: vehicle_input
+    status: active
+    pattern: rpc
+    producer: owning-client
+    consumers:
+      - networking-server
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    signal_signature: "VehicleInput(방향, 주행 모드, 드리프트, 복구, 네트워크 틱), 고정 주기, 초기 신뢰성 전송"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: ""
+  - contract: client_requests
+    status: active
+    pattern: rpc
+    producer: client
+    consumers:
+      - networking-server
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    signal_signature: "상차 시작·중단, 하차, 처분, 준비·취소, 하루 시작(호스트 clientId만). 결과는 복제 상태로 수신"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: ""
+  - contract: server_events
+    status: active
+    pattern: rpc
+    producer: networking-server
+    consumers:
+      - client
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    signal_signature: "조작 활성화·잠금, 충돌 피드백, 참가자 입·퇴장, 정산 전환"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: ""
 
 # Example:
 #
@@ -141,7 +207,59 @@ performance_budgets: []
 # Register an API decision when the choice is non-obvious and other ADRs might
 # make a different choice for the same purpose without knowing this was decided.
 
-api_decisions: []
+api_decisions:
+  - purpose: multiplayer_framework
+    status: active
+    api: "Netcode for GameObjects + Unity Transport (버전은 6000.6.8f1 컴파일 검증 후 고정)"
+    not: "Mirror, UNet, 직접 소켓"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    reason: "공식 프레임워크이며 엔진 참조 문서 기준"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+      - docs/architecture/adr-0002-session-join-method.md
+    added: 2026-11-21
+    revised: ""
+  - purpose: server_process
+    status: active
+    api: "Dedicated Server 빌드를 호스트 클라이언트가 자식 프로세스로 기동, 호스트는 loopback 접속"
+    not: "StartHost(호스트 프로세스 안 서버)"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    reason: "GDD networking 규칙 1(분리 실행, 호스트도 클라이언트)"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+      - docs/architecture/adr-0002-session-join-method.md
+    added: 2026-11-21
+    revised: ""
+  - purpose: vehicle_replication
+    status: active
+    api: "서버 권한 NetworkTransform/NetworkRigidbody 보간, 클라이언트 kinematic, 예측 없음"
+    not: "소유자(클라이언트) 권한 NetworkTransform"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    reason: "GDD networking 규칙 2·7(서버 권한 차량 물리)"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: ""
+  - purpose: session_join_internet
+    status: active
+    api: "UGS 참가 코드 + Relay (com.unity.services.multiplayer), 모든 빌드 동일. 서버 프로세스가 세션 생성(스파이크 경로 A/B)"
+    not: "Steam 네트워크(SDR), Epic Online Services, 가상 LAN 필수화"
+    adr: docs/architecture/adr-0002-session-join-method.md
+    reason: "사용자 결정 2026-11-21: 모든 빌드에 참가 방식 하나, NGO 공식 연동"
+    referenced_by:
+      - docs/architecture/adr-0002-session-join-method.md
+    added: 2026-11-21
+    revised: ""
+  - purpose: session_join_lan
+    status: active
+    api: "Unity Transport 직접 접속, IPv4:포트 입력, 호스트는 loopback"
+    not: "IPv6 주소 입력"
+    adr: docs/architecture/adr-0002-session-join-method.md
+    reason: "클라우드 의존 없는 개발·LAN 접속(1단계)"
+    referenced_by:
+      - docs/architecture/adr-0002-session-join-method.md
+    added: 2026-11-21
+    revised: ""
 
 # Example:
 #
@@ -167,7 +285,37 @@ api_decisions: []
 # Register a pattern when an ADR explicitly bans it AND other ADRs might
 # unknowingly use it (i.e., it's a tempting but wrong approach for this project).
 
-forbidden_patterns: []
+forbidden_patterns:
+  - pattern: domain_logic_netcode_reference
+    status: active
+    description: "도메인 규칙 클래스(시계·배정·마감·충돌 판정·정산)는 Unity.Netcode를 참조하지 않는다. NetworkBehaviour 어댑터만 참조한다"
+    why: "도메인 규칙을 네트워크 없이 단위 테스트하고 싱글·멀티 규칙을 하나로 유지하기 위해"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+  - pattern: client_shared_state_write
+    status: active
+    description: "클라이언트가 공유 상태(세션·물류·시계·차량 물리)를 직접 쓰지 않는다. 서버 요청 RPC만 쓴다"
+    why: "서버가 유일한 기준(GDD networking 규칙 2)"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+  - pattern: networkmanager_singleton_outside_adapter
+    status: active
+    description: "NetworkManager.Singleton은 네트워크 어댑터 계층 밖에서 쓰지 않는다. 필요한 값은 주입한다"
+    why: "싱글턴 결합은 테스트를 막는다(coding-standards: 의존성 주입)"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+  - pattern: static_mutable_state
+    status: active
+    description: "static 가변 상태를 두지 않는다. 불가피하면 RuntimeInitializeOnLoadMethod(SubsystemRegistration)에서 초기화한다"
+    why: "6.6 Play Mode 도메인 리로드 생략 시 Play 세션 간 상태가 남는다"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+  - pattern: unity_services_outside_adapter
+    status: active
+    description: "Unity.Services.* 참조는 네트워크 어댑터 어셈블리에만 둔다. 도메인 규칙·UI는 참조하지 않는다"
+    why: "참가 업체 교체·추가 시 영향 범위를 어댑터로 한정"
+    adr: docs/architecture/adr-0002-session-join-method.md
+    added: 2026-11-21
 
 # Example:
 #
