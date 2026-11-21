@@ -1,0 +1,26 @@
+using System.Net;
+using System.Net.Sockets;
+using Unity.Netcode.Transports.UTP;
+using UnityEditor;
+using UnityEngine;
+
+// 임시 검증용(검증 12): 포트가 점유된 상태에서 UnityTransport.StartServer 결과 확인. 에디터 비플레이 모드라 NetworkManager Awake가 없어 전송 계층만 본다.
+public static class BindProbe
+{
+    public static void Run()
+    {
+        const ushort port = 7791;
+        var blocker = new UdpClient(new IPEndPoint(IPAddress.Any, port));
+        var go = new GameObject("probe");
+        var t = go.AddComponent<UnityTransport>();
+        t.SetConnectionData("0.0.0.0", port, "0.0.0.0");
+        t.Initialize(null);
+        bool ret = t.StartServer();
+        Debug.Log($"[BindProbe] occupied port: UnityTransport.StartServer returned {ret}");
+        blocker.Close();
+        bool ret2 = t.StartServer();
+        Debug.Log($"[BindProbe] free port: UnityTransport.StartServer returned {ret2}");
+        t.Shutdown();
+        EditorApplication.Exit(0);
+    }
+}

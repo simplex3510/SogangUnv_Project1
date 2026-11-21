@@ -1,0 +1,1 @@
+2026-11-21T17:23:43.0142048+09:00 exit-reason: 실패: OnTransportFailure 이벤트

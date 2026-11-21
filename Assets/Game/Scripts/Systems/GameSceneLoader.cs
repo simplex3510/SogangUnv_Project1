@@ -26,6 +26,10 @@ namespace Game.Systems
 
             foreach (string path in _scenePaths)
             {
+#if UNITY_SERVER
+                // Dedicated Server는 UI 씬을 불러오지 않는다(UI Toolkit이 셰이더·폰트 없이 예외를 낸다)
+                if (path.EndsWith("/UI.unity")) continue;
+#endif
                 SceneManager.LoadScene(path, LoadSceneMode.Additive);
             }
         }
