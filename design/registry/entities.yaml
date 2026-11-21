@@ -54,7 +54,7 @@
 #   in any other shape is reported as unsupported layout, with its number.
 
 version: 1
-last_updated: ""
+last_updated: "2026-11-21"
 
 # ─── ENTITIES ────────────────────────────────────────────────────────────────
 # Named game-world objects: enemies, NPCs, characters, factions, bosses.
@@ -156,7 +156,17 @@ formulas: []
 #
 # Required fields: name, status, source, referenced_by, value, unit, added
 
-constants: []
+constants:
+  - name: session_max_participants
+    status: active
+    source: design/gdd/networking.md
+    referenced_by:
+      - design/gdd/networking.md
+      - design/game-brief.md
+    value: 4
+    unit: participants
+    added: 2026-11-21
+    revised: ""
 
 # Example:
 #
