@@ -4,7 +4,7 @@
 Accepted
 
 ## Date
-2026-11-21 (개정 1: 결정 4·5·6 — 자기 차량 예측, 비신뢰+중복 입력. 근거 SPIKE-NOTE. 개정 2: 결정 4·5 보강, 결정 14~18 추가 — `VehicleSimState` 외부 수정값, 틱 일치, 서버 Script 모드 틱, 서버→호스트 파일 채널, 네트워크 이벤트 순서, 접속 끊김·정산 유지, 인원 설정 전달, 일시정지 제거. 근거 `docs/architecture/architecture-review-2026-11-21.md`, 사용자 결정. 개정 3: 결정 4·14·16·가이드라인·검증 보강 — 방향 회전 외부 수정값, Relay 상태 파일, 정산 유지 조건, 트리거 버퍼. 근거 `docs/architecture/architecture-review-2026-11-21-2.md`, 사용자 결정)
+2026-11-21 (개정 1: 결정 4·5·6 — 자기 차량 예측, 비신뢰+중복 입력. 근거 SPIKE-NOTE. 개정 2: 결정 4·5 보강, 결정 14~18 추가 — `VehicleSimState` 외부 수정값, 틱 일치, 서버 Script 모드 틱, 서버→호스트 파일 채널, 네트워크 이벤트 순서, 접속 끊김·정산 유지, 인원 설정 전달, 일시정지 제거. 근거 `docs/architecture/architecture-review-2026-11-21.md`, 사용자 결정. 개정 3: 결정 4·14·16·가이드라인·검증 보강 — 방향 회전 외부 수정값, Relay 상태 파일, 정산 유지 조건, 트리거 버퍼. 근거 `docs/architecture/architecture-review-2026-11-21-2.md`, 사용자 결정. 개정 4: 결정 12 역할 기반 분기, 결정 19 에디터 멀티 테스트(Multiplayer Play Mode) 추가. 근거 6000.6.8f1 설치본 동봉 패키지·문서, 사용자 결정)
 
 ## Last Verified
 2026-11-21 (엔진 참조 `modules/networking.md`는 6.3 기준 2026-02-13 검증분. 6.4~6.6 네트워킹 변경은 NOT SOURCEABLE)
@@ -24,8 +24,8 @@ Accepted
 | **Layer** | Foundation |
 | **Knowledge Risk** | HIGH |
 | **References Consulted** | `docs/engine-reference/unity/VERSION.md`, `modules/networking.md`, `current-best-practices.md`(Multiplayer), `deprecated-apis.md`, `breaking-changes.md`(네트워킹 항목 없음) |
-| **Post-Cutoff APIs Used** | NGO 2.x 통합 RPC(`[Rpc(SendTo.Server)]`·`SendTo.Owner`, 비신뢰 전송 지정), Dedicated Server 빌드 서브타깃. 스파이크(2026-11-21)에서 NGO 2.14.0 + Unity Transport 6.6.0(built-in)이 6000.6.8f1에서 컴파일·실행되고 `[Rpc(SendTo.Server)]`가 동작함을 확인. 예측용 `Physics.simulationMode`/`Physics.Simulate`는 컷오프 이전 API이나 6.6에서 미확인 |
-| **Verification Required** | (1) NGO 버전 고정: 2.14.0 후보(스파이크 확인), 메인 프로젝트에서 재확인 (2) Dedicated Server 빌드가 이 프로젝트(URP, Input System, UI)에서 성공하고 `-batchmode`로 기동 (3) 서버 권한 Rigidbody 차량이 6.4~6.6 PhysX에서 기존과 같이 동작 (4) 클라이언트 NetworkRigidbody 보간이 차량 충돌 후 튀지 않음 (5) 호스트가 서버를 자식 프로세스로 띄우고 종료·강제 종료 시 서버가 함께 내려감 (6) 클라이언트 `SimulationMode.Script`에서 재시뮬레이션 비용(차량 4대 장면, RTT 200 ms 기준 서버 상태 1회당 약 10스텝)이 프레임 예산 안 (7) 소유 클라이언트에서 루트 렌더러·콜라이더를 꺼도 NetworkTransform 수신·소유권 RPC가 정상 (8) 같은 입력에서 서버와 예측 차량의 상태 차이(PhysX 비결정성) 크기 (9) 표시용 자식의 고정 스텝 사이 직접 보간이 떨림 없이 보이는지(예측 차량 Rigidbody interpolation은 None) (10) (stdout 대안을 쓸 때만) Windows Dedicated Server 빌드의 `Console.Out`이 부모의 리다이렉트로 오는지 (11) UTP disconnect 타임아웃 설정 이름·기본값(6.6 Unity Transport) (12) 포트 점유 시 바인딩 실패가 드러나는 방식 (13) 해결: 기존 코드가 `linearVelocity`로 6000.6.8f1에서 컴파일됨 (14) 끊김 콜백 시점에 소유 차량 NetworkObject가 파괴되는지 |
+| **Post-Cutoff APIs Used** | NGO 2.x 통합 RPC(`[Rpc(SendTo.Server)]`·`SendTo.Owner`, 비신뢰 전송 지정), Dedicated Server 빌드 서브타깃. 스파이크(2026-11-21)에서 NGO 2.14.0 + Unity Transport 6.6.0(built-in)이 6000.6.8f1에서 컴파일·실행되고 `[Rpc(SendTo.Server)]`가 동작함을 확인. 예측용 `Physics.simulationMode`/`Physics.Simulate`는 컷오프 이전 API이나 6.6에서 미확인. Multiplayer Play Mode 3.0.0(Play Mode Scenario, `CurrentPlayer`), Dedicated Server 3.0.0(`MultiplayerRolesManager`), Multiplayer Tools 2.2.12(Network Simulator)는 6000.6.8f1 설치본에 동봉 확인(2026-11-21) |
+| **Verification Required** | (1) NGO 버전 고정: 2.14.0 후보(스파이크 확인), 메인 프로젝트에서 재확인(에디터 기본 번들은 NGO 2.13.3) (2) Dedicated Server 빌드가 이 프로젝트(URP, Input System, UI)에서 성공하고 `-batchmode`로 기동 (3) 서버 권한 Rigidbody 차량이 6.4~6.6 PhysX에서 기존과 같이 동작 (4) 클라이언트 NetworkRigidbody 보간이 차량 충돌 후 튀지 않음 (5) 호스트가 서버를 자식 프로세스로 띄우고 종료·강제 종료 시 서버가 함께 내려감 (6) 클라이언트 `SimulationMode.Script`에서 재시뮬레이션 비용(차량 4대 장면, RTT 200 ms 기준 서버 상태 1회당 약 10스텝)이 프레임 예산 안 (7) 소유 클라이언트에서 루트 렌더러·콜라이더를 꺼도 NetworkTransform 수신·소유권 RPC가 정상 (8) 같은 입력에서 서버와 예측 차량의 상태 차이(PhysX 비결정성) 크기 (9) 표시용 자식의 고정 스텝 사이 직접 보간이 떨림 없이 보이는지(예측 차량 Rigidbody interpolation은 None) (10) (stdout 대안을 쓸 때만) Windows Dedicated Server 빌드의 `Console.Out`이 부모의 리다이렉트로 오는지 (11) UTP disconnect 타임아웃 설정 이름·기본값(6.6 Unity Transport) (12) 포트 점유 시 바인딩 실패가 드러나는 방식 (13) 해결: 기존 코드가 `linearVelocity`로 6000.6.8f1에서 컴파일됨 (14) 끊김 콜백 시점에 소유 차량 NetworkObject가 파괴되는지 (15) Play Mode Scenario(메인 에디터 클라이언트 + 추가 에디터 Server 역할)에서 Script 물리 모드 서버 틱이 정상 동작 |
 
 > 엔진 참조의 RPC 예시는 `[ServerRpc]`/`[ClientRpc]`(NGO 1.x 방식)이다. 본 ADR은 NGO 2.x 방식(`[Rpc(SendTo.…)]`)을 전제로 하며, 설치한 버전에서 어느 쪽이 유효한지 확인 후 그 방식 하나로 통일한다.
 
@@ -87,7 +87,7 @@ GDD `networking.md`는 서버 권한(차량 물리·물류·시계·정산), 분
 9. **접속 정보**: 클라이언트는 `(address, port)`만 받아 접속한다. 이 값을 어떻게 얻는지(코드·IP·Relay)는 후속 ADR이며, 이 ADR은 방식을 정하지 않는다.
 10. **코드 구조**: 도메인 규칙 클래스(예: 시계·배정·마감·충돌 판정·정산)는 `Unity.Netcode`를 참조하지 않는다. NetworkBehaviour 어댑터가 도메인 클래스를 서버에서 구동하고 결과를 복제한다. UI는 복제된 상태를 읽기 전용 인터페이스로 구독한다.
 11. **호스트 식별**: 호스트 클라이언트가 세션 생성 때 임의 토큰을 만들어 서버 기동 인자(`--host-token`)로 넘기고, 자기 접속 요청 페이로드(connection approval)에도 같은 토큰을 넣는다. 서버는 토큰이 맞는 clientId를 호스트로 기록한다. "하루 시작"·"세션 닫기"·"정산 확인 후 서버 종료" 요청과 호스트 이탈 판정은 이 clientId로만 한다. 첫 접속 순서로 호스트를 정하지 않는다.
-12. **씬·프리팹 일치**: 서버와 클라이언트 빌드는 같은 게임 씬과 같은 NetworkPrefabs 목록을 쓴다. 건물·배송지처럼 씬에 놓인 정적 오브젝트는 네트워크 동기화 대상이 아니다(NetworkObject 미부착). 동적 상태가 필요한 것만 서버가 스폰한다. 서버 전용 부트스트랩(카메라·UI 생성 생략)은 빌드 정의 기호로 분기한다.
+12. **씬·프리팹 일치**: 서버와 클라이언트 빌드는 같은 게임 씬과 같은 NetworkPrefabs 목록을 쓴다. 건물·배송지처럼 씬에 놓인 정적 오브젝트는 네트워크 동기화 대상이 아니다(NetworkObject 미부착). 동적 상태가 필요한 것만 서버가 스폰한다. 서버 전용 부트스트랩(NetworkManager 기동, 카메라·UI 생성 생략)은 `MultiplayerRolesManager.ActiveMultiplayerRoleMask`(Dedicated Server 패키지 Multiplayer Roles)로 분기해, 에디터 서버 인스턴스(결정 19)와 서버 빌드가 같은 코드를 탄다. 에디터 서버 인스턴스에는 `UNITY_SERVER`가 없으므로 정의 기호만으로 분기하지 않는다. `UNITY_SERVER`는 빌드에만 해당하는 제약에만 쓴다: 서버 빌드에서만 컴파일돼야 하는 코드(ADR-0002 `Unity.Services.Multiplayer.Server`), 서버 빌드에 셰이더·폰트가 없어 예외를 내는 UI 씬 제외.
 13. **적재 물류 표현**: 차량에 실린 물류는 NetworkObject로 재부모화하지 않는다. 적재는 `ParcelState`의 상태·차량 ID로만 복제하고 클라이언트가 표시한다.
 14. **서버 → 호스트 채널(상태 파일)**:
    - 호스트가 기동 인자 `--status-file <경로>`(사용자 임시 폴더, 세션마다 새 이름)를 넘기고, 서버는 그 파일에 상태 한 줄을 쓴다: `READY port=<n>`, `FAIL reason=<code>`, `CODE <joinCode>`(ADR-0002 2단계). 쓸 때는 임시 이름으로 쓴 뒤 바꿔 달아 반쯤 쓴 파일을 읽지 않게 한다.
@@ -112,6 +112,7 @@ GDD `networking.md`는 서버 권한(차량 물리·물류·시계·정산), 분
    - 클라이언트가 접속 끊김을 받았을 때 마지막으로 받은 `SessionState`가 Settlement이고 정산 결과를 받았으면 안내 없이 정산 화면을 유지한다(GDD 규칙 15). 그 외 상태면 연결 끊김 안내 후 메인 화면이다.
 17. **인원별 설정 전달**: 서버 어댑터가 하루 시작 요청을 수락하는 순간의 참가자 수를 도메인 초기화(3.4) 인자로 넘긴다. 도메인은 그 값으로 인원별 설정을 골라 하루 동안 바꾸지 않는다. 참가·이탈은 이 값을 바꾸지 않는다(GDD 규칙 3).
 18. **일시정지 제거**: 모든 모드에서 게임 시간·물리를 멈추는 기능을 두지 않는다(GDD 3.2, 규칙 3). `GameManager.IsPaused`와 이를 읽는 조작 가드는 마이그레이션 때 제거한다. 가이드 패널 확인창의 정지(`design/quick-specs/guide-panel-addition-2026-11-18.md`)도 정지 없는 동작으로 바뀐다.
+19. **에디터 멀티 테스트**: 규칙·동기화 테스트는 Multiplayer Play Mode(6000.6.8f1 기본 포함 3.0.0)의 Play Mode Scenario로 한다. 메인 에디터는 클라이언트, 추가 에디터 1개는 Server 역할, 필요하면 추가 에디터 클라이언트 1~2개를 둔다(에디터 플레이어 최대 4). 이 구성에서는 호스트가 서버를 자식 프로세스로 띄우지 않으므로, 에디터에서만 쓰는 직접 접속 경로(loopback, 호스트 토큰은 설정 값)를 개발용으로 둔다. 자식 프로세스 기동·상태 파일·부모 종료 감지·Dedicated Server 빌드·LAN 접속은 빌드로만 검증한다. 지연은 Multiplayer Tools의 Network Simulator로 넣는다.
 
 ### Architecture Diagram
 ```
@@ -234,7 +235,7 @@ GDD `networking.md`는 서버 권한(차량 물리·물류·시계·정산), 분
 - **Hub 에디터 6000.6.8f1에 Dedicated Server 빌드 모듈이 없음**: 첫 스토리에서 모듈 설치 여부 확인.
 - **물리 틱과 네트워크 틱 불일치로 보간 품질 저하**: 두 값을 설정에 두고 실측. 관계 설정법은 NOT SOURCEABLE.
 - **서버 헤드리스 실행에서 `Camera.main`·UI·URP 의존 코드가 오류**: 서버 부트스트랩 분기(결정 12), 서버 빌드에서 MeshCollider 메시가 빠지지 않는지 첫 스토리에서 확인. 모두 UNVERIFIED.
-- **에디터 개발 루프가 번거로움(Play 모드마다 서버 빌드 필요)**: 에디터에서는 서버를 별도 에디터 인스턴스나 빌드로 띄우는 개발용 경로를 둔다. Multiplayer Play Mode 같은 도구의 6.6 지원 여부는 NOT SOURCEABLE.
+- **에디터 개발 루프가 번거로움(Play 모드마다 서버 빌드 필요)**: 에디터에서는 서버를 별도 에디터 인스턴스나 빌드로 띄우는 개발용 경로를 둔다. 해결: 6000.6.8f1에 Multiplayer Play Mode 3.0.0·Dedicated Server 3.0.0이 기본 포함되고 동봉 문서가 6.3 LTS 이상 지원을 명시한다(결정 19). 남은 위험: 네트워크 프리팹 수정 후 가상 플레이어 해시 불일치(커뮤니티 보고, 6000.0/NGO 2.1.1 기준, 재시작으로 해소), Script 물리 모드의 다중 인스턴스 동작은 미확인(검증 15).
 - **Dedicated Server 빌드가 URP·Input System 등과 함께 성공하지 않음**: 대안 4로 되돌린다.
 - **비소유 클라이언트에서 차량이 충돌 후 튀거나 끊김**: 보간 방식(LegacyLerp/Lerp/SmoothDampening·스무딩)은 설정 값으로 두고 플레이테스트로 정한다. 스파이크에서 스무딩 끔이 기본보다 지연이 짧았다.
 - **PhysX 비결정성으로 예측이 계속 조금씩 어긋남**: 보정 스무딩으로 가리고 검증 항목 (8)로 크기를 잰다. 크면 예측 차량 물리를 단순화하거나 접촉 중 재조정 빈도를 조정한다.
