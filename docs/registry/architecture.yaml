@@ -113,7 +113,7 @@ state_ownership:
 
 interfaces:
   - contract: vehicle_input
-    status: active
+    status: "superseded_by: ADR-0001"
     pattern: rpc
     producer: owning-client
     consumers:
@@ -144,6 +144,30 @@ interfaces:
       - client
     adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
     signal_signature: "조작 활성화·잠금, 충돌 피드백, 참가자 입·퇴장, 정산 전환"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: ""
+  - contract: vehicle_input_predicted
+    status: active
+    pattern: rpc
+    producer: owning-client
+    consumers:
+      - networking-server
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    signal_signature: "VehicleInput(방향, 주행 모드, 드리프트, 복구, 입력 틱=클라이언트 물리 스텝), 매 물리 스텝 비신뢰 RPC로 최근 InputRedundancy개 묶음 전송, 서버는 틱으로 중복 제거"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: 2026-11-21
+  - contract: vehicle_sim_state
+    status: active
+    pattern: rpc
+    producer: networking-server
+    consumers:
+      - owning-client
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    signal_signature: "VehicleSimState(마지막 적용 입력 틱, 위치, 회전, 선속도, 각속도, 차량 내부 상태 전부), 서버 → 소유자 비신뢰 RPC, 서버 틱마다. 재조정 기준"
     referenced_by:
       - docs/architecture/adr-0001-multiplayer-networking-architecture.md
     added: 2026-11-21
@@ -231,7 +255,7 @@ api_decisions:
     added: 2026-11-21
     revised: ""
   - purpose: vehicle_replication
-    status: active
+    status: "superseded_by: ADR-0001"
     api: "서버 권한 NetworkTransform/NetworkRigidbody 보간, 클라이언트 kinematic, 예측 없음"
     not: "소유자(클라이언트) 권한 NetworkTransform"
     adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
@@ -258,6 +282,26 @@ api_decisions:
     reason: "클라우드 의존 없는 개발·LAN 접속(1단계)"
     referenced_by:
       - docs/architecture/adr-0002-session-join-method.md
+    added: 2026-11-21
+    revised: ""
+  - purpose: vehicle_replication_predicted
+    status: active
+    api: "비소유 클라이언트는 서버 권한 NetworkTransform/NetworkRigidbody 보간(kinematic), 소유 클라이언트는 로컬 예측 차량 + 재조정(되감기·재시뮬레이션) + 보정 스무딩"
+    not: "소유자(클라이언트) 권한 NetworkTransform, AnticipatedNetworkTransform(모든 관찰자 보간을 끔)"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    reason: "GDD networking 규칙 2·7·8, 실시간 조작감 우선(사용자 결정 2026-11-21, 지연 스파이크)"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: 2026-11-21
+  - purpose: client_physics_mode
+    status: active
+    api: "클라이언트 Physics.simulationMode = SimulationMode.Script, FixedUpdate·재시뮬레이션에서 Physics.Simulate(fixedDeltaTime) 직접 호출, 종료 시 복원"
+    not: "클라이언트 자동 물리 시뮬레이션에서 재조정"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    reason: "재조정 때 예측 차량 스텝을 직접 되풀이하기 위해"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
     added: 2026-11-21
     revised: ""
 
@@ -315,6 +359,12 @@ forbidden_patterns:
     description: "Unity.Services.* 참조는 네트워크 어댑터 어셈블리에만 둔다. 도메인 규칙·UI는 참조하지 않는다"
     why: "참가 업체 교체·추가 시 영향 범위를 어댑터로 한정"
     adr: docs/architecture/adr-0002-session-join-method.md
+    added: 2026-11-21
+  - pattern: predicted_state_judgement
+    status: active
+    description: "소유 클라이언트의 예측 차량 결과(충돌·트리거·위치)로 내구도·물류·장애물 효과 등 도메인 상태를 바꾸거나 서버로 보내지 않는다. 판정과 충돌 연출은 서버 결과로만 한다"
+    why: "예측은 표시용이며 서버가 유일한 기준(GDD 규칙 2·7). 재시뮬레이션은 같은 스텝을 여러 번 실행한다"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
     added: 2026-11-21
 
 # Example:
