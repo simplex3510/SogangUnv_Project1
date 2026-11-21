@@ -36,15 +36,7 @@ namespace Game.Networking
         {
             var role = MultiplayerRolesManager.ActiveMultiplayerRoleMask;
             bool isServer = role == MultiplayerRoleFlags.Server;
-            var config = Resources.FindObjectsOfTypeAll<ServerNetworkConfig>().FirstOrDefault();
-#if UNITY_EDITOR
-            // 에디터 Play에서는 Preloaded Assets가 로드되지 않으므로 에셋을 직접 찾는다
-            if (config == null)
-            {
-                string guid = UnityEditor.AssetDatabase.FindAssets("t:ServerNetworkConfig").FirstOrDefault();
-                if (guid != null) config = UnityEditor.AssetDatabase.LoadAssetAtPath<ServerNetworkConfig>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
-            }
-#endif
+            var config = ServerNetworkConfig.Find();
             bool devClient = config != null && config.DevDirectConnect && role == MultiplayerRoleFlags.Client;
             if (!isServer && !devClient) return;
             if (config == null)
@@ -62,26 +54,41 @@ namespace Game.Networking
                 AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
             }
 
+            var nm = CreateManager(config, transport =>
+            {
+                if (isServer) transport.SetConnectionData(config.ListenAddress, config.Port, config.ListenAddress);
+                else transport.SetConnectionData(config.DevConnectAddress, config.Port);
+            });
+            nm.gameObject.AddComponent<DeferredStart>().Run = () => StartNetwork(nm, nm.GetComponent<UnityTransport>(), config, isServer);
+        }
+
+        /// <summary>
+        /// 서버·개발용 클라이언트·로비 클라이언트가 공유하는 NetworkManager 생성. 호출마다 Transport 설정을 처음부터 다시 구성한다.
+        /// ConnectionApproval은 서버와 클라이언트가 같아야 접속 설정 해시가 맞으므로 여기서 한 번만 켠다.
+        /// </summary>
+        internal static NetworkManager CreateManager(ServerNetworkConfig config, Action<UnityTransport> configureTransport)
+        {
             // 비활성 상태로 구성한 뒤 켠다: NetworkConfig를 Awake 전에 채워야 NullReference가 나지 않는다
             var go = new GameObject("DedicatedServerNetworkManager");
             go.SetActive(false);
             UnityEngine.Object.DontDestroyOnLoad(go);
             var transport = go.AddComponent<UnityTransport>();
             transport.DisconnectTimeoutMS = config.DisconnectTimeoutMs;
-            if (isServer) transport.SetConnectionData(config.ListenAddress, config.Port, config.ListenAddress);
-            else transport.SetConnectionData(config.DevConnectAddress, config.Port);
+            configureTransport(transport);
 
             var nm = go.AddComponent<NetworkManager>();
-            nm.NetworkConfig = new NetworkConfig { NetworkTransport = transport, TickRate = config.TickRate };
+            nm.NetworkConfig = new NetworkConfig { NetworkTransport = transport, TickRate = config.TickRate, ConnectionApproval = true };
             if (config.PrefabsList != null) nm.NetworkConfig.Prefabs.NetworkPrefabsLists.Add(config.PrefabsList);
             go.SetActive(true);
-            go.AddComponent<DeferredStart>().Run = () => StartNetwork(nm, transport, config, isServer);
+            return nm;
         }
 
         private static void StartNetwork(NetworkManager nm, UnityTransport transport, ServerNetworkConfig config, bool isServer)
         {
             if (!isServer)
             {
+                // 클라이언트에서는 자기 접속에만 호출된다. 서버 로그의 id와 맞춰 보기 위해 남긴다
+                nm.OnClientConnectedCallback += id => Debug.Log($"[Client] 접속 완료 내 id={id}");
                 Debug.Log($"[Client] 개발용 직접 접속 {config.DevConnectAddress}:{config.Port} StartClient={nm.StartClient()}");
                 return;
             }
@@ -89,6 +96,7 @@ namespace Game.Networking
             nm.OnClientConnectedCallback += id => Debug.Log($"[Server] 클라이언트 접속 id={id}");
             nm.OnTransportFailure += () => Fail("OnTransportFailure 이벤트");
             nm.OnServerStopped += _ => LogExit("OnServerStopped 이벤트");
+            ServerSession.Attach(nm, config);
 
             bool started;
             try { started = nm.StartServer(); }
@@ -101,6 +109,7 @@ namespace Game.Networking
                 return;
             }
             Debug.Log($"[Server] 기동 완료 port={transport.ConnectionData.Port} tick={config.TickRate}");
+            ServerSession.Ready(transport.ConnectionData.Port);
 
             // 유휴 서버 틱: 자동 종료 옵션 검사용(-autoQuitSeconds, 검증 전용)
             if (_autoQuitAt > 0f) nm.gameObject.AddComponent<AutoQuit>().Deadline = _autoQuitAt;
@@ -112,6 +121,7 @@ namespace Game.Networking
 
         private static void Fail(string reason)
         {
+            ServerSession.WriteFail(reason);
             LogExit("실패: " + reason);
             Application.Quit(1);
         }
@@ -127,7 +137,7 @@ namespace Game.Networking
             catch (Exception e) { Debug.LogError("[Server] 종료 사유 파일 쓰기 실패: " + e.Message); }
         }
 
-        private static string GetArg(string name)
+        internal static string GetArg(string name)
         {
             string[] args = Environment.GetCommandLineArgs();
             int i = Array.IndexOf(args, name);

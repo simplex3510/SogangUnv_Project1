@@ -1,12 +1,12 @@
 # Story 003: 같은 LAN 2대 Direct 참가 (AC-NET-30)
 
 > **Epic**: networking
-> **Status**: Ready
+> **Status**: In Progress
 > **Layer**: Core
 > **Type**: Integration
 > **Estimate**: L
 > **Manifest Version**: N/A (no control manifest)
-> **Last Updated**: [set by /dev-story when implementation begins]
+> **Last Updated**: 2026-11-21
 
 ## Context
 
@@ -66,9 +66,12 @@
 
 ## Files
 
-- `Assets/Game/Scripts/Networking/` (세션 어댑터, 서버 기동·상태 파일, 접속 입력 해석)
-- 로비 임시 UI (참가자 목록, LAN IP:포트 표시, 참가 입력)
-- 네트워크 설정 ScriptableObject (포트, READY 대기 시간)
+- `Assets/Game/Scripts/Networking/ServerSession.cs`
+- `Assets/Game/Scripts/Networking/NetworkSessionAdapter.cs`
+- `Assets/Game/Scripts/Networking/LobbyGui.cs`
+- `Assets/Game/Scripts/Networking/ServerNetworkConfig.cs`
+- `Assets/Game/Scripts/Networking/DedicatedServerBootstrap.cs`
+- `Assets/Game/Configs/ServerNetworkConfig.asset`
 
 ---
 
