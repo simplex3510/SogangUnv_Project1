@@ -1,7 +1,7 @@
 # ADR-0001: Multiplayer Networking Architecture
 
 ## Status
-Proposed
+Accepted
 
 ## Date
 2026-11-21 (개정 2026-11-21: 결정 4·5·6 변경 — 자기 차량 클라이언트 예측 도입, 입력 비신뢰+중복 전송. 근거 `prototypes/net-latency-spike-2026-11-21/SPIKE-NOTE.md`, 사용자 결정)
@@ -36,7 +36,7 @@ Proposed
 | **Depends On** | None (기존 ADR 0건, `docs/registry/architecture.yaml` 비어 있음 확인) |
 | **Enables** | 세션 참가 수단 ADR(ADR-0002), 서버 빌드·배포 ADR |
 | **Blocks** | networking 에픽·스토리 전체(아직 생성 전) |
-| **Ordering Note** | `/design-review`(2026-11-21)와 지연 스파이크(Open Question 2)는 완료. 수락 전 Open Question 1(2026-11-16 멀티 취소 이유) 정리 권장 |
+| **Ordering Note** | `/design-review`(2026-11-21)와 지연 스파이크(Open Question 2)는 완료. Open Question 1(2026-11-16 멀티 취소 이유)도 해결: 당시 발표 마감 내 구현 불가 판단. 발표·수업 프로젝트는 끝났고 이후 1인 개발로 마감 제약 없음(사용자, 2026-11-21) |
 
 ## Context
 

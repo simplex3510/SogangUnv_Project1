@@ -1,7 +1,7 @@
 # ADR-0002: Session Join Method
 
 ## Status
-Proposed
+Accepted
 
 ## Date
 2026-11-21
@@ -31,7 +31,7 @@ ADR-0001의 호스트 PC 자식 서버에 다른 참가자가 접속할 수단�
 
 | Field | Value |
 |-------|-------|
-| **Depends On** | ADR-0001 (Proposed — 이 ADR 구현 전에 Accepted 필요) |
+| **Depends On** | ADR-0001 (Accepted 2026-11-21) |
 | **Enables** | 로비·참가 UI의 UX 명세(GDD UI Requirements "참가 수단 UI는 참가 수단이 정해진 뒤") |
 | **Blocks** | networking 에픽의 원격 참가 스토리(아직 생성 전) |
 | **Ordering Note** | 2단계는 스파이크 결과가 나와야 확정된다. 스파이크가 실패하면 이 ADR을 개정한다 |

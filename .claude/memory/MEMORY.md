@@ -12,3 +12,4 @@
 - [QA 기준 씬은 Release](project-dev-scenes-unused.md) — 밸런싱·실측은 Release/MainGameScene(Boot부터), SampleMapDesign 맵 값은 임시, Dev/FailedScene 미사용
 - [외부 에셋은 ExternalAssets](project-sounds-gitignored.md) — 사운드·모델·스카이박스는 Assets/ExternalAssets/(gitignore), Resources 폴더 쓰지 않음
 - [업체 전제 금지](feedback-no-vendor-presumption.md) — UGS·Steam 등 외부 서비스는 따로 비교해 사용자가 선택
+- [솔로 개발 전환](project-solo-after-course.md) — 2026-11-21부터 1인 개발, 발표 마감 없음
