@@ -1,0 +1,7 @@
+# 서버 빌드 재기동 (Story 002) 2026-11-21T18:15:05+09:00
+# 명령: Server.exe -batchmode -nographics -logFile server.log -exitLog exit.txt -autoQuitSeconds 8 / exit code는 아래
+26:[Server] StartServer 반환값=True
+27:[Server] 기동 완료 port=7777 tick=30
+69:[Server] 2026-11-21T18:15:04.9601247+09:00 exit-reason: OnServerStopped 이벤트
+--- exit.txt ---
+2026-11-21T18:15:04.9601247+09:00 exit-reason: OnServerStopped 이벤트

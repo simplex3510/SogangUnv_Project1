@@ -24,5 +24,11 @@ namespace Game.Networking
 
         [Tooltip("서버 종료 사유를 남기는 파일 이름. 커맨드라인 -exitLog <경로>가 있으면 그 경로를 쓴다.")]
         public string ExitReasonFileName = "server-exit.log";
+
+        [Tooltip("개발용 직접 접속. 켜져 있고 역할이 Client면 승인 없이 DevConnectAddress:Port로 접속한다. 기본 꺼짐.")]
+        public bool DevDirectConnect = false;
+
+        [Tooltip("개발용 직접 접속 주소(loopback).")]
+        public string DevConnectAddress = "127.0.0.1";
     }
 }

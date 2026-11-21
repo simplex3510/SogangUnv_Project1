@@ -11,5 +11,5 @@
 | # | Story | Type | Status | ADR |
 |---|-------|------|--------|-----|
 | 001 | NGO 설치와 Dedicated Server 빌드·기동 확인 | Integration | Complete | ADR-0001 |
-| 002 | 서버 부트스트랩 역할 분기와 에디터 멀티 테스트 | Integration | Ready | ADR-0001 |
+| 002 | 서버 부트스트랩 역할 분기와 에디터 멀티 테스트 | Integration | Complete | ADR-0001 |
 | 003 | 같은 LAN 2대 Direct 참가 (AC-NET-30) | Integration | Ready | ADR-0002 |

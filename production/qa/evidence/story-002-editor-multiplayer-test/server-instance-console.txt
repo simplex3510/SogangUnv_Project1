@@ -1,0 +1,17 @@
+"timestampUtc":"2026-11-21T09:08:25.2467309Z","level":"log","message":"[Server] 2026-11-21T18:08:25.2380400+09:00 exit-reason: 실패: ServerNetworkConfig를 찾지 못함(Preloaded Assets 누락)"
+"timestampUtc":"2026-11-21T09:09:30.5895776Z","level":"log","message":"[Server] StartServer 반환값=True"
+"timestampUtc":"2026-11-21T09:09:30.5905965Z","level":"log","message":"[Server] 기동 완료 port=7777 tick=30"
+"timestampUtc":"2026-11-21T09:09:32.8575449Z","level":"log","message":"[Server] 클라이언트 접속 id=1"
+"timestampUtc":"2026-11-21T09:09:33.2379096Z","level":"log","message":"[Server] 클라이언트 접속 id=2"
+"timestampUtc":"2026-11-21T09:11:18.2546136Z","level":"log","message":"[Server] 2026-11-21T18:11:18.2476138+09:00 exit-reason: OnServerStopped 이벤트"
+"timestampUtc":"2026-11-21T09:11:35.4043044Z","level":"log","message":"[Server] StartServer 반환값=True"
+"timestampUtc":"2026-11-21T09:11:35.4053073Z","level":"log","message":"[Server] 기동 완료 port=7777 tick=30"
+"timestampUtc":"2026-11-21T09:11:37.5693129Z","level":"log","message":"[Server] 클라이언트 접속 id=2"
+"timestampUtc":"2026-11-21T09:11:37.6753434Z","level":"log","message":"[Server] 클라이언트 접속 id=1"
+--- main editor (Client) ---
+"timestampUtc":"2026-11-21T09:11:35.0939601Z","level":"log","message":"[Client] 개발용 직접 접속 127.0.0.1:7777 StartClient=True"
+--- 시작 시점 수정 후 재실행 (DeferredStart.Start) ---
+2026-11-21T09:20:07.6927482Z [Server] StartServer 반환값=True
+2026-11-21T09:20:07.6937475Z [Server] 기동 완료 port=7777 tick=30
+2026-11-21T09:20:09.5543985Z [Server] 클라이언트 접속 id=1
+2026-11-21T09:20:09.9559945Z [Server] 클라이언트 접속 id=2
