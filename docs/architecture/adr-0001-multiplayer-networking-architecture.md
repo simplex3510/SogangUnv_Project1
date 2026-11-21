@@ -4,7 +4,7 @@
 Accepted
 
 ## Date
-2026-11-21 (개정 2026-11-21: 결정 4·5·6 변경 — 자기 차량 클라이언트 예측 도입, 입력 비신뢰+중복 전송. 근거 `prototypes/net-latency-spike-2026-11-21/SPIKE-NOTE.md`, 사용자 결정)
+2026-11-21 (개정 1: 결정 4·5·6 — 자기 차량 예측, 비신뢰+중복 입력. 근거 SPIKE-NOTE. 개정 2: 결정 4·5 보강, 결정 14~18 추가 — `VehicleSimState` 외부 수정값, 틱 일치, 서버 Script 모드 틱, 서버→호스트 파일 채널, 네트워크 이벤트 순서, 접속 끊김·정산 유지, 인원 설정 전달, 일시정지 제거. 근거 `docs/architecture/architecture-review-2026-11-21.md`, 사용자 결정. 개정 3: 결정 4·14·16·가이드라인·검증 보강 — 방향 회전 외부 수정값, Relay 상태 파일, 정산 유지 조건, 트리거 버퍼. 근거 `docs/architecture/architecture-review-2026-11-21-2.md`, 사용자 결정)
 
 ## Last Verified
 2026-11-21 (엔진 참조 `modules/networking.md`는 6.3 기준 2026-02-13 검증분. 6.4~6.6 네트워킹 변경은 NOT SOURCEABLE)
@@ -25,7 +25,7 @@ Accepted
 | **Knowledge Risk** | HIGH |
 | **References Consulted** | `docs/engine-reference/unity/VERSION.md`, `modules/networking.md`, `current-best-practices.md`(Multiplayer), `deprecated-apis.md`, `breaking-changes.md`(네트워킹 항목 없음) |
 | **Post-Cutoff APIs Used** | NGO 2.x 통합 RPC(`[Rpc(SendTo.Server)]`·`SendTo.Owner`, 비신뢰 전송 지정), Dedicated Server 빌드 서브타깃. 스파이크(2026-11-21)에서 NGO 2.14.0 + Unity Transport 6.6.0(built-in)이 6000.6.8f1에서 컴파일·실행되고 `[Rpc(SendTo.Server)]`가 동작함을 확인. 예측용 `Physics.simulationMode`/`Physics.Simulate`는 컷오프 이전 API이나 6.6에서 미확인 |
-| **Verification Required** | (1) NGO 버전 고정: 2.14.0 후보(스파이크 확인), 메인 프로젝트에서 재확인 (2) Dedicated Server 빌드가 이 프로젝트(URP, Input System, UI)에서 성공하고 `-batchmode`로 기동 (3) 서버 권한 Rigidbody 차량이 6.4~6.6 PhysX에서 기존과 같이 동작 (4) 클라이언트 NetworkRigidbody 보간이 차량 충돌 후 튀지 않음 (5) 호스트가 서버를 자식 프로세스로 띄우고 종료·강제 종료 시 서버가 함께 내려감 (6) 클라이언트 `SimulationMode.Script`에서 재시뮬레이션 비용(차량 4대 장면, RTT 200 ms 기준 서버 상태 1회당 약 10스텝)이 프레임 예산 안 (7) 소유 클라이언트에서 루트 렌더러·콜라이더를 꺼도 NetworkTransform 수신·소유권 RPC가 정상 (8) 같은 입력에서 서버와 예측 차량의 상태 차이(PhysX 비결정성) 크기 |
+| **Verification Required** | (1) NGO 버전 고정: 2.14.0 후보(스파이크 확인), 메인 프로젝트에서 재확인 (2) Dedicated Server 빌드가 이 프로젝트(URP, Input System, UI)에서 성공하고 `-batchmode`로 기동 (3) 서버 권한 Rigidbody 차량이 6.4~6.6 PhysX에서 기존과 같이 동작 (4) 클라이언트 NetworkRigidbody 보간이 차량 충돌 후 튀지 않음 (5) 호스트가 서버를 자식 프로세스로 띄우고 종료·강제 종료 시 서버가 함께 내려감 (6) 클라이언트 `SimulationMode.Script`에서 재시뮬레이션 비용(차량 4대 장면, RTT 200 ms 기준 서버 상태 1회당 약 10스텝)이 프레임 예산 안 (7) 소유 클라이언트에서 루트 렌더러·콜라이더를 꺼도 NetworkTransform 수신·소유권 RPC가 정상 (8) 같은 입력에서 서버와 예측 차량의 상태 차이(PhysX 비결정성) 크기 (9) 표시용 자식의 고정 스텝 사이 직접 보간이 떨림 없이 보이는지(예측 차량 Rigidbody interpolation은 None) (10) (stdout 대안을 쓸 때만) Windows Dedicated Server 빌드의 `Console.Out`이 부모의 리다이렉트로 오는지 (11) UTP disconnect 타임아웃 설정 이름·기본값(6.6 Unity Transport) (12) 포트 점유 시 바인딩 실패가 드러나는 방식 (13) 해결: 기존 코드가 `linearVelocity`로 6000.6.8f1에서 컴파일됨 (14) 끊김 콜백 시점에 소유 차량 NetworkObject가 파괴되는지 |
 
 > 엔진 참조의 RPC 예시는 `[ServerRpc]`/`[ClientRpc]`(NGO 1.x 방식)이다. 본 ADR은 NGO 2.x 방식(`[Rpc(SendTo.…)]`)을 전제로 하며, 설치한 버전에서 어느 쪽이 유효한지 확인 후 그 방식 하나로 통일한다.
 
@@ -70,11 +70,14 @@ GDD `networking.md`는 서버 권한(차량 물리·물류·시계·정산), 분
      - 클라이언트 물리는 `Physics.simulationMode = SimulationMode.Script`로 두고 매 FixedUpdate와 재시뮬레이션에서 `Physics.Simulate(fixedDeltaTime)`을 직접 호출한다. 클라이언트 씬의 동적 바디는 예측 차량뿐이라는 전제다(다른 차량·NPC는 kinematic 보간 표시).
      - 보정 스무딩: 재조정 전후 위치·회전 차이는 표시용 자식(메시·카메라 추적 대상)의 오프셋으로 옮겨 설정 시간 동안 0으로 줄인다. 차이가 설정 임계 이상(복구 순간이동 등)이면 오프셋 없이 즉시 맞춘다.
    - **판정은 서버만**: 예측 차량의 충돌·트리거는 표시와 물리 반응에만 쓰고 내구도·물류·장애물 효과를 바꾸지 않는다. 충돌 연출은 서버 결과 수신 후 재생한다(GDD 규칙 7). 예측 상태는 클라이언트 로컬 값이며 서버로 보내지 않는다(서버로 가는 것은 입력뿐 — `client_shared_state_write` 금지와 충돌 없음).
-   - **차량 시뮬레이션 공용 코드**: 입력과 상태를 받아 다음 상태를 내는 차량 시뮬레이션은 `Unity.Netcode`를 참조하지 않는 하나의 코드로 두고 서버와 소유 클라이언트가 같이 쓴다(결정 10). 주행 모드·고속 게이지·드리프트 등 차량 내부 상태는 모두 `VehicleSimState`에 담는다.
-   - **서버 입력 적용**: 서버는 FixedUpdate마다 입력 틱 순서대로 다음 입력 1개를 적용하고, 그 틱을 `VehicleSimState`의 마지막 적용 틱으로 기록한다. 그 틱의 입력이 없으면 입력 0을 적용한다(GDD Edge: 마지막 입력 유지 안 함). 대기 입력이 설정 개수를 넘으면 오래된 것부터 버린다.
+   - **차량 시뮬레이션 공용 코드**: 입력과 상태를 받아 다음 상태를 내는 차량 시뮬레이션은 `Unity.Netcode`를 참조하지 않는 하나의 코드로 두고 서버와 소유 클라이언트가 같이 쓴다(결정 10). 스텝 함수의 입력은 `VehicleInput`과 `VehicleSimState` 둘뿐이고, 그 밖의 값(싱글턴·static·다른 컴포넌트)을 읽지 않는다. 지면 판정용 물리 씬 질의(레이캐스트)는 허용한다. `VehicleSimState`에는 차량 내부 상태(주행 모드, 고속 게이지, 드리프트)와 **서버가 정하는 외부 수정값**을 모두 담는다.
+     - 외부 수정값: 적재 속도 배율(8.6), 장애물 속도 효과 배율과 남은 시간(10.3), 복구 잠금 남은 시간(10.6), 조작 활성 여부(하루 시작·종료 잠금), 대기 중인 방향 회전 yaw(장애물 효과, 10.3. 다음 스텝에 적용한 뒤 0).
+     - 외부 수정값은 서버만 바꾼다. 예측 차량은 마지막으로 받은 값으로 진행하며 남은 시간은 스텝마다 줄인다. 서버에서 새로 생긴 효과(트리거 진입·상차 완료)는 다음 `VehicleSimState` 수신 때 재조정으로 반영된다.
+   - **틱 일치**: 서버와 클라이언트의 `Time.fixedDeltaTime`은 같은 설정 값(ScriptableObject)에서 읽는다. 입력 틱이 물리 스텝 번호이므로 값이 다르면 재조정이 성립하지 않는다.
+   - **서버 입력 적용**: 서버는 고정 스텝마다(결정 15의 2단계) 입력 틱 순서대로 다음 입력 1개를 적용하고, 그 틱을 `VehicleSimState`의 마지막 적용 틱으로 기록한다. 그 틱의 입력이 없으면 입력 0을 적용한다(GDD Edge: 마지막 입력 유지 안 함). 대기 입력이 설정 개수를 넘으면 오래된 것부터 버린다.
 5. **복제 수단**: 
    - 연속 값(차량·NPC 위치) → `NetworkTransform`/`NetworkRigidbody` 계열 보간(비소유 클라이언트 표시용).
-   - 자기 차량 권위 상태 → 서버 → 소유자 RPC(`VehicleSimState`, 비신뢰, 서버 틱마다).
+   - 자기 차량 권위 상태 → 서버 → 소유자 RPC(`VehicleSimState`, 비신뢰). 서버는 물리 스텝 직후 상태를 기록하고, NGO 네트워크 틱마다 마지막 기록 1개를 보낸다(주기는 NetworkManager 틱 설정 값). 상태에 입력 틱이 들어 있어 같은 상태의 중복 전송이나 건너뜀은 재조정에 영향이 없다.
    - 하루 공통 상태(세션 상태, 서버 시계 기준값, 물류 목록·예약, 정산 결과) → 서버 소유 NetworkBehaviour 한 곳의 `NetworkVariable`/`NetworkList`(INetworkSerializable 구조체).
    - 일회성 이벤트(조작 활성화·잠금, 충돌 피드백, 입·퇴장 토스트, 정산 전환) → 서버→클라이언트 RPC.
    - 흩어진 물류 오브젝트 → 서버가 스폰하는 NetworkObject.
@@ -86,6 +89,29 @@ GDD `networking.md`는 서버 권한(차량 물리·물류·시계·정산), 분
 11. **호스트 식별**: 호스트 클라이언트가 세션 생성 때 임의 토큰을 만들어 서버 기동 인자(`--host-token`)로 넘기고, 자기 접속 요청 페이로드(connection approval)에도 같은 토큰을 넣는다. 서버는 토큰이 맞는 clientId를 호스트로 기록한다. "하루 시작"·"세션 닫기"·"정산 확인 후 서버 종료" 요청과 호스트 이탈 판정은 이 clientId로만 한다. 첫 접속 순서로 호스트를 정하지 않는다.
 12. **씬·프리팹 일치**: 서버와 클라이언트 빌드는 같은 게임 씬과 같은 NetworkPrefabs 목록을 쓴다. 건물·배송지처럼 씬에 놓인 정적 오브젝트는 네트워크 동기화 대상이 아니다(NetworkObject 미부착). 동적 상태가 필요한 것만 서버가 스폰한다. 서버 전용 부트스트랩(카메라·UI 생성 생략)은 빌드 정의 기호로 분기한다.
 13. **적재 물류 표현**: 차량에 실린 물류는 NetworkObject로 재부모화하지 않는다. 적재는 `ParcelState`의 상태·차량 ID로만 복제하고 클라이언트가 표시한다.
+14. **서버 → 호스트 채널(상태 파일)**:
+   - 호스트가 기동 인자 `--status-file <경로>`(사용자 임시 폴더, 세션마다 새 이름)를 넘기고, 서버는 그 파일에 상태 한 줄을 쓴다: `READY port=<n>`, `FAIL reason=<code>`, `CODE <joinCode>`(ADR-0002 2단계). 쓸 때는 임시 이름으로 쓴 뒤 바꿔 달아 반쯤 쓴 파일을 읽지 않게 한다.
+   - 호스트 클라이언트는 짧은 주기로 파일을 확인해 (Direct) READY를 받은 뒤에만 loopback 접속한다. FAIL이거나 설정 시간 안에 READY가 없으면 서버 프로세스를 종료하고 세션 생성 실패를 표시한다. 세션이 끝나면 호스트가 파일을 지운다.
+   - Relay 모드: 서버는 READY 대신 `CODE <joinCode>` 한 줄만 쓰고, 이것이 준비 신호다. 호스트는 loopback이 아니라 그 코드로 접속한다(ADR-0002 결정 3).
+   - 대안: 표준 출력 한 줄 프로토콜. Windows 플레이어 빌드의 stdout 리다이렉트가 검증되면(검증 항목 10) 쓸 수 있으나, 호스트가 출력을 계속 읽지 않으면 파이프가 차서 서버가 멈출 수 있어 기본으로 하지 않는다.
+   - 예전 서버 접속 방지: connection approval에서 페이로드에 호스트 토큰이 있는데 서버의 `--host-token`과 다르면 거부한다(사유: 다른 세션). 호스트는 거부를 받으면 세션 생성 실패로 처리한다.
+   - 포트는 Direct 모드의 포트 포워딩을 위해 설정 값 고정이다(자동 할당 쓰지 않음). 바인딩 실패가 `StartServer` 반환값·예외·전송 이벤트 중 무엇으로 드러나는지는 검증 항목 (12).
+15. **서버 틱과 네트워크 이벤트 처리 순서**:
+   - 서버도 `Physics.simulationMode = SimulationMode.Script`로 두고, 서버 어댑터 한 곳이 고정 스텝마다 아래 순서를 직접 호출한다. Unity 기본 루프에서는 `FixedUpdate` 뒤에 물리와 `OnCollision*`이 돌아 판정이 한 스텝 늦어지므로 쓰지 않는다.
+     1. 큐 반영: (1) 이탈 (2) 참가 (3) 요청(받은 순서)
+     2. 차량 입력 적용(입력 틱 순서, 결정 4)
+     3. `Physics.Simulate(fixedDeltaTime)` — 이 동안 들어온 접촉은 버퍼에 모으기만 한다
+     4. 충돌 판정(버퍼의 접촉으로 Δv 판정, 순수 함수)
+     5. 도메인 시계·판정(3.7 순서)
+     6. 차량별 `VehicleSimState` 기록
+   - NGO 콜백(접속·끊김)과 요청 RPC는 받는 즉시 도메인을 바꾸지 않고 큐에 넣는다. 그래서 같은 스텝의 상차 완료와 이탈은 이탈이 먼저다(GDD Edge).
+   - 끊긴 참가자의 차량 NetworkObject는 NGO가 콜백 시점에 파괴할 수 있다(UNVERIFIED). 큐에서 꺼낼 때 파괴 여부를 확인하거나 차량 프리팹에 `DontDestroyWithOwner`를 켜 서버가 직접 제거한다.
+16. **접속 끊김 판정과 정산 화면 유지**:
+   - 접속 끊김은 Unity Transport의 disconnect 타임아웃 하나로 판정한다(값은 외부 설정, GDD `TODO(tuning)`). 클라이언트는 입력 0도 매 스텝 보내므로 입력 미수신과 연결 침묵이 같다. 별도 앱 레벨 타이머는 두지 않는다.
+   - 클라이언트 빌드는 `Application.runInBackground = true`로 둔다. 꺼지면 창이 비활성일 때 입력 송신이 멈춰 끊김으로 처리된다.
+   - 클라이언트가 접속 끊김을 받았을 때 마지막으로 받은 `SessionState`가 Settlement이고 정산 결과를 받았으면 안내 없이 정산 화면을 유지한다(GDD 규칙 15). 그 외 상태면 연결 끊김 안내 후 메인 화면이다.
+17. **인원별 설정 전달**: 서버 어댑터가 하루 시작 요청을 수락하는 순간의 참가자 수를 도메인 초기화(3.4) 인자로 넘긴다. 도메인은 그 값으로 인원별 설정을 골라 하루 동안 바꾸지 않는다. 참가·이탈은 이 값을 바꾸지 않는다(GDD 규칙 3).
+18. **일시정지 제거**: 모든 모드에서 게임 시간·물리를 멈추는 기능을 두지 않는다(GDD 3.2, 규칙 3). `GameManager.IsPaused`와 이를 읽는 조작 가드는 마이그레이션 때 제거한다. 가이드 패널 확인창의 정지(`design/quick-specs/guide-panel-addition-2026-11-18.md`)도 정지 없는 동작으로 바뀐다.
 
 ### Architecture Diagram
 ```
@@ -107,12 +133,14 @@ GDD `networking.md`는 서버 권한(차량 물리·물류·시계·정산), 분
 
 ### Key Interfaces
 - `VehicleInput` (INetworkSerializable struct): 방향, 주행 모드, 드리프트, 복구, 입력 틱(클라이언트 물리 스텝 번호). 소유 클라이언트 → 서버, 최근 `InputRedundancy`개를 묶어 비신뢰 RPC.
-- `VehicleSimState` (INetworkSerializable struct): 마지막 적용 입력 틱, 위치, 회전, 선속도, 각속도, 차량 내부 상태(주행 모드, 고속 게이지, 드리프트 등 시뮬레이션에 쓰는 값 전부). 서버 → 소유자 비신뢰 RPC. 차량 시뮬레이션 공용 코드의 입출력 타입과 같다.
+- `VehicleSimState` (INetworkSerializable struct): 마지막 적용 입력 틱, 위치, 회전, 선속도, 각속도, 주행 모드, 고속 게이지, 드리프트 상태, 적재 속도 배율, 장애물 속도 배율, 장애물 효과 남은 시간, 복구 잠금 남은 시간, 조작 활성 여부, 대기 방향 회전 yaw. 서버 → 소유자 비신뢰 RPC. 차량 시뮬레이션 공용 코드의 입출력 타입과 같다.
 - `SessionState` (enum, 서버 소유 NetworkVariable): Closed/Lobby/DayStarting/DayRunning/Settlement.
 - `ParcelState` (INetworkSerializable struct): 물류 ID, 상태(기존 `ParcelStatus` enum 재사용), 예약자 ID, 적재 차량 ID, 내구도, 남은 제한 시간, 폐기 여부, 목적지. 서버 소유 NetworkList.
 - 요청 RPC(클라이언트 → 서버, 결과는 복제로 수신): 상차 시작·중단, 하차, 처분, 준비·준비 취소, 하루 시작(호스트만).
 - 서버 → 클라이언트 이벤트 RPC: 조작 활성화·잠금, 충돌 피드백, 참가자 입·퇴장, 정산 전환.
-- 서버 기동 인자: `--port`, `--parent-pid`, `--host-token`, 세션 설정 JSON 경로.
+- 서버 기동 인자: `--port`, `--parent-pid`, `--host-token`, `--status-file`, 세션 설정 JSON 경로.
+- 상태 파일 한 줄(서버 → 호스트): `READY port=<n>` / `FAIL reason=<code>` / `CODE <joinCode>`.
+- connection approval 거부 사유: 정원 초과, 정산 중, 다른 세션(호스트 토큰 불일치).
 - 접속 요청 페이로드: 호스트 토큰(호스트만), 표시 이름.
 
 ### Implementation Guidelines
@@ -133,6 +161,12 @@ GDD `networking.md`는 서버 권한(차량 물리·물류·시계·정산), 분
 - RPC 표기는 설치한 NGO 버전에서 확인한 한 방식(`[Rpc(SendTo.…)]` 또는 `[ServerRpc]`/`[ClientRpc]`)으로 통일한다. 두 방식을 섞지 않아야 한다.
 - 복제 구조체(`ParcelState` 등)에는 관리형 `string`을 넣지 않는다. 정수 ID나 고정 길이 타입을 쓴다.
 - 코드의 `EntityId`를 int로 캐스팅하거나 `GetInstanceID()`를 쓰지 않는다(6.4 deprecated, 6.5 removed, `deprecated-apis.md`).
+- 차량 스텝 함수는 `VehicleInput`·`VehicleSimState` 외의 값을 읽지 않아야 한다(static·싱글턴·`GetComponent` 금지).
+- NGO 콜백·요청 RPC 핸들러에서 도메인 상태를 바로 바꾸지 않는다. 큐에 넣고 결정 15 순서로 반영한다.
+- 물리 콜백(`OnCollision*`·`OnTrigger*`)은 서버에서도 접촉·진입·이탈을 버퍼에 넣기만 하고 판정·효과 적용을 하지 않는다.
+- 예측 차량 Rigidbody의 `interpolation`은 None으로 두고 표시용 자식에서 고정 스텝 사이를 직접 보간한다(재시뮬레이션이 `Physics.Simulate`를 여러 번 부르므로).
+- Rigidbody 속도 직접 쓰기는 재조정(예측 차량을 서버 상태로 되돌릴 때)과 서버의 복구 순간이동에서만 허용한다. 그 밖의 이동은 힘으로 한다.
+- 서버와 클라이언트 모두 종료 시 `Physics.simulationMode`를 `FixedUpdate`로 되돌린다.
 
 ## Alternatives Considered
 
@@ -215,6 +249,11 @@ GDD `networking.md`는 서버 권한(차량 물리·물류·시계·정산), 분
 - **비신뢰 입력이 연속 유실**: `InputRedundancy`를 넘는 연속 유실이면 그 틱은 입력 0이 되고 예측이 보정된다. 유실률은 Network Profiler로 실측.
 - **서버 프로세스 고아화(호스트 비정상 종료)**: 부모 PID 감시 + 접속 끊김 시 종료로 이중 방어. AC-NET-23·29로 검증.
 - **싱글 시작이 느림**: 서버 기동 시간 측정, 기준 초과 시 싱글만 StartHost로 돌리는 결정은 GDD 규칙 3과 충돌하므로 ADR 개정 필요.
+- **상태 파일 경합**: 이전 세션 파일을 읽지 않도록 세션마다 새 경로를 쓰고 임시 이름 → 바꿔 달기로 쓴다.
+- **UTP 타임아웃이 길면**: 끊김 확정 전까지 서버는 그 차량에 입력 0을 적용한다. 값은 설정으로 두고 실측해 줄인다.
+- **서버 Script 모드**: 서버의 모든 동적 바디(NPC 포함)가 어댑터의 `Physics.Simulate` 호출로만 움직인다. 호출이 빠지면 월드 전체가 멈추므로 어댑터 하나가 소유한다.
+- **외부 수정값 변화 순간의 예측 오차**: 상차 완료·장애물 진입은 서버에서 먼저 일어나므로 RTT만큼 늦게 반영되고 재조정이 한 번 생긴다. 보정 스무딩으로 가린다.
+- **일시정지 제거**: 싱글 플레이어도 메뉴·확인창 중 시간이 흐른다. 가이드 패널 quick-spec과 다르다.
 
 ## GDD Requirements Addressed
 
@@ -230,6 +269,12 @@ GDD `networking.md`는 서버 권한(차량 물리·물류·시계·정산), 분
 | networking.md | 규칙 8·AC-NET-13: 조작 지연 | 결정 4(자기 차량 예측·재조정·보정 스무딩)·6(비신뢰+중복 입력) |
 | collision-durability-rules.md | 4장 2·3항: 모든 차량 동적 바디, 판정과 콜백 분리 | 결정 4, 가이드라인 |
 | game-concept.md | 3·8·10·12장 | 서버가 규칙 그대로 실행(결정 3) |
+| networking.md | 규칙 3: 인원별 설정은 하루 시작 수락 시점 인원 | 결정 17 |
+| networking.md | 규칙 8·12: 예측과 복구·잠금·적재·장애물 효과 일치 | 결정 4(외부 수정값) |
+| networking.md | 규칙 15: 서버 종료 후 정산 화면 유지 | 결정 16 |
+| networking.md | Edge: 입력 미수신 → 접속 끊김 | 결정 16 |
+| networking.md | Edge: 상차 완료와 이탈이 같은 프레임이면 이탈 먼저 | 결정 15 |
+| collision-durability-rules.md | 4장 3항: 판정을 물리 콜백과 분리 | 결정 15(접촉 버퍼 → 판정 단계) |
 
 ## Performance Implications
 - **CPU**: 서버가 4대 차량 + NPC 물리를 처리. 예산 NOT SOURCEABLE → 구현 후 `/perf-profile`로 실측
@@ -245,11 +290,14 @@ GDD `networking.md`는 서버 권한(차량 물리·물류·시계·정산), 분
 5. 멀티 기능(예약·참가·복귀·이탈 물류) 순서로 추가.
 
 ## Validation Criteria
-- AC-NET-01~29(`design/gdd/networking.md`) 통과(AC-NET-13은 측정만).
+- AC-NET-01~31(`design/gdd/networking.md`) 통과(AC-NET-13은 측정만).
 - 싱글 기존 QA 테스트 케이스 전부 통과(AC-NET-03).
 - 서버 자식 프로세스 기동·종료·호스트 강제 종료 시 고아 프로세스 없음.
 - 지연 시뮬레이션에서 조작·충돌 표시가 허용 가능한지 플레이테스트. NGO 2.14의 `UnityTransport.DebugSimulator`는 폐기(효과 없음)라, UTP `SimulatorPipelineStage`를 붙인 드라이버(스파이크 방식) 또는 Multiplayer Tools의 Network Simulator를 쓴다.
 - 예측: 추가 RTT 100 ms에서 자기 차량 입력 → 화면이 로컬 프레임 수준(합격선은 실제 차량으로 측정 후 GDD에 기록), 재조정 보정이 직선 주행에서 보이지 않음.
+- 남은 서버 프로세스가 포트를 잡은 상태에서 세션을 만들면 세션 생성 실패가 표시되고 예전 서버에 붙지 않는다.
+- 적재 직후·감속 장애물 통과·복구 직후에 예측 차량 위치 보정이 스냅 임계를 넘지 않는다.
+- 클라이언트 창을 비활성으로 두어도 접속이 유지된다.
 
 ## Related
 - `design/gdd/networking.md`, `design/gdd/collision-durability-rules.md`, `design/gdd/game-concept.md`

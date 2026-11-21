@@ -37,33 +37,199 @@
 #   its fields sit two columns past the dash. Quote a value that holds ": ". A
 #   line in any other shape is reported as unsupported layout, with its number.
 
-version: 1
-last_updated: ""
+version: 3
+last_updated: "2026-11-21"
 
-requirements: []
+requirements:
+- id: TR-networking-001
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "서버를 호스트 PC의 자식 프로세스로 분리 실행하고 호스트 플레이어도 클라이언트로 접속한다 (규칙 1)"
+  created: 2026-11-21
+  revised: ""
+  status: active
 
-# --- EXAMPLE ENTRIES (remove when first real entries are added) ---
-#
-# - id: TR-combat-001
-#   system: combat
-#   gdd: design/gdd/combat-system.md
-#   requirement: "Player takes damage from enemies based on attack power minus defence"
-#   created: 2026-03-10
-#   revised: ""
-#   status: active
-#
-# - id: TR-combat-002
-#   system: combat
-#   gdd: design/gdd/combat-system.md
-#   requirement: "Combo window timing is 0.4 seconds between hits"
-#   created: 2026-03-10
-#   revised: "2026-04-01"
-#   status: active
-#
-# - id: TR-combat-003
-#   system: combat
-#   gdd: design/gdd/combat-system.md
-#   requirement: "Old damage formula using raw stats"
-#   created: 2026-03-10
-#   revised: ""
-#   status: "superseded-by: TR-combat-001"
+- id: TR-networking-002
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "게임 시계·물류·차량 물리·정산은 서버만 결정하고 클라이언트는 입력과 요청만 보낸다 (규칙 2)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-003
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "싱글은 참가자 1명인 같은 세션 경로이며 멀티 전용 규칙 분기가 없다 (규칙 3)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-004
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "인원별 설정 값은 하루 시작 요청이 수락된 시점의 참가자 수로 고정한다 (규칙 3)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-005
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "정원 4명, 초과 참가와 정산 중 참가를 서버가 거부한다 (규칙 4·16)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-006
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "하루 도중 참가·복귀 시 최초 상태로 스폰하고 하루 상태를 동기화한다 (규칙 4)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-007
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "하루 시작은 다른 참가자 전원 준비가 필요하고 조작 활성화를 전원에게 동시에 보낸다 (규칙 5)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-008
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "서버 시계만 진행하고 클라이언트는 서버 시각으로 표시를 맞춘다 (규칙 6)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-009
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "서버가 모든 차량 물리를 시뮬레이션하고 차량끼리 충돌을 같은 Δv 기준으로 서버가 판정한다 (규칙 7)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-010
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "자기 차량은 클라이언트 예측·재조정, 다른 차량은 서버 상태 보간으로 표시한다 (규칙 8)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-011
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "물류 예약은 서버가 받은 순서대로 처리하고 그룹 선택은 예약된 물류를 건너뛴다 (규칙 9)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-012
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "적재·무게 한도와 속도 감소는 차량별로 적용한다 (규칙 10)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-013
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "하차 완료와 폐기 전환은 서버가 판정한다 (규칙 11)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-014
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "복구는 서버가 실행하고 복구 후 조작 잠금은 서버가 입력을 무시하는 것으로 처리한다 (규칙 12)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-015
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "정산·별점은 서버가 팀 전체로 합산한다 (규칙 13)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-016
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "하루 종료 시 서버가 전원 조작을 동시에 잠그고 정산 화면으로 전환한다 (규칙 14)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-017
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "호스트가 정산을 확인하거나 정산 중 호스트 접속 끊김·서버 비정상 종료가 나도 서버가 종료되고 다른 참가자의 정산 화면은 유지된다 (규칙 15, Edge)"
+  created: 2026-11-21
+  revised: 2026-11-21
+  status: active
+
+- id: TR-networking-018
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "참가 수단은 1단계 IP:포트 직접 접속, 2단계 참가 코드 + Relay (규칙 16)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-019
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "호스트 이탈·서버 비정상 종료 시 서버를 종료하고 남은 참가자를 메인 화면으로 보낸다 (Edge)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-020
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "일반 참가자 이탈 시 차량 제거, 예약 해제, 적재 물류를 흩어진 물류 오브젝트로 남긴다 (Edge)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-021
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "입력이 없는 구간은 입력 0, 설정 시간 이상 입력이 없으면 접속 끊김으로 처리한다 (Edge)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-022
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "상차 완료와 참가자 이탈이 같은 서버 프레임이면 이탈을 먼저 처리한다 (Edge)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-023
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "규칙에 어긋난 클라이언트 요청은 서버가 거부하고 클라이언트 표시를 서버 상태로 되돌린다 (Edge)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+
+- id: TR-networking-024
+  system: networking
+  gdd: design/gdd/networking.md
+  requirement: "네트워크 대역폭·갱신 주기·타임아웃 값은 외부 설정에 두고 실측으로 정한다 (Open Question 13)"
+  created: 2026-11-21
+  revised: ""
+  status: active
+

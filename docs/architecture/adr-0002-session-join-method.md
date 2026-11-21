@@ -4,7 +4,7 @@
 Accepted
 
 ## Date
-2026-11-21
+2026-11-21 (개정 1: 결정 2에 싱글 세션 바인딩 추가. 근거 `docs/architecture/architecture-review-2026-11-21-3.md`, 사용자 결정)
 
 ## Last Verified
 2026-11-21 (Unity 플러그인 `setup-multiplayer-services` 참조 문서 기준. 엔진 참조 `docs/engine-reference/unity/`에는 해당 서비스 항목 없음)
@@ -59,6 +59,7 @@ ADR-0001 결정 9는 클라이언트가 `(address, port)`만 받아 접속하고
    - 서버는 설정된 포트(기본값은 설정 파일, 코드 상수 금지)로 모든 인터페이스에서 수신한다.
    - 호스트 클라이언트는 loopback으로 접속하고, 로비 화면에 호스트 PC의 LAN IP:포트를 표시한다.
    - 참가자는 IP:포트를 입력해 접속한다. 인터넷 접속은 호스트가 포트 포워딩을 한 경우만 지원한다.
+   - 혼자 하는 세션도 같은 방식(모든 인터페이스에서 수신)이다. 첫 실행 때 Windows 방화벽 허용 창이 뜨는 것은 감수하고, 안내 문구나 설치 시 규칙 등록은 서버 빌드·배포 ADR에서 정한다(사용자 결정, 2026-11-21). 혼자면 loopback으로만 여는 안은 하루 도중 참가(GDD 규칙 4)를 막기 때문에 채택하지 않았다.
 3. **2단계 — Relay(스파이크 통과 시)**:
    - 서버 프로세스가 UGS에 인증하고 `com.unity.services.multiplayer`로 Relay 세션을 만들며, NGO는 Server 역할로 시작한다. 스파이크는 두 경로를 따로 검증하고 통과한 쪽을 채택한다.
      - **경로 A**: `IMultiplayerService.CreateSessionAsync`(→ `IHostSession`) + `WithRelayNetwork` + `WithNetworkHandler`로 기본 NGO 연동을 끄고 핸들러에서 `StartServer`.
@@ -155,7 +156,7 @@ Direct (1단계)                         Relay (2단계)
 - **같은 PC의 호스트 클라이언트와 서버 프로세스가 같은 익명 플레이어 ID로 로그인**(NOT SOURCEABLE): 인증 프로필 분리 가능 여부를 스파이크에서 확인.
 - **Relay 세션 수명**(할당 유지 조건, 서버가 떠날 때 세션 삭제 여부, 하루 내내 참가 가능 여부, NOT SOURCEABLE): 스파이크에서 AC-NET-23과 함께 확인.
 - **UTP의 모든 인터페이스 수신 설정 방법**(NOT SOURCEABLE): 1단계 검증 항목 (1)로 확인.
-- **Windows 방화벽이 서버 프로세스 수신을 차단**: 1단계 첫 실행 시 확인. 안내 문구 또는 설치 시 규칙 등록은 배포 ADR에서 정한다.
+- **Windows 방화벽이 서버 프로세스 수신을 차단**: 1단계 첫 실행 시 확인. 안내 문구 또는 설치 시 규칙 등록은 배포 ADR에서 정한다. 싱글 세션도 해당(결정 2).
 - **LAN IP 표시가 여러 네트워크 어댑터에서 틀림**: 표시 후보를 모두 보여 주는 것으로 처리.
 - **`com.unity.services.multiplayer` 버전 호환**: 2단계 설치 시 컴파일로 확인.
 - **무료 한도 초과 과금**: 검색 시점(2026-11-21) 요금 페이지 기준 월 평균 동접 50명과 동접당 대역폭 일정량까지 무료이고 초과분은 종량제다([요금](https://unity.com/products/gaming-services/pricing)). "비용 0" 기준은 이 한도 안에서만 성립한다. 2단계 착수 시 공식 페이지를 다시 확인하고, 차량 복제 대역폭 실측값(ADR-0001)으로 한도 소진 속도를 추정한다.

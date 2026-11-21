@@ -161,7 +161,7 @@ interfaces:
     added: 2026-11-21
     revised: 2026-11-21
   - contract: vehicle_sim_state
-    status: active
+    status: "superseded_by: ADR-0001"
     pattern: rpc
     producer: networking-server
     consumers:
@@ -172,6 +172,18 @@ interfaces:
       - docs/architecture/adr-0001-multiplayer-networking-architecture.md
     added: 2026-11-21
     revised: ""
+  - contract: vehicle_sim_state_v2
+    status: active
+    pattern: rpc
+    producer: networking-server
+    consumers:
+      - owning-client
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    signal_signature: "VehicleSimState(마지막 적용 입력 틱, 위치, 회전, 선·각속도, 주행 모드, 고속 게이지, 드리프트, 적재 속도 배율, 장애물 속도 배율·남은 시간, 복구 잠금 남은 시간, 조작 활성 여부, 대기 방향 회전 yaw), 물리 스텝 직후 기록, NGO 네트워크 틱마다 마지막 기록을 소유자에게 비신뢰 RPC. 차량 스텝 함수의 유일한 상태 입력"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: 2026-11-21
 
 # Example:
 #
@@ -304,6 +316,36 @@ api_decisions:
       - docs/architecture/adr-0001-multiplayer-networking-architecture.md
     added: 2026-11-21
     revised: ""
+  - purpose: server_tick_order
+    status: active
+    api: "서버도 Physics.simulationMode = Script, 어댑터 한 곳이 고정 스텝마다 큐 반영(이탈→참가→요청) → 입력 적용 → Physics.Simulate → 접촉 버퍼로 충돌 판정 → 도메인 시계·판정 → VehicleSimState 기록"
+    not: "서버 기본 FixedUpdate 물리 루프(판정이 한 스텝 늦음)"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    reason: "처리 순서를 코드로 보장하고 이탈 우선 규칙(GDD Edge)을 지키기 위해"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: ""
+  - purpose: server_host_channel
+    status: active
+    api: "호스트가 --status-file 경로를 넘기고 서버가 READY port= / FAIL reason= / CODE 한 줄을 임시 이름 → 바꿔 달기로 씀, 호스트는 READY 후에만 접속"
+    not: "stdout 파이프(검증 전, 읽지 않으면 서버 정지 위험)"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    reason: "세션 생성 실패·예전 서버 접속을 호스트가 감지하기 위해(스파이크 함정)"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: ""
+  - purpose: disconnect_detection
+    status: active
+    api: "Unity Transport disconnect 타임아웃 하나(외부 설정), 클라이언트 Application.runInBackground = true"
+    not: "앱 레벨 입력 미수신 타이머 별도 운용"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    reason: "클라이언트가 입력 0도 매 스텝 보내므로 입력 미수신과 연결 침묵이 같음"
+    referenced_by:
+      - docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+    revised: ""
 
 # Example:
 #
@@ -364,6 +406,24 @@ forbidden_patterns:
     status: active
     description: "소유 클라이언트의 예측 차량 결과(충돌·트리거·위치)로 내구도·물류·장애물 효과 등 도메인 상태를 바꾸거나 서버로 보내지 않는다. 판정과 충돌 연출은 서버 결과로만 한다"
     why: "예측은 표시용이며 서버가 유일한 기준(GDD 규칙 2·7). 재시뮬레이션은 같은 스텝을 여러 번 실행한다"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+  - pattern: network_callback_direct_domain_write
+    status: active
+    description: "NGO 접속·끊김 콜백과 요청 RPC 핸들러에서 도메인 상태를 바로 바꾸지 않는다. 서버 어댑터 큐에 넣고 서버 틱 순서로 반영한다"
+    why: "같은 스텝 이벤트의 처리 순서(이탈 우선)를 보장하기 위해"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+  - pattern: vehicle_step_external_read
+    status: active
+    description: "차량 스텝 함수는 VehicleInput·VehicleSimState 외의 값(static, 싱글턴, GetComponent)을 읽지 않는다"
+    why: "서버와 예측 차량이 같은 입력으로 같은 결과를 내야 재조정이 성립한다"
+    adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
+    added: 2026-11-21
+  - pattern: game_pause
+    status: active
+    description: "게임 시간·물리를 멈추는 정지 기능(GameManager.IsPaused 등)을 두지 않는다. 싱글도 같다"
+    why: "서버 시계만 진행하고 싱글·멀티 규칙이 같아야 한다(GDD 3.2, networking 규칙 3)"
     adr: docs/architecture/adr-0001-multiplayer-networking-architecture.md
     added: 2026-11-21
 
